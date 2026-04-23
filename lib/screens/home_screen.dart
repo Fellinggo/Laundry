@@ -437,7 +437,6 @@ class _HomeScreenState
                                     onTap: () {
                                       // Parse itemsJson jika ada untuk menampilkan detail lengkap
                                       final itemsJson = order['itemsJson'];
-                                      List<dynamic> orderItems = [];
                                       
                                       if (itemsJson != null && itemsJson.isNotEmpty) {
                                         try {
@@ -447,9 +446,7 @@ class _HomeScreenState
                                             // Jika masih string JSON, parse dulu
                                             // orderItems = jsonDecode(itemsJson);
                                             // Untuk sementara, gunakan pendekatan sederhana
-                                            orderItems = [];
                                           } else if (itemsJson is List) {
-                                            orderItems = itemsJson;
                                           }
                                         } catch (e) {
                                           print('Error parsing itemsJson: $e');
