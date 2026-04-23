@@ -1,0 +1,337 @@
+import 'package:flutter/material.dart';
+import '../constants/app_colors.dart';
+import '../constants/app_spacing.dart';
+import '../constants/app_text_styles.dart';
+import '../widgets/eta_badge.dart';
+import '../widgets/navy_app_bar.dart';
+import '../widgets/login_modal_sheet.dart';
+
+class ServicesScreen extends StatelessWidget {
+  const ServicesScreen({
+    super.key,
+    this.onOpenNotifications,
+    this.loggedIn = false,
+  });
+
+  final VoidCallback? onOpenNotifications;
+  final bool loggedIn;
+
+  void _handleTap(BuildContext context, VoidCallback action) {
+    if (!loggedIn) {
+      showLoginModal(context);
+      return;
+    }
+    action();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.headerNavy,
+      appBar: NavyCenterTitleAppBar(
+        title: 'Layanan',
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: GestureDetector(
+              onTap: () => _handleTap(
+                context,
+                () => onOpenNotifications?.call(),
+              ),
+              child: const Icon(
+                Icons.notifications_none_rounded,
+                color: Colors.white,
+                size: 26,
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(top: 12),
+        decoration: const BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          // ✅ MENHILANGKAN EFEK OVER-SCROLL (GLOW/STRETCH)
+          child: ScrollConfiguration(
+            behavior: const ScrollBehavior().copyWith(overscroll: false),
+            child: SingleChildScrollView(
+              physics: const ClampingScrollPhysics(), // Memastikan scroll berhenti di batas konten
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Layanan Lainnya',
+                    style: AppTextStyles.sectionTitle.copyWith(fontSize: 16),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // GRID LAYOUT UNTUK LAYANAN UTAMA
+                  GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(), // Agar scroll utama yang bekerja
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: 0.85,
+                    children: [
+                      _gridCard(
+                        context,
+                        title: 'Cuci Regular',
+                        price: 'Rp 20.000 / Plastik',
+                        eta: 'ETA 10 jam',
+                        etaType: EtaType.normal,
+                        imagePath: 'assets/images/Cucireg.png',
+                      ),
+                      _gridCard(
+                        context,
+                        title: 'Cuci Setrika',
+                        price: 'Rp 28.000 / Plastik',
+                        eta: 'ETA 11 jam',
+                        etaType: EtaType.fast,
+                        imagePath: 'assets/images/Cucisetrika.png',
+                      ),
+                      _gridCard(
+                        context,
+                        title: 'Cuci Kering',
+                        price: 'Rp 23.000 / Plastik',
+                        eta: 'ETA 12 jam',
+                        etaType: EtaType.long,
+                        imagePath: 'assets/images/kering.png',
+                      ),
+                      _gridCard(
+                        context,
+                        title: 'Paket Service',
+                        price: 'Rp 48.000 / Plastik',
+                        eta: 'Express',
+                        etaType: EtaType.express,
+                        imagePath: 'assets/images/paket.png',
+                      ),
+                      _gridCard(
+                        context,
+                        title: 'Cuci Jas / Gaun',
+                        price: 'Rp 23.000 / item',
+                        eta: 'Express',
+                        etaType: EtaType.express,
+                        imagePath: 'assets/images/jasgaun.png',
+                      ),
+                      _gridCard(
+                        context,
+                        title: 'Setrika Saja',
+                        price: 'Rp 21.000 / Plastik',
+                        eta: 'ETA 11 jam',
+                        etaType: EtaType.fast,
+                        imagePath: 'assets/images/setrikasaja.png',
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // KARTU LEBAR UNTUK BED LINEN
+                  _wideCard(
+                    context,
+                    title: 'Cuci Bedcover / Selimut / Sprei',
+                    price: 'Rp 25.000 / Item',
+                    eta: 'ETA 12 jam',
+                    imagePath: 'assets/images/sprei.png',
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  _wideCard(
+                    context,
+                    title: 'Cuci Sepatu',
+                    price: 'Rp 20.000 / Item',
+                    eta: 'ETA 12 jam',
+                    imagePath: 'assets/images/sepatu.png',
+                  ),
+
+                  const SizedBox(height: 80),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ================= GRID CARD =================
+  Widget _gridCard(
+    BuildContext context, {
+    required String title,
+    required String price,
+    required String eta,
+    required EtaType etaType,
+    required String imagePath,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(255, 255, 255, 255),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.36),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => _handleTap(
+              context,
+              () => Navigator.pushNamed(
+                context,
+                '/service-detail',
+                arguments: {
+                  'title': title,
+                },
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 5,
+                  child: Stack(
+                    children: [
+                      Image.asset(
+                        imagePath,
+                        width: double.infinity,
+                        height: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: EtaBadge(label: eta, type: etaType),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        price,
+                        style: AppTextStyles.caption.copyWith(
+                          fontSize: 11,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.sectionTitle.copyWith(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.headerNavy,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ================= WIDE CARD =================
+  Widget _wideCard(
+    BuildContext context, {
+    required String title,
+    required String price,
+    required String eta,
+    required String imagePath,
+  }) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.36),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => _handleTap(
+              context,
+              () => Navigator.pushNamed(
+                context,
+                '/service-detail',
+                arguments: {
+                  'title': title,
+                },
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Stack(
+                  children: [
+                    Image.asset(
+                      imagePath,
+                      height: 120,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: EtaBadge(label: eta, type: EtaType.normal),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        price,
+                        style: AppTextStyles.caption.copyWith(fontSize: 12),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        title,
+                        style: AppTextStyles.sectionTitle.copyWith(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
