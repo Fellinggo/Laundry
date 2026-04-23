@@ -23,6 +23,32 @@ class _LoginScreenState extends State<LoginScreen> {
   String? emailError;
   String? passwordError;
 
+  @override
+  void initState() {
+    super.initState();
+    _checkAutoLogin();
+  }
+
+  // ============================================
+  // AUTO LOGIN JIKA TETAP MASUK AKTIF
+  // ============================================
+  Future<void> _checkAutoLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    final staySignedIn = prefs.getBool('staySignedIn') ?? false;
+    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    
+    if (staySignedIn && isLoggedIn) {
+      // Langsung ke main screen
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/main',
+          (route) => false,
+        );
+      });
+    }
+  }
+
   Future<void> handleLogin() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -62,24 +88,34 @@ class _LoginScreenState extends State<LoginScreen> {
     bool hasNumber = password.contains(RegExp(r'[0-9]'));
 
     if (!(hasMinLength && hasUppercase && hasLowercase && hasNumber)) {
-      passwordError =
-          "Min 6 karakter, huruf besar, kecil, dan angka wajib ada";
+      passwordError = "Min 6 karakter, huruf besar, kecil, dan angka wajib ada";
       hasError = true;
     }
 
-    // ❌ STOP JIKA ADA ERROR (TAPI TIDAK RETURN PER FIELD)
     if (hasError) {
       setState(() {});
       return;
     }
 
-    // ================= SUCCESS LOGIN =================
+    // ============================================
+    // SUCCESS LOGIN
+    // ============================================
     String namaUser = email.split('@')[0];
 
+    // Set status login
     await prefs.setBool('isLoggedIn', true);
+    await prefs.setBool('isSignup', false); // ← PENTING: false untuk login
     await prefs.setString('userName', namaUser);
     await prefs.setString('userEmail', email);
+    
+    // Simpan status "Tetap Masuk"
+    await prefs.setBool('staySignedIn', _staySignedIn);
 
+    // JANGAN hapus alamat! Alamat akan diload berdasarkan email di ProfileScreen
+    // await prefs.remove('userAddresses'); // ← JANGAN LAKUKAN INI
+    // await prefs.remove('userAddressTitles'); // ← JANGAN LAKUKAN INI
+
+    if (!mounted) return;
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/main',
@@ -87,7 +123,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // ================= FIELD STYLE ERROR =================
   OutlineInputBorder _border(bool error) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
@@ -133,10 +168,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-
                     // ================= EMAIL =================
                     TextField(
                       controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         labelText: "Email",
                         hintText: "Masukkan Email",
@@ -229,7 +264,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const Spacer(),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // TODO: Implement lupa password
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Fitur lupa password akan segera hadir'),
+                              ),
+                            );
+                          },
                           child: Text(
                             'Lupa password',
                             style: AppTextStyles.link,
@@ -257,8 +299,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: AppTextStyles.bodyMuted,
                         ),
                         TextButton(
-                          onPressed: () =>
-                              Navigator.pushReplacementNamed(
+                          onPressed: () => Navigator.pushReplacementNamed(
                             context,
                             '/register',
                           ),

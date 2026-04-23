@@ -45,22 +45,36 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
   Future<void> _loadAddressesFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     
-    final savedAddresses = prefs.getStringList('userAddresses') ?? [];
-    final savedTitles = prefs.getStringList('userAddressTitles') ?? [];
+    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    final email = prefs.getString('userEmail') ?? '';
+    
+    if (!isLoggedIn) {
+      setState(() {
+        _addresses = {};
+        _selectedAddressType = '';
+        _isLoadingAddresses = false;
+      });
+      return;
+    }
+
+    // ============================================
+    // LOAD DENGAN KEY BERDASARKAN EMAIL
+    // ============================================
+    final addressKey = 'userAddresses_$email';
+    final titlesKey = 'userAddressTitles_$email';
+    
+    final savedAddresses = prefs.getStringList(addressKey) ?? [];
+    final savedTitles = prefs.getStringList(titlesKey) ?? [];
 
     setState(() {
       if (savedAddresses.isNotEmpty) {
-        // Load semua alamat dari SharedPreferences
         _addresses = {};
         for (int i = 0; i < savedAddresses.length; i++) {
           final title = i < savedTitles.length ? savedTitles[i] : 'Alamat ${i + 1}';
           _addresses[title] = savedAddresses[i];
         }
-        
-        // Set alamat pertama sebagai default
         _selectedAddressType = savedTitles.isNotEmpty ? savedTitles[0] : 'Alamat 1';
       } else {
-        // Jika tidak ada alamat, kosongkan
         _addresses = {};
         _selectedAddressType = '';
       }
@@ -492,9 +506,6 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
 
                         if (_pickupError || _deliveryError) return;
                         
-                        // ============================================
-                        // VALIDASI ALAMAT SEBELUM LANJUT
-                        // ============================================
                         if (selectedAddress.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -504,14 +515,22 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
                           return;
                         }
 
+                        // ============================================
+                        // AMBIL items DARI args DAN TERUSKAN
+                        // ============================================
+                        final items = args['items'] ?? [];
+                        final serviceFee = args['serviceFee'] ?? 0;
+                        final deliveryFee = args['deliveryFee'] ?? 5000;
+                        final total = args['total'] ?? (serviceFee + deliveryFee);
+
                         Navigator.pushNamed(
                           context,
                           '/order-review',
                           arguments: {
-                            'items': args['items'],
-                            'serviceFee': args['serviceFee'],
-                            'deliveryFee': 5000,
-                            'total': args['serviceFee'] + 5000,
+                            'items': items,                    // ← TERUSKAN items
+                            'serviceFee': serviceFee,
+                            'deliveryFee': deliveryFee,
+                            'total': total,
                             'pickupTime': _formatTime(_pickupTime),
                             'deliveryTime': _formatTime(_deliveryTime),
                             'address': selectedAddress,

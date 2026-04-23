@@ -159,21 +159,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   // ============================================
-  // PERBAIKI METHOD INI - CLEAR SEMUA DATA USER
+  // LOGOUT - HANYA HAPUS STATUS LOGIN
+  // DATA USER (EMAIL, ALAMAT) TETAP DISIMPAN
   // ============================================
-  Future<void> _logoutAndGoHome(BuildContext context) async {
+  Future<void> _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     
-    // CLEAR SEMUA DATA USER
-    await prefs.remove('isLoggedIn');
-    await prefs.remove('isSignup');
-    await prefs.remove('userName');
-    await prefs.remove('userEmail');
-    await prefs.remove('userAddresses');
-    await prefs.remove('userAddressTitles');
+    // HANYA hapus status login
+    await prefs.setBool('isLoggedIn', false);
     
-    // Alternatif: clear semua sekaligus
-    // await prefs.clear();
+    // DATA INI TETAP DISIMPAN (TIDAK DIHAPUS):
+    // - userEmail
+    // - userName
+    // - isSignup
+    // - userAddresses_$email
+    // - userAddressTitles_$email
 
     if (!mounted) return;
     Navigator.pushNamedAndRemoveUntil(
@@ -184,13 +184,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   // ============================================
-  // METHOD KHUSUS UNTUK HAPUS AKUN
+  // HAPUS AKUN - HAPUS SEMUA DATA PERMANEN
   // ============================================
-  Future<void> _deleteAccountAndLogout(BuildContext context) async {
+  Future<void> _deleteAccount(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     
-    // CLEAR SEMUA DATA - HAPUS AKUN PERMANEN
-    await prefs.clear(); // Clear semua data sekaligus
+    // Hapus SEMUA data
+    await prefs.clear();
 
     if (!mounted) return;
     Navigator.pushNamedAndRemoveUntil(
@@ -225,7 +225,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              await _deleteAccountAndLogout(context); // ← GUNAKAN METHOD KHUSUS
+              await _deleteAccount(context);
             },
             child: Text(
               'Hapus Akun',
@@ -243,7 +243,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text('Keluar', style: AppTextStyles.sectionTitle),
-        content: const Text('Apakah kamu yakin ingin keluar?'),
+        content: const Text('Apakah kamu yakin ingin keluar? Data kamu akan tetap tersimpan.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -252,7 +252,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              await _logoutAndGoHome(context);
+              await _logout(context);
             },
             child: const Text(
               'Keluar',

@@ -29,15 +29,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     loadUser();
   }
 
-  // ============================================
-  // TAMBAHKAN INI - Refresh setiap screen muncul
-  // ============================================
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Refresh data setiap kali kembali ke screen ini
     loadUser();
   }
+
+  // ============================================
+  // GET STORAGE KEY BERDASARKAN EMAIL
+  // ============================================
+  String get _addressKey => 'userAddresses_$email';
+  String get _titlesKey => 'userAddressTitles_$email';
 
   Future<void> loadUser() async {
     final prefs = await SharedPreferences.getInstance();
@@ -49,12 +51,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         name = prefs.getString('userName') ?? 'User';
         email = prefs.getString('userEmail') ?? '-';
 
-        // Cek apakah ada alamat yang sudah tersimpan
-        final savedAddresses = prefs.getStringList('userAddresses') ?? [];
-        final savedTitles = prefs.getStringList('userAddressTitles') ?? [];
+        // ============================================
+        // LOAD ALAMAT BERDASARKAN EMAIL
+        // ============================================
+        final savedAddresses = prefs.getStringList(_addressKey) ?? [];
+        final savedTitles = prefs.getStringList(_titlesKey) ?? [];
 
         if (savedAddresses.isNotEmpty) {
-          // Load alamat yang sudah tersimpan (baik dari signup yang sudah tambah alamat, atau dari login)
+          // Load alamat yang sudah tersimpan untuk email ini
           addresses = List.generate(savedAddresses.length, (i) {
             return {
               'title': i < savedTitles.length ? savedTitles[i] : 'Alamat',
@@ -62,18 +66,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             };
           });
         } else {
-          // Tidak ada alamat tersimpan
+          // Tidak ada alamat tersimpan untuk email ini
           final isSignup = prefs.getBool('isSignup') ?? false;
 
           if (isSignup) {
-            // =========================
             // SIGNUP → ALAMAT KOSONG
-            // =========================
             addresses = [];
           } else {
-            // =========================
             // LOGIN → 2 ALAMAT DEFAULT
-            // =========================
             addresses = [
               {
                 'title': 'Rumah',
@@ -89,9 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
         }
       } else {
-        // =========================
         // BELUM LOGIN → KOSONG
-        // =========================
         name = 'Belum Login';
         email = 'Silakan login terlebih dahulu';
         addresses = [];
@@ -99,21 +97,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  // Simpan alamat ke SharedPreferences
+  // ============================================
+  // SIMPAN ALAMAT DENGAN KEY BERDASARKAN EMAIL
+  // ============================================
   Future<void> _saveAddressesToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     
     final addressList = addresses.map((addr) => addr['address']!).toList();
     final titleList = addresses.map((addr) => addr['title']!).toList();
     
-    await prefs.setStringList('userAddresses', addressList);
-    await prefs.setStringList('userAddressTitles', titleList);
+    // Simpan dengan key berdasarkan email
+    await prefs.setStringList(_addressKey, addressList);
+    await prefs.setStringList(_titlesKey, titleList);
   }
 
   void _handleProtectedAction(VoidCallback action) {
     if (!isLoggedIn) {
       Navigator.pushNamed(context, '/login').then((_) {
-        // Refresh setelah kembali dari halaman login
         loadUser();
       });
     } else {
@@ -128,7 +128,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await _saveAddressesToPrefs();
   }
 
-  // Method untuk menambah alamat baru
   Future<void> _addNewAddress() async {
     final result = await Navigator.pushNamed(
       context,
@@ -146,7 +145,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // Method untuk mengedit alamat
   Future<void> _editAddress(int index) async {
     final result = await Navigator.pushNamed(
       context,
@@ -194,7 +192,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: IconButton(
                     onPressed: () =>
                         Navigator.pushNamed(context, '/settings').then((_) {
-                          // Refresh setelah kembali dari settings (jika logout)
                           loadUser();
                         }),
                     icon: const Icon(
@@ -305,9 +302,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             )
           else
-            // ============================================
-            // TAMPILAN SAAT BELUM LOGIN
-            // ============================================
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
