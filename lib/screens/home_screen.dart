@@ -31,18 +31,26 @@ class HomeScreen
   final VoidCallback? onOpenNotifications;
   final VoidCallback? onOpenServices;
   final Function(
-    Map<String, dynamic>,
-  )? onOpenServiceDetail;
+    Map<
+      String,
+      dynamic
+    >,
+  )?
+  onOpenServiceDetail;
   final VoidCallback? onOpenDisc;
-  
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<
+    HomeScreen
+  >
+  createState() => _HomeScreenState();
 }
 
 class _HomeScreenState
     extends
-        State<HomeScreen> {
+        State<
+          HomeScreen
+        > {
   Widget _buildEmptyOrderBox() {
     return Container(
       width: double.infinity,
@@ -57,8 +65,7 @@ class _HomeScreenState
         ),
       ),
       child: Column(
-        mainAxisAlignment:
-            MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             Icons.assignment_outlined,
@@ -79,9 +86,21 @@ class _HomeScreenState
     );
   }
 
-  List<Map<String, dynamic>> activeOrders = [];
+  List<
+    Map<
+      String,
+      dynamic
+    >
+  >
+  activeOrders = [];
 
-  final List<Map<String, dynamic>> items = [
+  final List<
+    Map<
+      String,
+      dynamic
+    >
+  >
+  items = [
     {
       'title': 'Cuci Regular',
       'price': 'Rp 20.000/plastik',
@@ -115,7 +134,10 @@ class _HomeScreenState
   }
 
   // ✅ FUNGSI LOAD ORDER - SUDAH DIPERBAIKI
-  Future<void> loadActiveOrder() async {
+  Future<
+    void
+  >
+  loadActiveOrder() async {
     final prefs = await SharedPreferences.getInstance();
     final isLogin =
         prefs.getBool(
@@ -130,41 +152,85 @@ class _HomeScreenState
       return;
     }
 
-    final List<String> ordersRaw =
+    final List<
+      String
+    >
+    ordersRaw =
         prefs.getStringList(
-              'active_orders',
-            ) ??
-            [];
+          'active_orders',
+        ) ??
+        [];
 
     print(
       'Jumlah pesanan di SharedPreferences: ${ordersRaw.length}',
     );
 
     // ✅ FILTER: Hanya ambil yang valid
-    final List<String> validOrders = ordersRaw.where((orderString) {
-      final data = Uri.splitQueryString(orderString);
-      final String orderId = data['orderId'] ?? '';
-      return orderId.isNotEmpty && orderId != '000000';
-    }).toList();
+    final List<
+      String
+    >
+    validOrders = ordersRaw.where(
+      (
+        orderString,
+      ) {
+        final data = Uri.splitQueryString(
+          orderString,
+        );
+        final String orderId =
+            data['orderId'] ??
+            '';
+        return orderId.isNotEmpty &&
+            orderId !=
+                '000000';
+      },
+    ).toList();
 
     // Simpan ulang jika ada data tidak valid
-    if (validOrders.length != ordersRaw.length) {
-      await prefs.setStringList('active_orders', validOrders);
-      print('🧹 Data tidak valid dibersihkan. Sebelum: ${ordersRaw.length}, Sesudah: ${validOrders.length}');
+    if (validOrders.length !=
+        ordersRaw.length) {
+      await prefs.setStringList(
+        'active_orders',
+        validOrders,
+      );
+      print(
+        '🧹 Data tidak valid dibersihkan. Sebelum: ${ordersRaw.length}, Sesudah: ${validOrders.length}',
+      );
     }
 
     setState(
       () {
         activeOrders = validOrders.map(
-          (e) {
-            final data = Uri.splitQueryString(e);  // ✅ MEMBACA DATA
+          (
+            e,
+          ) {
+            final data = Uri.splitQueryString(
+              e,
+            ); // ✅ MEMBACA DATA
             return {
-              'orderId': data['orderId'] ?? '000000',  // ✅ AMBIL ORDER ID
-              'service': data['service'] ?? 'Cuci Regular',
-              'qty': data['qty'] ?? '1',
-              'pickupTime': data['pickupTime'] ?? '-',
-              'deliveryTime': data['deliveryTime'] ?? '-',
-              'totalPrice': data['totalPrice'] ?? 'Rp 0',
+              'orderId':
+                  data['orderId'] ??
+                  '000000',
+              'service':
+                  data['service'] ??
+                  'Cuci Regular',
+              'qty':
+                  data['qty'] ??
+                  '1',
+              'pickupTime':
+                  data['pickupTime'] ??
+                  '-',
+              'deliveryTime':
+                  data['deliveryTime'] ??
+                  '-',
+              'totalPrice':
+                  data['totalPrice'] ??
+                  'Rp 0',
+              'address':
+                  data['address'] ??
+                  '-', // ✅ TAMBAHKAN
+              'itemsJson':
+                  data['itemsJson'] ??
+                  '',
             };
           },
         ).toList();
@@ -174,9 +240,7 @@ class _HomeScreenState
     print(
       'Active orders loaded: ${activeOrders.length}',
     );
-    for (
-      var order in activeOrders
-    ) {
+    for (var order in activeOrders) {
       print(
         '   - Order ID: ${order['orderId']}',
       );
@@ -185,7 +249,11 @@ class _HomeScreenState
 
   void _handleServiceTap(
     BuildContext context,
-    Map<String, dynamic> service,
+    Map<
+      String,
+      dynamic
+    >
+    service,
   ) {
     if (!widget.loggedIn) {
       showLoginModal(
@@ -221,14 +289,18 @@ class _HomeScreenState
       return;
     }
 
-    List<String?> promoCodes = [
+    List<
+      String?
+    >
+    promoCodes = [
       'SSSd789',
       'PAYDAYWUSH',
-      'BERSIHSPREI'
+      'BERSIHSPREI',
     ];
     String? code = promoCodes[index];
 
-    if (code != null) {
+    if (code !=
+        null) {
       await Clipboard.setData(
         ClipboardData(
           text: code,
@@ -267,10 +339,9 @@ class _HomeScreenState
       child: Column(
         children: [
           HomeNavyHeaderBlock(
-            onNotification: () =>
-                _handleNotificationTap(
-                  context,
-                ),
+            onNotification: () => _handleNotificationTap(
+              context,
+            ),
           ),
           Expanded(
             child: RoundedWhitePanel(
@@ -286,17 +357,14 @@ class _HomeScreenState
                 child: SingleChildScrollView(
                   physics: const ClampingScrollPhysics(),
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (widget.loggedIn &&
                           widget.userFirstName !=
                               null) ...[
                         Text(
                           'Hi ${widget.userFirstName} 👋',
-                          style: AppTextStyles
-                              .screenTitleNavy
-                              .copyWith(
+                          style: AppTextStyles.screenTitleNavy.copyWith(
                             fontSize: 18,
                           ),
                         ),
@@ -306,8 +374,7 @@ class _HomeScreenState
                       ],
 
                       const SectionHeaderRow(
-                        title:
-                            'Layanan Laundry Kami',
+                        title: 'Layanan Laundry Kami',
                       ),
                       const SizedBox(
                         height: 12,
@@ -321,17 +388,12 @@ class _HomeScreenState
                               children: [
                                 Expanded(
                                   child: ServiceCardCompact(
-                                    title: items[0]
-                                        ['title'],
-                                    priceLabel: items[0]
-                                        ['price'],
-                                    etaLabel: items[0]
-                                        ['eta'],
-                                    etaType: items[0]
-                                        ['type'],
+                                    title: items[0]['title'],
+                                    priceLabel: items[0]['price'],
+                                    etaLabel: items[0]['eta'],
+                                    etaType: items[0]['type'],
                                     selected: false,
-                                    onTap: () =>
-                                        _handleServiceTap(
+                                    onTap: () => _handleServiceTap(
                                       context,
                                       items[0],
                                     ),
@@ -342,17 +404,12 @@ class _HomeScreenState
                                 ),
                                 Expanded(
                                   child: ServiceCardCompact(
-                                    title: items[1]
-                                        ['title'],
-                                    priceLabel: items[1]
-                                        ['price'],
-                                    etaLabel: items[1]
-                                        ['eta'],
-                                    etaType: items[1]
-                                        ['type'],
+                                    title: items[1]['title'],
+                                    priceLabel: items[1]['price'],
+                                    etaLabel: items[1]['eta'],
+                                    etaType: items[1]['type'],
                                     selected: false,
-                                    onTap: () =>
-                                        _handleServiceTap(
+                                    onTap: () => _handleServiceTap(
                                       context,
                                       items[1],
                                     ),
@@ -365,33 +422,24 @@ class _HomeScreenState
                             width: 10,
                           ),
                           GestureDetector(
-                            onTap: () => widget
-                                .onOpenServices
-                                ?.call(),
+                            onTap: () => widget.onOpenServices?.call(),
                             child: Container(
                               height: 100,
                               width: 50,
                               decoration: BoxDecoration(
-                                color: Colors
-                                    .grey
-                                    .shade100,
-                                borderRadius:
-                                    BorderRadius.circular(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(
                                   14,
                                 ),
                                 border: Border.all(
-                                  color: Colors
-                                      .grey
-                                      .shade300,
+                                  color: Colors.grey.shade300,
                                 ),
                               ),
                               child: const Center(
                                 child: Icon(
-                                  Icons
-                                      .arrow_forward_ios_rounded,
+                                  Icons.arrow_forward_ios_rounded,
                                   size: 18,
-                                  color: AppColors
-                                      .headerNavy,
+                                  color: AppColors.headerNavy,
                                 ),
                               ),
                             ),
@@ -416,69 +464,67 @@ class _HomeScreenState
                             ? _buildEmptyOrderBox()
                             : PageView.builder(
                                 controller: PageController(
-                                  viewportFraction:
-                                      0.9,
+                                  viewportFraction: 0.9,
                                   initialPage: 0,
                                 ),
-                                itemCount:
-                                    activeOrders.length,
+                                itemCount: activeOrders.length,
                                 padEnds: false,
                                 itemBuilder:
                                     (
-                                  context,
-                                  index,
-                                ) {
-                                  final order =
-                                      activeOrders[
-                                          index];
-                                  return GestureDetector(
-                                    behavior: HitTestBehavior
-                                        .opaque,
-                                    onTap: () {
-                                      // Parse itemsJson jika ada untuk menampilkan detail lengkap
-                                      final itemsJson = order['itemsJson'];
-                                      
-                                      if (itemsJson != null && itemsJson.isNotEmpty) {
-                                        try {
-                                          // Decode itemsJson jika ada (format JSON string)
-                                          // Asumsikan itemsJson sudah dalam bentuk List atau Map
-                                          if (itemsJson is String) {
-                                            // Jika masih string JSON, parse dulu
-                                            // orderItems = jsonDecode(itemsJson);
-                                            // Untuk sementara, gunakan pendekatan sederhana
-                                          } else if (itemsJson is List) {
+                                      context,
+                                      index,
+                                    ) {
+                                      final order = activeOrders[index];
+                                      return GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: () {
+                                          // Parse itemsJson jika ada untuk menampilkan detail lengkap
+                                          final itemsJson = order['itemsJson'];
+
+                                          if (itemsJson !=
+                                                  null &&
+                                              itemsJson.isNotEmpty) {
+                                            try {
+                                              // Decode itemsJson jika ada (format JSON string)
+                                              // Asumsikan itemsJson sudah dalam bentuk List atau Map
+                                              if (itemsJson
+                                                  is String) {
+                                                // Jika masih string JSON, parse dulu
+                                                // orderItems = jsonDecode(itemsJson);
+                                                // Untuk sementara, gunakan pendekatan sederhana
+                                              } else if (itemsJson
+                                                  is List) {}
+                                            } catch (
+                                              e
+                                            ) {
+                                              print(
+                                                'Error parsing itemsJson: $e',
+                                              );
+                                            }
                                           }
-                                        } catch (e) {
-                                          print('Error parsing itemsJson: $e');
-                                        }
-                                      }
-                                      
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/order-detail',
-                                        arguments: {
-                                          ...order,
-                                          'fromActiveOrder': true, // Tambahkan orderItems untuk detail lengkap
+
+                                          Navigator.pushNamed(
+                                            context,
+                                            '/order-detail',
+                                            arguments: {
+                                              ...order,
+                                              'fromActiveOrder': true, // Tambahkan orderItems untuk detail lengkap
+                                            },
+                                          );
                                         },
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            right: 12,
+                                          ),
+                                          child: ActiveOrderCard(
+                                            statusTitle: 'Pesanan ${order['orderId']}',
+                                            subtitle: 'Pickup: ${order['pickupTime']}\nDelivery: ${order['deliveryTime']}',
+                                            totalPrice: order['totalPrice'],
+                                            currentStep: 0,
+                                          ),
+                                        ),
                                       );
                                     },
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                        right: 12,
-                                      ),
-                                      child: ActiveOrderCard(
-                                        statusTitle:
-                                            'Pesanan ${order['orderId']}',
-                                        subtitle:
-                                            'Pickup: ${order['pickupTime']}\nDelivery: ${order['deliveryTime']}',
-                                        totalPrice:
-                                            order['totalPrice'],
-                                        currentStep:
-                                            0,
-                                      ),
-                                    ),
-                                  );
-                                },
                               ),
                       ),
 
@@ -488,19 +534,17 @@ class _HomeScreenState
                       SectionHeaderRow(
                         title: 'Penawaran Khusus',
                         actionLabel: 'Lainnya',
-                        onAction: () =>
-                            widget.onOpenDisc
-                                ?.call(),
+                        onAction: () => widget.onOpenDisc?.call(),
                       ),
 
                       OfferImageAutoSlider(
-                        onTap: (
-                          index,
-                        ) =>
-                            _handleOfferTap(
-                          context,
-                          index,
-                        ),
+                        onTap:
+                            (
+                              index,
+                            ) => _handleOfferTap(
+                              context,
+                              index,
+                            ),
                       ),
 
                       const SizedBox(
@@ -533,16 +577,16 @@ class HomeNavyHeaderBlock
   Widget build(
     BuildContext context,
   ) {
-    final top =
-        MediaQuery.of(
-          context,
-        ).padding.top;
+    final top = MediaQuery.of(
+      context,
+    ).padding.top;
 
     return Container(
       color: AppColors.headerNavy,
       padding: EdgeInsets.fromLTRB(
         20,
-        top + 15,
+        top +
+            15,
         20,
         20,
       ),

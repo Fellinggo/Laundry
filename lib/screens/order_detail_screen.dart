@@ -10,22 +10,33 @@ import '../widgets/navy_app_bar.dart';
 import '../widgets/rounded_white_panel.dart';
 import '../screens/main_shell_screen.dart';
 
-class OrderDetailScreen extends StatelessWidget {
-  const OrderDetailScreen({super.key});
+class OrderDetailScreen
+    extends
+        StatelessWidget {
+  const OrderDetailScreen({
+    super.key,
+  });
 
   // ============================================
   // GENERATE ORDER ID 6 DIGIT ACAK
   // ============================================
   String _generateOrderId() {
     final random = Random();
-    final int orderNumber = 100000 + random.nextInt(900000);
+    final int orderNumber =
+        100000 +
+        random.nextInt(
+          900000,
+        );
     return orderNumber.toString();
   }
 
   // ============================================
   // FUNGSI SIMPAN PESANAN KE SHARED PREFERENCES
   // ============================================
-  Future<void> _saveOrderToSharedPreferences({
+  Future<
+    void
+  >
+  _saveOrderToSharedPreferences({
     required String orderId,
     required String service,
     required String qty,
@@ -37,32 +48,65 @@ class OrderDetailScreen extends StatelessWidget {
   }) async {
     final prefs = await SharedPreferences.getInstance();
 
-    final String orderString = 
-        'orderId=$orderId&'
-        'service=$service&'
-        'qty=$qty&'
-        'pickupTime=$pickupTime&'
-        'deliveryTime=$deliveryTime&'
-        'totalPrice=$totalPrice&'
-        'address=$address&'
-        'itemsJson=$itemsJson';
+    final String orderString = Uri(
+      queryParameters: {
+        'orderId': orderId,
+        'service': service,
+        'qty': qty,
+        'pickupTime': pickupTime,
+        'deliveryTime': deliveryTime,
+        'totalPrice': totalPrice,
+        'address': address, // ✅ sekarang aman
+        'itemsJson': itemsJson,
+      },
+    ).query;
 
-    final List<String> existingOrders = prefs.getStringList('active_orders') ?? [];
-    existingOrders.add(orderString);
-    await prefs.setStringList('active_orders', existingOrders);
+    final List<
+      String
+    >
+    existingOrders =
+        prefs.getStringList(
+          'active_orders',
+        ) ??
+        [];
+    existingOrders.add(
+      orderString,
+    );
+    await prefs.setStringList(
+      'active_orders',
+      existingOrders,
+    );
 
-    debugPrint('✅ Pesanan baru disimpan: $orderId');
-    debugPrint('📦 Total pesanan aktif: ${existingOrders.length}');
+    debugPrint(
+      '✅ Pesanan baru disimpan: $orderId',
+    );
+    debugPrint(
+      '📦 Total pesanan aktif: ${existingOrders.length}',
+    );
   }
 
   // ============================================
   // ENCODE ITEMS KE JSON STRING
   // ============================================
-  String _encodeItemsToJson(List<Map<String, dynamic>> items) {
+  String _encodeItemsToJson(
+    List<
+      Map<
+        String,
+        dynamic
+      >
+    >
+    items,
+  ) {
     try {
-      return jsonEncode(items);
-    } catch (e) {
-      debugPrint('Error encoding items to JSON: $e');
+      return jsonEncode(
+        items,
+      );
+    } catch (
+      e
+    ) {
+      debugPrint(
+        'Error encoding items to JSON: $e',
+      );
       return '[]';
     }
   }
@@ -70,18 +114,41 @@ class OrderDetailScreen extends StatelessWidget {
   // ============================================
   // DECODE ITEMS DARI JSON STRING
   // ============================================
-  List<Map<String, dynamic>> _decodeItemsFromJson(String? itemsJson) {
-    if (itemsJson == null || itemsJson.isEmpty) {
+  List<
+    Map<
+      String,
+      dynamic
+    >
+  >
+  _decodeItemsFromJson(
+    String? itemsJson,
+  ) {
+    if (itemsJson ==
+            null ||
+        itemsJson.isEmpty) {
       return [];
     }
     try {
-      final decoded = jsonDecode(itemsJson);
-      if (decoded is List) {
-        return decoded.cast<Map<String, dynamic>>();
+      final decoded = jsonDecode(
+        itemsJson,
+      );
+      if (decoded
+          is List) {
+        return decoded
+            .cast<
+              Map<
+                String,
+                dynamic
+              >
+            >();
       }
       return [];
-    } catch (e) {
-      debugPrint('Error decoding items JSON: $e');
+    } catch (
+      e
+    ) {
+      debugPrint(
+        'Error decoding items JSON: $e',
+      );
       return [];
     }
   }
@@ -89,12 +156,25 @@ class OrderDetailScreen extends StatelessWidget {
   // ============================================
   // HITUNG DURASI DALAM MENIT
   // ============================================
-  int _calculateDurationMinutes(String pickup, String delivery) {
+  int _calculateDurationMinutes(
+    String pickup,
+    String delivery,
+  ) {
     try {
-      final p = DateTime.parse(pickup);
-      final d = DateTime.parse(delivery);
-      return d.difference(p).inMinutes;
-    } catch (e) {
+      final p = DateTime.parse(
+        pickup,
+      );
+      final d = DateTime.parse(
+        delivery,
+      );
+      return d
+          .difference(
+            p,
+          )
+          .inMinutes;
+    } catch (
+      e
+    ) {
       return 120;
     }
   }
@@ -102,24 +182,47 @@ class OrderDetailScreen extends StatelessWidget {
   // ============================================
   // FORMAT RUPIAH
   // ============================================
-  String _formatRupiah(dynamic value) {
+  String _formatRupiah(
+    dynamic value,
+  ) {
     int number = 0;
-    if (value is int) {
+    if (value
+        is int) {
       number = value;
-    } else if (value is String) {
-      number = int.tryParse(value) ?? 0;
+    } else if (value
+        is String) {
+      number =
+          int.tryParse(
+            value,
+          ) ??
+          0;
     } else {
       number = 0;
     }
-    
+
     final s = number.toString();
     final buffer = StringBuffer();
     int count = 0;
-    for (int i = s.length - 1; i >= 0; i--) {
-      buffer.write(s[i]);
+    for (
+      int i =
+          s.length -
+          1;
+      i >=
+          0;
+      i--
+    ) {
+      buffer.write(
+        s[i],
+      );
       count++;
-      if (count % 3 == 0 && i != 0) {
-        buffer.write('.');
+      if (count %
+                  3 ==
+              0 &&
+          i !=
+              0) {
+        buffer.write(
+          '.',
+        );
       }
     }
     return 'Rp ${buffer.toString().split('').reversed.join()}';
@@ -128,71 +231,129 @@ class OrderDetailScreen extends StatelessWidget {
   // ============================================
   // EKSTRAK NILAI INT DARI DYNAMIC
   // ============================================
-  int _toInt(dynamic value) {
-    if (value == null) return 0;
-    if (value is int) return value;
-    if (value is String) return int.tryParse(value) ?? 0;
-    if (value is double) return value.toInt();
+  int _toInt(
+    dynamic value,
+  ) {
+    if (value ==
+        null)
+      return 0;
+    if (value
+        is int)
+      return value;
+    if (value
+        is String)
+      return int.tryParse(
+            value,
+          ) ??
+          0;
+    if (value
+        is double)
+      return value.toInt();
     return 0;
   }
 
   // ============================================
   // WIDGET ITEM PESANAN DENGAN GAMBAR
   // ============================================
-  Widget _buildOrderItemRow(Map<String, dynamic> item) {
-    final name = item['title'] ?? item['name'] ?? 'Layanan';
-    final qty = _toInt(item['qty']);
-    final price = _toInt(item['price']);
-    final subtotal = _toInt(item['subtotal']) != 0 
-        ? _toInt(item['subtotal']) 
-        : (qty * price);
+  Widget _buildOrderItemRow(
+    Map<
+      String,
+      dynamic
+    >
+    item,
+  ) {
+    final name =
+        item['title'] ??
+        item['name'] ??
+        'Layanan';
+    final qty = _toInt(
+      item['qty'],
+    );
+    final price = _toInt(
+      item['price'],
+    );
+    final subtotal =
+        _toInt(
+              item['subtotal'],
+            ) !=
+            0
+        ? _toInt(
+            item['subtotal'],
+          )
+        : (qty *
+              price);
     final image = item['image'];
-    
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        vertical: 8,
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          if (image != null && image.toString().isNotEmpty)
+          if (image !=
+                  null &&
+              image.toString().isNotEmpty)
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(
+                8,
+              ),
               child: Image.asset(
                 image,
                 width: 45,
                 height: 45,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    width: 45,
-                    height: 45,
-                    color: Colors.grey.shade200,
-                    child: const Icon(Icons.local_laundry_service, size: 20),
-                  );
-                },
+                errorBuilder:
+                    (
+                      context,
+                      error,
+                      stackTrace,
+                    ) {
+                      return Container(
+                        width: 45,
+                        height: 45,
+                        color: Colors.grey.shade200,
+                        child: const Icon(
+                          Icons.local_laundry_service,
+                          size: 20,
+                        ),
+                      );
+                    },
               ),
             ),
-          if (image != null && image.toString().isNotEmpty) const SizedBox(width: 12),
-          
+          if (image !=
+                  null &&
+              image.toString().isNotEmpty)
+            const SizedBox(
+              width: 12,
+            ),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   name,
-                  style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500),
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   '${_formatRupiah(price)} x $qty',
-                  style: AppTextStyles.bodyMuted.copyWith(fontSize: 12),
+                  style: AppTextStyles.bodyMuted.copyWith(
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
           ),
-          
+
           Text(
-            _formatRupiah(subtotal),
+            _formatRupiah(
+              subtotal,
+            ),
             style: AppTextStyles.body.copyWith(
               fontWeight: FontWeight.w600,
               color: AppColors.primaryNavy,
@@ -206,39 +367,87 @@ class OrderDetailScreen extends StatelessWidget {
   // ============================================
   // BUILD ORDER ITEMS WIDGET
   // ============================================
-  Widget _buildOrderItems(List<Map<String, dynamic>> items) {
+  Widget _buildOrderItems(
+    List<
+      Map<
+        String,
+        dynamic
+      >
+    >
+    items,
+  ) {
     if (items.isEmpty) {
       return const Center(
-        child: Text('Tidak ada layanan'),
+        child: Text(
+          'Tidak ada layanan',
+        ),
       );
     }
-    
-    final totalQty = items.fold(0, (sum, item) => sum + _toInt(item['qty']));
-    final totalPrice = items.fold(0, (sum, item) {
-      final qty = _toInt(item['qty']);
-      final price = _toInt(item['price']);
-      return sum + (qty * price);
-    });
-    
+
+    final totalQty = items.fold(
+      0,
+      (
+        sum,
+        item,
+      ) =>
+          sum +
+          _toInt(
+            item['qty'],
+          ),
+    );
+    final totalPrice = items.fold(
+      0,
+      (
+        sum,
+        item,
+      ) {
+        final qty = _toInt(
+          item['qty'],
+        );
+        final price = _toInt(
+          item['price'],
+        );
+        return sum +
+            (qty *
+                price);
+      },
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Daftar Pesanan',
-          style: AppTextStyles.sectionTitle.copyWith(fontSize: 16),
+          style: AppTextStyles.sectionTitle.copyWith(
+            fontSize: 16,
+          ),
         ),
-        const SizedBox(height: 12),
-        ...items.map((item) => _buildOrderItemRow(item)),
-        const Divider(height: 24),
+        const SizedBox(
+          height: 12,
+        ),
+        ...items.map(
+          (
+            item,
+          ) => _buildOrderItemRow(
+            item,
+          ),
+        ),
+        const Divider(
+          height: 24,
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               'Subtotal ($totalQty item)',
-              style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
+              style: AppTextStyles.body.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
             Text(
-              _formatRupiah(totalPrice),
+              _formatRupiah(
+                totalPrice,
+              ),
               style: AppTextStyles.body.copyWith(
                 fontWeight: FontWeight.bold,
                 color: AppColors.primaryNavy,
@@ -253,13 +462,21 @@ class OrderDetailScreen extends StatelessWidget {
   // ============================================
   // WIDGET BOX
   // ============================================
-  Widget _box({required Widget child}) {
+  Widget _box({
+    required Widget child,
+  }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(
+        16,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderLight),
+        borderRadius: BorderRadius.circular(
+          16,
+        ),
+        border: Border.all(
+          color: AppColors.borderLight,
+        ),
       ),
       child: child,
     );
@@ -268,20 +485,30 @@ class OrderDetailScreen extends StatelessWidget {
   // ============================================
   // WIDGET ROW
   // ============================================
-  Widget _row(String title, String value, {bool bold = false}) {
+  Widget _row(
+    String title,
+    String value, {
+    bool bold = false,
+  }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        vertical: 8,
+      ),
       child: Row(
         children: [
           Expanded(
             child: Text(
               title,
-              style: bold ? AppTextStyles.sectionTitle : AppTextStyles.body,
+              style: bold
+                  ? AppTextStyles.sectionTitle
+                  : AppTextStyles.body,
             ),
           ),
           Text(
             value,
-            style: bold ? AppTextStyles.sectionTitle : AppTextStyles.body,
+            style: bold
+                ? AppTextStyles.sectionTitle
+                : AppTextStyles.body,
           ),
         ],
       ),
@@ -289,82 +516,188 @@ class OrderDetailScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)?.settings.arguments as Map? ?? {};
+  Widget build(
+    BuildContext context,
+  ) {
+    final args =
+        ModalRoute.of(
+              context,
+            )?.settings.arguments
+            as Map? ??
+        {};
 
     // ============================================
     // CEK APAKAH DARI ACTIVE ORDER ATAU CHECKOUT
     // ============================================
-    final bool isFromActiveOrder = args['fromActiveOrder'] == true;
+    final bool isFromActiveOrder =
+        args['fromActiveOrder'] ==
+        true;
 
     // ============================================
     // AMBIL DAN PARSE DATA DARI ARGUMENTS
     // ============================================
-    List<Map<String, dynamic>> orderItems = [];
-    
+    List<
+      Map<
+        String,
+        dynamic
+      >
+    >
+    orderItems = [];
+
     // Cek apakah ada itemsJson
-    if (args['itemsJson'] != null && args['itemsJson'].toString().isNotEmpty) {
-      orderItems = _decodeItemsFromJson(args['itemsJson'].toString());
+    if (args['itemsJson'] !=
+            null &&
+        args['itemsJson'].toString().isNotEmpty) {
+      orderItems = _decodeItemsFromJson(
+        args['itemsJson'].toString(),
+      );
     }
-    
+
     // Cek apakah ada orderItems langsung
-    if (orderItems.isEmpty && args['orderItems'] != null) {
-      if (args['orderItems'] is List) {
-        orderItems = (args['orderItems'] as List).cast<Map<String, dynamic>>();
+    if (orderItems.isEmpty &&
+        args['orderItems'] !=
+            null) {
+      if (args['orderItems']
+          is List) {
+        orderItems =
+            (args['orderItems']
+                    as List)
+                .cast<
+                  Map<
+                    String,
+                    dynamic
+                  >
+                >();
       }
     }
-    
+
     // Cek apakah ada items langsung
-    if (orderItems.isEmpty && args['items'] != null) {
-      if (args['items'] is List) {
-        orderItems = (args['items'] as List).cast<Map<String, dynamic>>();
+    if (orderItems.isEmpty &&
+        args['items'] !=
+            null) {
+      if (args['items']
+          is List) {
+        orderItems =
+            (args['items']
+                    as List)
+                .cast<
+                  Map<
+                    String,
+                    dynamic
+                  >
+                >();
       }
     }
 
     // Generate Order ID (hanya untuk checkout, untuk active order pakai yang sudah ada)
-    final String orderId = isFromActiveOrder 
-        ? (args['orderId']?.toString() ?? '000000')
-        : (args['orderId'] ?? _generateOrderId());
+    final String orderId = isFromActiveOrder
+        ? (args['orderId']?.toString() ??
+              '000000')
+        : (args['orderId'] ??
+              _generateOrderId());
 
     // Hitung total quantity dan total harga dengan aman
     int totalQty = 0;
     int totalPrice = 0;
-    
+
     if (orderItems.isNotEmpty) {
-      totalQty = orderItems.fold(0, (sum, item) => sum + _toInt(item['qty']));
-      totalPrice = orderItems.fold(0, (sum, item) {
-        final qty = _toInt(item['qty']);
-        final price = _toInt(item['price']);
-        return sum + (qty * price);
-      });
+      totalQty = orderItems.fold(
+        0,
+        (
+          sum,
+          item,
+        ) =>
+            sum +
+            _toInt(
+              item['qty'],
+            ),
+      );
+      totalPrice = orderItems.fold(
+        0,
+        (
+          sum,
+          item,
+        ) {
+          final qty = _toInt(
+            item['qty'],
+          );
+          final price = _toInt(
+            item['price'],
+          );
+          return sum +
+              (qty *
+                  price);
+        },
+      );
     } else {
       // Fallback untuk format lama
-      totalQty = _toInt(args['qty'] != null ? args['qty'] : 1);
-      totalPrice = _toInt(args['serviceFee'] != null ? args['serviceFee'] : 0);
+      totalQty = _toInt(
+        args['qty'] !=
+                null
+            ? args['qty']
+            : 1,
+      );
+      totalPrice = _toInt(
+        args['serviceFee'] !=
+                null
+            ? args['serviceFee']
+            : 0,
+      );
     }
 
     // Ambil data lainnya dengan aman
-    final String pickupTimeText = args['pickupTime']?.toString() ?? '-';
-    final String deliveryTimeText = args['deliveryTime']?.toString() ?? '-';
-    final String pickupAddress = args['address']?.toString() ?? 'Alamat belum diisi';
-    final String deliveryAddress = args['deliveryAddress']?.toString() ?? pickupAddress;
-    
-    final int deliveryFee = _toInt(args['deliveryFee'] != null ? args['deliveryFee'] : 5000);
-    final int grandTotal = totalPrice + deliveryFee;
+    final String pickupTimeText =
+        args['pickupTime']?.toString() ??
+        '-';
+    final String deliveryTimeText =
+        args['deliveryTime']?.toString() ??
+        '-';
+    final String pickupAddress =
+        args['address']?.toString() ??
+        'Alamat belum diisi';
+    final String deliveryAddress =
+        args['deliveryAddress']?.toString() ??
+        pickupAddress;
+
+    final int deliveryFee = _toInt(
+      args['deliveryFee'] !=
+              null
+          ? args['deliveryFee']
+          : 5000,
+    );
+    final int grandTotal =
+        totalPrice +
+        deliveryFee;
 
     // Service summary untuk display
-    final String serviceSummary = orderItems.isEmpty 
-        ? (args['service']?.toString() ?? 'Laundry')
-        : orderItems.map((item) => '${item['title'] ?? item['name']} (${item['qty']})').join(' + ');
+    final String serviceSummary = orderItems.isEmpty
+        ? (args['service']?.toString() ??
+              'Laundry')
+        : orderItems
+              .map(
+                (
+                  item,
+                ) => '${item['title'] ?? item['name']} (${item['qty']})',
+              )
+              .join(
+                ' + ',
+              );
 
     // Hitung durasi
-    final int durationMinutes = _calculateDurationMinutes(pickupTimeText, deliveryTimeText);
-    final String durationText = durationMinutes >= 60
+    final int durationMinutes = _calculateDurationMinutes(
+      pickupTimeText,
+      deliveryTimeText,
+    );
+    final String durationText =
+        durationMinutes >=
+            60
         ? '${(durationMinutes / 60).round()} jam'
         : '$durationMinutes menit';
 
     // Encode items ke JSON untuk disimpan (hanya untuk checkout)
-    final itemsJson = _encodeItemsToJson(orderItems);
+    final itemsJson = _encodeItemsToJson(
+      orderItems,
+    );
 
     return Scaffold(
       backgroundColor: AppColors.headerNavy,
@@ -379,243 +712,428 @@ class OrderDetailScreen extends StatelessWidget {
               qty: totalQty.toString(),
               pickupTime: pickupTimeText,
               deliveryTime: deliveryTimeText,
-              totalPrice: _formatRupiah(grandTotal),
+              totalPrice: _formatRupiah(
+                grandTotal,
+              ),
               address: pickupAddress,
               itemsJson: itemsJson,
             );
 
             if (!context.mounted) return;
 
-            ScaffoldMessenger.of(context).showSnackBar(
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(
               SnackBar(
-                content: Text('Pesanan $orderId berhasil dibuat!'),
+                content: Text(
+                  'Pesanan $orderId berhasil dibuat!',
+                ),
                 backgroundColor: AppColors.success,
-                duration: const Duration(seconds: 2),
+                duration: const Duration(
+                  seconds: 2,
+                ),
               ),
             );
 
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (_) => const MainShellScreen()),
-              (route) => false,
+              MaterialPageRoute(
+                builder:
+                    (
+                      _,
+                    ) => const MainShellScreen(),
+              ),
+              (
+                route,
+              ) => false,
             );
           } else {
             // Jika dari active order, langsung back tanpa menyimpan
-            Navigator.pop(context);
+            Navigator.pop(
+              context,
+            );
           }
         },
       ),
       body: Column(
         children: [
-          const SizedBox(height: 8),
+          const SizedBox(
+            height: 8,
+          ),
           Expanded(
             child: RoundedWhitePanel(
               topRadius: 40,
-              padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xl, AppSpacing.xl, 8),
-              child: NotificationListener<OverscrollIndicatorNotification>(
-                onNotification: (overscroll) {
-                  overscroll.disallowIndicator();
-                  return true;
-                },
-                child: SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // ============================================
-                      // BOX STATUS PESANAN
-                      // ============================================
-                      _box(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                AppSpacing.xl,
+                AppSpacing.xl,
+                8,
+              ),
+              child:
+                  NotificationListener<
+                    OverscrollIndicatorNotification
+                  >(
+                    onNotification:
+                        (
+                          overscroll,
+                        ) {
+                          overscroll.disallowIndicator();
+                          return true;
+                        },
+                    child: SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // ============================================
+                          // BOX STATUS PESANAN
+                          // ============================================
+                          _box(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                  child: Text(
-                                    'Pesanan kamu akan segera diambil',
-                                    style: AppTextStyles.sectionTitle.copyWith(fontSize: 16),
-                                  ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        'Pesanan kamu akan segera diambil',
+                                        style: AppTextStyles.sectionTitle.copyWith(
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 5,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.successBg,
+                                        borderRadius: BorderRadius.circular(
+                                          20,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'Diproses',
+                                        style: AppTextStyles.caption.copyWith(
+                                          color: AppColors.success,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.successBg,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
+                                const SizedBox(
+                                  height: 12,
+                                ),
+                                Center(
                                   child: Text(
-                                    'Diproses',
+                                    'Pesanan $orderId • $totalQty item • selesai dalam $durationText',
+                                    textAlign: TextAlign.center,
                                     style: AppTextStyles.caption.copyWith(
-                                      color: AppColors.success,
-                                      fontWeight: FontWeight.w700,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ),
+                                const SizedBox(
+                                  height: 16,
+                                ),
+                                const OrderStepProgressBar(
+                                  activeIndex: 0,
+                                ),
+                                const SizedBox(
+                                  height: 16,
+                                ),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                    16,
+                                  ),
+                                  child: AspectRatio(
+                                    aspectRatio:
+                                        16 /
+                                        9,
+                                    child: Image.asset(
+                                      'assets/images/map_dummy.png',
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 14,
+                                ),
+                                Row(
+                                  children: const [
+                                    Icon(
+                                      Icons.location_on,
+                                      color: Colors.red,
+                                      size: 18,
+                                    ),
+                                    SizedBox(
+                                      width: 6,
+                                    ),
+                                    Text(
+                                      'Titik Penjemputan',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 4,
+                                ),
+                                Text(
+                                  pickupAddress,
+                                  style: AppTextStyles.body,
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Column(
+                                  children: List.generate(
+                                    3,
+                                    (
+                                      index,
+                                    ) => const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 1,
+                                      ),
+                                      child: Text(
+                                        '•',
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 14,
+                                          height: 0.7,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  children: const [
+                                    Icon(
+                                      Icons.location_on,
+                                      color: Colors.green,
+                                      size: 18,
+                                    ),
+                                    SizedBox(
+                                      width: 6,
+                                    ),
+                                    Text(
+                                      'Titik Pengantaran',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 4,
+                                ),
+                                Text(
+                                  deliveryAddress,
+                                  style: AppTextStyles.bodyMuted,
+                                ),
                               ],
                             ),
-                            const SizedBox(height: 12),
-                            Center(
-                              child: Text(
-                                'Pesanan $orderId • $totalQty item • selesai dalam $durationText',
-                                textAlign: TextAlign.center,
-                                style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600),
+                          ),
+
+                          const SizedBox(
+                            height: 20,
+                          ),
+
+                          // ============================================
+                          // BOX DAFTAR PESANAN
+                          // ============================================
+                          if (orderItems.isNotEmpty)
+                            _box(
+                              child: _buildOrderItems(
+                                orderItems,
                               ),
                             ),
-                            const SizedBox(height: 16),
-                            const OrderStepProgressBar(activeIndex: 0),
-                            const SizedBox(height: 16),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(16),
-                              child: AspectRatio(
-                                aspectRatio: 16 / 9,
-                                child: Image.asset(
-                                  'assets/images/map_dummy.png',
-                                  fit: BoxFit.cover,
+
+                          // Fallback jika orderItems kosong
+                          if (orderItems.isEmpty)
+                            _box(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Daftar Pesanan',
+                                    style: AppTextStyles.sectionTitle.copyWith(
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 12,
+                                  ),
+                                  _row(
+                                    args['service']?.toString() ??
+                                        'Laundry',
+                                    '${args['qty'] ?? 1} x ${_formatRupiah(args['serviceFee'] ?? 0)}',
+                                  ),
+                                  const Divider(),
+                                  _row(
+                                    'Subtotal Pesanan',
+                                    _formatRupiah(
+                                      totalPrice,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                          const SizedBox(
+                            height: 20,
+                          ),
+
+                          // ============================================
+                          // BOX DETAIL (WAKTU, ALAMAT, PEMBAYARAN)
+                          // ============================================
+                          _box(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _row(
+                                  'Waktu Pengambilan',
+                                  pickupTimeText,
+                                ),
+                                const Divider(),
+                                _row(
+                                  'Waktu Pengiriman',
+                                  deliveryTimeText,
+                                ),
+                                const Divider(),
+                                _row(
+                                  'Alamat Pengiriman',
+                                  deliveryAddress,
+                                ),
+                                const Divider(),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  'Detail Pembayaran',
+                                  style: AppTextStyles.sectionTitle,
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                _row(
+                                  'Biaya Pengiriman',
+                                  _formatRupiah(
+                                    deliveryFee,
+                                  ),
+                                ),
+                                _row(
+                                  'Kode Promo',
+                                  '-',
+                                ),
+                                const Divider(),
+                                _row(
+                                  'Total Pembayaran',
+                                  _formatRupiah(
+                                    grandTotal,
+                                  ),
+                                  bold: true,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(
+                            height: 20,
+                          ),
+
+                          // ============================================
+                          // TOMBOL KONFIRMASI PESANAN (HANYA UNTUK CHECKOUT)
+                          // ============================================
+                          if (!isFromActiveOrder)
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  await _saveOrderToSharedPreferences(
+                                    orderId: orderId,
+                                    service: serviceSummary,
+                                    qty: totalQty.toString(),
+                                    pickupTime: pickupTimeText,
+                                    deliveryTime: deliveryTimeText,
+                                    totalPrice: _formatRupiah(
+                                      grandTotal,
+                                    ),
+                                    address: pickupAddress,
+                                    itemsJson: itemsJson,
+                                  );
+
+                                  if (!context.mounted) return;
+
+                                  ScaffoldMessenger.of(
+                                    context,
+                                  ).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Pesanan $orderId berhasil dibuat!',
+                                      ),
+                                      backgroundColor: AppColors.success,
+                                      duration: const Duration(
+                                        seconds: 2,
+                                      ),
+                                    ),
+                                  );
+
+                                  Future.delayed(
+                                    const Duration(
+                                      seconds: 1,
+                                    ),
+                                    () {
+                                      if (!context.mounted) return;
+                                      Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (
+                                                _,
+                                              ) => const MainShellScreen(),
+                                        ),
+                                        (
+                                          route,
+                                        ) => false,
+                                      );
+                                    },
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.headerNavy,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                      12,
+                                    ),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Konfirmasi Pesanan',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 14),
-                            Row(
-                              children: const [
-                                Icon(Icons.location_on, color: Colors.red, size: 18),
-                                SizedBox(width: 6),
-                                Text('Titik Penjemputan', style: TextStyle(fontWeight: FontWeight.w600)),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(pickupAddress, style: AppTextStyles.body),
-                            const SizedBox(height: 10),
-                            Column(
-                              children: List.generate(3, (index) => const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 1),
-                                child: Text('•', style: TextStyle(color: Colors.grey, fontSize: 14, height: 0.7)),
-                              )),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: const [
-                                Icon(Icons.location_on, color: Colors.green, size: 18),
-                                SizedBox(width: 6),
-                                Text('Titik Pengantaran', style: TextStyle(fontWeight: FontWeight.w600)),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(deliveryAddress, style: AppTextStyles.bodyMuted),
-                          ],
-                        ),
-                      ),
-                      
-                      const SizedBox(height: 20),
-                      
-                      // ============================================
-                      // BOX DAFTAR PESANAN
-                      // ============================================
-                      if (orderItems.isNotEmpty)
-                        _box(
-                          child: _buildOrderItems(orderItems),
-                        ),
-                      
-                      // Fallback jika orderItems kosong
-                      if (orderItems.isEmpty)
-                        _box(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Daftar Pesanan',
-                                style: AppTextStyles.sectionTitle.copyWith(fontSize: 16),
-                              ),
-                              const SizedBox(height: 12),
-                              _row(args['service']?.toString() ?? 'Laundry', 
-                                   '${args['qty'] ?? 1} x ${_formatRupiah(args['serviceFee'] ?? 0)}'),
-                              const Divider(),
-                              _row('Subtotal Pesanan', _formatRupiah(totalPrice)),
-                            ],
+                          const SizedBox(
+                            height: 20,
                           ),
-                        ),
-
-                      const SizedBox(height: 20),
-
-                      // ============================================
-                      // BOX DETAIL (WAKTU, ALAMAT, PEMBAYARAN)
-                      // ============================================
-                      _box(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _row('Waktu Pengambilan', pickupTimeText),
-                            const Divider(),
-                            _row('Waktu Pengiriman', deliveryTimeText),
-                            const Divider(),
-                            _row('Alamat Pengiriman', deliveryAddress),
-                            const Divider(),
-                            const SizedBox(height: 10),
-                            Text('Detail Pembayaran', style: AppTextStyles.sectionTitle),
-                            const SizedBox(height: 10),
-                            _row('Biaya Pengiriman', _formatRupiah(deliveryFee)),
-                            _row('Kode Promo', '-'),
-                            const Divider(),
-                            _row('Total Pembayaran', _formatRupiah(grandTotal), bold: true),
-                          ],
-                        ),
+                        ],
                       ),
-                      
-                      const SizedBox(height: 20),
-
-                      // ============================================
-                      // TOMBOL KONFIRMASI PESANAN (HANYA UNTUK CHECKOUT)
-                      // ============================================
-                      if (!isFromActiveOrder) 
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              await _saveOrderToSharedPreferences(
-                                orderId: orderId,
-                                service: serviceSummary,
-                                qty: totalQty.toString(),
-                                pickupTime: pickupTimeText,
-                                deliveryTime: deliveryTimeText,
-                                totalPrice: _formatRupiah(grandTotal),
-                                address: pickupAddress,
-                                itemsJson: itemsJson,
-                              );
-
-                              if (!context.mounted) return;
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Pesanan $orderId berhasil dibuat!'),
-                                  backgroundColor: AppColors.success,
-                                  duration: const Duration(seconds: 2),
-                                ),
-                              );
-
-                              Future.delayed(const Duration(seconds: 1), () {
-                                if (!context.mounted) return;
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(builder: (_) => const MainShellScreen()),
-                                  (route) => false,
-                                );
-                              });
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.headerNavy,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                            child: const Text(
-                              'Konfirmasi Pesanan',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      const SizedBox(height: 20),
-                    ],
+                    ),
                   ),
-                ),
-              ),
             ),
           ),
         ],
