@@ -33,75 +33,97 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
     return 'Rp $result';
   }
 
-  // ============================================
-  // HITUNG TOTAL SERVICE FEE DARI ORDER ITEMS
-  // ============================================
-  // ============================================
-// HITUNG TOTAL SERVICE FEE DARI ORDER ITEMS
-// ============================================
-int _calculateTotalServiceFee(List<dynamic> orderItems) {
-  if (orderItems.isEmpty) return 0;
-  
-  int total = 0;
-  for (var item in orderItems) {
+  int _calculateTotalServiceFee(List<dynamic> items) {
+    if (items.isEmpty) return 0;
+    
+    int total = 0;
+    for (var item in items) {
+      if (item.containsKey('subtotal')) {
+        total += (item['subtotal'] as int?) ?? 0;
+      } else {
+        final qty = (item['qty'] as int?) ?? 1;
+        final price = (item['price'] as int?) ?? 0;
+        total += (qty * price);
+      }
+    }
+    return total;
+  }
+
+  String _encodeItemsToJson(List<dynamic> items) {
+    String jsonStr = '[';
+    for (int i = 0; i < items.length; i++) {
+      final item = items[i];
+      jsonStr += '{';
+      jsonStr += '"title":"${item['title']}",';
+      jsonStr += '"price":${item['price']},';
+      jsonStr += '"qty":${item['qty']},';
+      jsonStr += '"subtotal":${item['subtotal']},';
+      jsonStr += '"image":"${item['image']}"';
+      jsonStr += '}';
+      if (i < items.length - 1) jsonStr += ',';
+    }
+    jsonStr += ']';
+    return jsonStr;
+  }
+
+  Widget _buildOrderItem(Map<String, dynamic> item) {
+    final name = item['title'] ?? item['name'] ?? 'Layanan';
     final qty = (item['qty'] as int?) ?? 1;
     final price = (item['price'] as int?) ?? 0;
-    total = total + (qty * price);
-  }
-  return total;
-}
-
-  // Widget untuk menampilkan item pesanan
-  Widget _buildOrderItem(String name, int qty, int pricePerItem) {
-    final totalPrice = qty * pricePerItem;
+    final subtotal = item['subtotal'] ?? (qty * price);
+    
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Nama layanan dan quantity
+          if (item['image'] != null)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                item['image'],
+                width: 45,
+                height: 45,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: 45,
+                    height: 45,
+                    color: Colors.grey.shade200,
+                    child: const Icon(Icons.local_laundry_service, size: 20),
+                  );
+                },
+              ),
+            ),
+          if (item['image'] != null) const SizedBox(width: 12),
+          
           Expanded(
-            flex: 3,
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(
-                    name,
-                    style: AppTextStyles.body.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
+                Text(
+                  name,
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.w500,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  'x$qty',
+                  '${_formatRp(price)} x $qty',
                   style: AppTextStyles.bodyMuted.copyWith(
-                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 8),
-          // Harga satuan dan total
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  _formatRp(pricePerItem),
-                  style: AppTextStyles.bodyMuted.copyWith(
-                    fontSize: 12,
-                  ),
-                ),
-                Text(
-                  _formatRp(totalPrice),
-                  style: AppTextStyles.body.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primaryNavy,
-                  ),
-                ),
-              ],
+          
+          Text(
+            _formatRp(subtotal),
+            style: AppTextStyles.body.copyWith(
+              fontWeight: FontWeight.w600,
+              color: AppColors.primaryNavy,
             ),
           ),
         ],
@@ -109,62 +131,26 @@ int _calculateTotalServiceFee(List<dynamic> orderItems) {
     );
   }
 
-  // Widget untuk menampilkan semua layanan yang dipesan
   Widget _buildServiceSummary(Map args) {
-    final List<dynamic> orderItems = args['orderItems'] ?? [];
+    final List<dynamic> items = args['items'] ?? [];
     
-    if (orderItems.isEmpty) {
-      // Fallback jika tidak ada orderItems (format lama)
+    if (items.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.inputFill,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    args['service'] ?? 'Layanan',
-                    style: AppTextStyles.body.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${args['qty'] ?? 1} x ${_formatRp(args['serviceFee'] ?? 0)}',
-                    style: AppTextStyles.bodyMuted,
-                  ),
-                ],
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  'Total Layanan',
-                  style: AppTextStyles.caption,
-                ),
-                Text(
-                  _formatRp(args['serviceFee'] ?? 0),
-                  style: AppTextStyles.body.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryNavy,
-                    fontSize: 16,
-                  ),
-                ),
-              ],
-            ),
-          ],
+        child: const Center(
+          child: Text(
+            'Tidak ada layanan dipilih',
+            style: TextStyle(color: Colors.grey),
+          ),
         ),
       );
     }
 
-    // Format baru dengan multiple items
-    final totalServiceFee = _calculateTotalServiceFee(orderItems);
+    final totalServiceFee = _calculateTotalServiceFee(items);
     
     return Container(
       padding: const EdgeInsets.all(16),
@@ -174,45 +160,15 @@ int _calculateTotalServiceFee(List<dynamic> orderItems) {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Layanan',
-                style: AppTextStyles.sectionTitle.copyWith(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Text(
-                'Harga',
-                style: AppTextStyles.caption.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          
-          // List layanan
-          ...orderItems.map((item) {
-            final name = item['name'] ?? 'Layanan';
-            final qty = item['qty'] ?? 1;
-            final price = item['price'] ?? 0;
-            
-            return _buildOrderItem(name, qty, price);
-          }),
-          
+          ...items.map((item) => _buildOrderItem(item as Map<String, dynamic>)),
           const Divider(height: 24),
-          
-          // Total
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Total Layanan',
+                'Total Pesanan',
                 style: AppTextStyles.body.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -232,52 +188,34 @@ int _calculateTotalServiceFee(List<dynamic> orderItems) {
     );
   }
 
-  Widget _buildEditButton(VoidCallback onEdit) {
-    return TextButton.icon(
-      onPressed: onEdit,
-      icon: const Icon(Icons.edit_outlined, size: 16),
-      label: Text(
-        'Edit',
-        style: AppTextStyles.bodyMuted.copyWith(
-          color: AppColors.actionBlue,
-        ),
-      ),
-      style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        minimumSize: Size.zero,
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ),
-    );
-  }
-
   Future<void> _processPayment(Map args) async {
     setState(() => _payLoading = true);
-
     await Future.delayed(const Duration(milliseconds: 800));
 
     final prefs = await SharedPreferences.getInstance();
     List<String> currentOrders = prefs.getStringList('active_orders') ?? [];
 
-    final List<dynamic> orderItems = args['orderItems'] ?? [];
+    final List<dynamic> items = args['items'] ?? [];
     
-    String serviceNames;
-    int totalQty;
-    
-    if (orderItems.isNotEmpty) {
-      serviceNames = orderItems.map((item) => '${item['name']} (${item['qty']})').join(' + ');
-      totalQty = orderItems.fold(0, (sum, item) => sum + (item['qty'] as int));
-    } else {
-      serviceNames = args['service'] ?? 'Laundry';
-      totalQty = args['qty'] ?? 1;
+    String serviceSummary = '';
+    for (var item in items) {
+      final name = item['title'] ?? 'Layanan';
+      final qty = (item['qty'] as int?) ?? 1;
+      serviceSummary += '$name ($qty) + ';
+    }
+    if (serviceSummary.endsWith(' + ')) {
+      serviceSummary = serviceSummary.substring(0, serviceSummary.length - 3);
     }
 
+    final itemsJson = _encodeItemsToJson(items);
+
     String newOrderRaw = 
-        "service=$serviceNames&"
-        "qty=$totalQty&"
-        "pickupTime=${args['pickupTime'] ?? '-'}&"
-        "deliveryTime=${args['deliveryTime'] ?? '-'}&"
-        "totalPrice=${args['total'] ?? 0}&"
-        "address=${args['address'] ?? '-'}";
+        "$serviceSummary|"
+        "${args['total'] ?? 0}|"
+        "${args['pickupTime'] ?? '-'}|"
+        "${args['deliveryTime'] ?? '-'}|"
+        "${args['address'] ?? '-'}|"
+        "$itemsJson";
 
     currentOrders.add(newOrderRaw);
     await prefs.setStringList('active_orders', currentOrders);
@@ -287,10 +225,11 @@ int _calculateTotalServiceFee(List<dynamic> orderItems) {
 
     Navigator.pushNamed(
       context,
-      '/payment',
+      '/order-detail',
       arguments: {
         ...args,
-        'orderItems': orderItems,
+        'items': items,
+        'serviceSummary': serviceSummary,
       },
     );
   }
@@ -299,16 +238,14 @@ int _calculateTotalServiceFee(List<dynamic> orderItems) {
   Widget build(BuildContext context) {
     final args = (ModalRoute.of(context)?.settings.arguments as Map?) ?? {};
     
-    // ============================================
-    // HITUNG ULANG TOTAL JIKA PERLU
-    // ============================================
-    final List<dynamic> orderItems = args['orderItems'] ?? [];
-    final calculatedServiceFee = orderItems.isNotEmpty 
-        ? _calculateTotalServiceFee(orderItems) 
+    final List<dynamic> items = args['items'] ?? [];
+    
+    final calculatedServiceFee = items.isNotEmpty 
+        ? _calculateTotalServiceFee(items) 
         : (args['serviceFee'] ?? 0);
     
     final deliveryFee = args['deliveryFee'] ?? 5000;
-    final totalPayment = calculatedServiceFee + deliveryFee;
+    final totalPayment = args['total'] ?? (calculatedServiceFee + deliveryFee);
 
     return Scaffold(
       backgroundColor: AppColors.headerNavy,
@@ -322,157 +259,201 @@ int _calculateTotalServiceFee(List<dynamic> orderItems) {
           Expanded(
             child: RoundedWhitePanel(
               topRadius: AppSpacing.sheetTopRadius,
-              padding: const EdgeInsets.all(AppSpacing.xl),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                AppSpacing.xl,
+                AppSpacing.xl,
+                0,
+              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ================= HEADER LAYANAN + EDIT =================
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Ringkasan Layanan',
-                        style: AppTextStyles.sectionTitle.copyWith(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
+                  // ============================================
+                  // SCROLLABLE CONTENT - NO OVERSCROLL
+                  // ============================================
+                  Expanded(
+                    child: ScrollConfiguration(
+                      behavior: const _NoOverscrollBehavior(),
+                      child: SingleChildScrollView(
+                        physics: const ClampingScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Ringkasan Pesanan',
+                              style: AppTextStyles.sectionTitle.copyWith(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            
+                            _buildServiceSummary(args),
+                            
+                            const SizedBox(height: 24),
+                            
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Detail Pengiriman',
+                                  style: AppTextStyles.sectionTitle.copyWith(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                TextButton.icon(
+                                  onPressed: () => Navigator.pop(context),
+                                  icon: const Icon(Icons.edit_outlined, size: 16),
+                                  label: Text(
+                                    'Edit',
+                                    style: AppTextStyles.bodyMuted.copyWith(
+                                      color: AppColors.actionBlue,
+                                    ),
+                                  ),
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    minimumSize: Size.zero,
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppColors.inputFill,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                children: [
+                                  InfoKvRow(
+                                    label: 'Waktu Pengambilan',
+                                    value: args['pickupTime'] ?? '-',
+                                    valueBold: true,
+                                  ),
+                                  InfoKvRow(
+                                    label: 'Waktu Pengiriman',
+                                    value: args['deliveryTime'] ?? '-',
+                                    valueBold: true,
+                                  ),
+                                  InfoKvRow(
+                                    label: 'Alamat',
+                                    value: args['address'] ?? '-',
+                                    valueBold: true,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            
+                            const SizedBox(height: 24),
+                            
+                            Text(
+                              'Detail Pembayaran',
+                              style: AppTextStyles.sectionTitle.copyWith(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppColors.inputFill,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                children: [
+                                  InfoKvRow(
+                                    label: 'Total Pesanan',
+                                    value: _formatRp(calculatedServiceFee),
+                                  ),
+                                  InfoKvRow(
+                                    label: 'Biaya Pengiriman',
+                                    value: _formatRp(deliveryFee),
+                                  ),
+                                  const Divider(height: 16),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Total Pembayaran',
+                                        style: AppTextStyles.bodyMuted.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Text(
+                                        _formatRp(totalPayment),
+                                        style: AppTextStyles.body.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryNavy,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            
+                            const SizedBox(height: 24),
+                          ],
                         ),
                       ),
-                      _buildEditButton(() => Navigator.pop(context)),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  
-                  // ================= SERVICE SUMMARY =================
-                  _buildServiceSummary(args),
-                  
-                  const SizedBox(height: 24),
-                  
-                  // ================= INFO PICKUP & DELIVERY =================
-                  Text(
-                    'Detail Pengiriman',
-                    style: AppTextStyles.sectionTitle.copyWith(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 12),
                   
+                  // ============================================
+                  // FIXED BUTTON DI BAWAH
+                  // ============================================
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                     decoration: BoxDecoration(
-                      color: AppColors.inputFill,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      children: [
-                        InfoKvRow(
-                          label: 'Waktu Pengambilan',
-                          value: args['pickupTime'] ?? '-',
-                          valueBold: true,
-                        ),
-                        InfoKvRow(
-                          label: 'Waktu Pengiriman',
-                          value: args['deliveryTime'] ?? '-',
-                          valueBold: true,
-                        ),
-                        InfoKvRow(
-                          label: 'Alamat Pengiriman',
-                          value: args['address'] ?? '-',
-                          valueBold: true,
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, -2),
                         ),
                       ],
                     ),
-                  ),
-                  
-                  const SizedBox(height: 24),
-                  
-                  // ================= DETAIL PEMBAYARAN =================
-                  Text(
-                    'Detail Pembayaran',
-                    style: AppTextStyles.sectionTitle.copyWith(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  
-                 // Container Detail Pembayaran
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.inputFill,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: [
-                      InfoKvRow(
-                        label: 'Biaya Layanan',
-                        value: _formatRp(calculatedServiceFee),
-                      ),
-                      InfoKvRow(
-                        label: 'Biaya Pengiriman',
-                        value: _formatRp(deliveryFee),
-                      ),
-                      const Divider(height: 16),
-                      // Ganti InfoKvRow dengan Row custom untuk total
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Total Pembayaran',
-                            style: AppTextStyles.bodyMuted.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.headerNavy,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                           ),
-                          Text(
-                            _formatRp(totalPayment),
-                            style: AppTextStyles.body.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryNavy,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                  
-                  const Spacer(),
-                  
-                  // ================= BUTTON BAYAR =================
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.headerNavy,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                         ),
+                        onPressed: _payLoading ? null : () => _processPayment({
+                          ...args,
+                          'items': items,
+                          'serviceFee': calculatedServiceFee,
+                          'total': totalPayment,
+                        }),
+                        child: _payLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(
+                                'Bayar',
+                                style: AppTextStyles.sectionTitle.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
                       ),
-                      onPressed: _payLoading ? null : () => _processPayment({
-                        ...args,
-                        'serviceFee': calculatedServiceFee, // Update serviceFee
-                        'total': totalPayment, // Update total
-                      }),
-                      child: _payLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : Text(
-                              'Bayar',
-                              style: AppTextStyles.sectionTitle.copyWith(
-                                color: Colors.white,
-                                fontSize: 16,
-                              ),
-                            ),
                     ),
                   ),
                 ],
@@ -482,5 +463,26 @@ int _calculateTotalServiceFee(List<dynamic> orderItems) {
         ],
       ),
     );
+  }
+}
+
+// ============================================
+// CUSTOM SCROLL BEHAVIOR - NO OVERSCROLL
+// ============================================
+class _NoOverscrollBehavior extends ScrollBehavior {
+  const _NoOverscrollBehavior();
+
+  @override
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    return child;
+  }
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return const ClampingScrollPhysics();
   }
 }
