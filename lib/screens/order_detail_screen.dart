@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,13 +13,18 @@ import '../screens/main_shell_screen.dart';
 class OrderDetailScreen extends StatelessWidget {
   const OrderDetailScreen({super.key});
 
+  // ============================================
+  // GENERATE ORDER ID 6 DIGIT ACAK
+  // ============================================
   String _generateOrderId() {
     final random = Random();
     final int orderNumber = 100000 + random.nextInt(900000);
     return orderNumber.toString();
   }
 
-  // ✅ FUNGSI SIMPAN PESANAN KE SHARED PREFERENCES
+  // ============================================
+  // FUNGSI SIMPAN PESANAN KE SHARED PREFERENCES
+  // ============================================
   Future<void> _saveOrderToSharedPreferences({
     required String orderId,
     required String service,
@@ -27,18 +33,19 @@ class OrderDetailScreen extends StatelessWidget {
     required String deliveryTime,
     required String totalPrice,
     required String address,
-    required String itemsJson, // ← Tambahkan itemsJson
+    required String itemsJson,
   }) async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Format: serviceSummary|totalPrice|pickupTime|deliveryTime|address|itemsJson
     final String orderString = 
-        "$service|"
-        "$totalPrice|"
-        "$pickupTime|"
-        "$deliveryTime|"
-        "$address|"
-        "$itemsJson";
+        'orderId=$orderId&'
+        'service=$service&'
+        'qty=$qty&'
+        'pickupTime=$pickupTime&'
+        'deliveryTime=$deliveryTime&'
+        'totalPrice=$totalPrice&'
+        'address=$address&'
+        'itemsJson=$itemsJson';
 
     final List<String> existingOrders = prefs.getStringList('active_orders') ?? [];
     existingOrders.add(orderString);
@@ -48,24 +55,40 @@ class OrderDetailScreen extends StatelessWidget {
     debugPrint('📦 Total pesanan aktif: ${existingOrders.length}');
   }
 
-  // ✅ ENCODE ITEMS KE JSON STRING
+  // ============================================
+  // ENCODE ITEMS KE JSON STRING
+  // ============================================
   String _encodeItemsToJson(List<Map<String, dynamic>> items) {
-    String jsonStr = '[';
-    for (int i = 0; i < items.length; i++) {
-      final item = items[i];
-      jsonStr += '{';
-      jsonStr += '"title":"${item['title'] ?? item['name'] ?? ''}",';
-      jsonStr += '"price":${item['price'] ?? 0},';
-      jsonStr += '"qty":${item['qty'] ?? 1},';
-      jsonStr += '"subtotal":${item['subtotal'] ?? 0},';
-      jsonStr += '"image":"${item['image'] ?? ''}"';
-      jsonStr += '}';
-      if (i < items.length - 1) jsonStr += ',';
+    try {
+      return jsonEncode(items);
+    } catch (e) {
+      debugPrint('Error encoding items to JSON: $e');
+      return '[]';
     }
-    jsonStr += ']';
-    return jsonStr;
   }
 
+  // ============================================
+  // DECODE ITEMS DARI JSON STRING
+  // ============================================
+  List<Map<String, dynamic>> _decodeItemsFromJson(String? itemsJson) {
+    if (itemsJson == null || itemsJson.isEmpty) {
+      return [];
+    }
+    try {
+      final decoded = jsonDecode(itemsJson);
+      if (decoded is List) {
+        return decoded.cast<Map<String, dynamic>>();
+      }
+      return [];
+    } catch (e) {
+      debugPrint('Error decoding items JSON: $e');
+      return [];
+    }
+  }
+
+  // ============================================
+  // HITUNG DURASI DALAM MENIT
+  // ============================================
   int _calculateDurationMinutes(String pickup, String delivery) {
     try {
       final p = DateTime.parse(pickup);
@@ -76,8 +99,20 @@ class OrderDetailScreen extends StatelessWidget {
     }
   }
 
-  String _formatRupiah(int value) {
-    final s = value.toString();
+  // ============================================
+  // FORMAT RUPIAH
+  // ============================================
+  String _formatRupiah(dynamic value) {
+    int number = 0;
+    if (value is int) {
+      number = value;
+    } else if (value is String) {
+      number = int.tryParse(value) ?? 0;
+    } else {
+      number = 0;
+    }
+    
+    final s = number.toString();
     final buffer = StringBuffer();
     int count = 0;
     for (int i = s.length - 1; i >= 0; i--) {
@@ -87,15 +122,30 @@ class OrderDetailScreen extends StatelessWidget {
         buffer.write('.');
       }
     }
-    return buffer.toString().split('').reversed.join();
+    return 'Rp ${buffer.toString().split('').reversed.join()}';
   }
 
-  // ✅ WIDGET ITEM PESANAN DENGAN GAMBAR
+  // ============================================
+  // EKSTRAK NILAI INT DARI DYNAMIC
+  // ============================================
+  int _toInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? 0;
+    if (value is double) return value.toInt();
+    return 0;
+  }
+
+  // ============================================
+  // WIDGET ITEM PESANAN DENGAN GAMBAR
+  // ============================================
   Widget _buildOrderItemRow(Map<String, dynamic> item) {
     final name = item['title'] ?? item['name'] ?? 'Layanan';
-    final qty = (item['qty'] as int?) ?? 1;
-    final price = (item['price'] as int?) ?? 0;
-    final subtotal = item['subtotal'] ?? (qty * price);
+    final qty = _toInt(item['qty']);
+    final price = _toInt(item['price']);
+    final subtotal = _toInt(item['subtotal']) != 0 
+        ? _toInt(item['subtotal']) 
+        : (qty * price);
     final image = item['image'];
     
     return Padding(
@@ -130,9 +180,11 @@ class OrderDetailScreen extends StatelessWidget {
                 Text(
                   name,
                   style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  '$qty x Rp ${_formatRupiah(price)}',
+                  '${_formatRupiah(price)} x $qty',
                   style: AppTextStyles.bodyMuted.copyWith(fontSize: 12),
                 ),
               ],
@@ -140,7 +192,7 @@ class OrderDetailScreen extends StatelessWidget {
           ),
           
           Text(
-            'Rp ${_formatRupiah(subtotal is int ? subtotal : subtotal.toInt())}',
+            _formatRupiah(subtotal),
             style: AppTextStyles.body.copyWith(
               fontWeight: FontWeight.w600,
               color: AppColors.primaryNavy,
@@ -151,7 +203,9 @@ class OrderDetailScreen extends StatelessWidget {
     );
   }
 
-  // ✅ BUILD ORDER ITEMS WIDGET
+  // ============================================
+  // BUILD ORDER ITEMS WIDGET
+  // ============================================
   Widget _buildOrderItems(List<Map<String, dynamic>> items) {
     if (items.isEmpty) {
       return const Center(
@@ -159,11 +213,10 @@ class OrderDetailScreen extends StatelessWidget {
       );
     }
     
-    // Hitung total
-    final totalQty = items.fold(0, (sum, item) => sum + ((item['qty'] as int?) ?? 1));
+    final totalQty = items.fold(0, (sum, item) => sum + _toInt(item['qty']));
     final totalPrice = items.fold(0, (sum, item) {
-      final qty = (item['qty'] as int?) ?? 1;
-      final price = (item['price'] as int?) ?? 0;
+      final qty = _toInt(item['qty']);
+      final price = _toInt(item['price']);
       return sum + (qty * price);
     });
     
@@ -185,7 +238,7 @@ class OrderDetailScreen extends StatelessWidget {
               style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
             ),
             Text(
-              'Rp ${_formatRupiah(totalPrice)}',
+              _formatRupiah(totalPrice),
               style: AppTextStyles.body.copyWith(
                 fontWeight: FontWeight.bold,
                 color: AppColors.primaryNavy,
@@ -197,76 +250,159 @@ class OrderDetailScreen extends StatelessWidget {
     );
   }
 
+  // ============================================
+  // WIDGET BOX
+  // ============================================
+  Widget _box({required Widget child}) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: child,
+    );
+  }
+
+  // ============================================
+  // WIDGET ROW
+  // ============================================
+  Widget _row(String title, String value, {bool bold = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: bold ? AppTextStyles.sectionTitle : AppTextStyles.body,
+            ),
+          ),
+          Text(
+            value,
+            style: bold ? AppTextStyles.sectionTitle : AppTextStyles.body,
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)?.settings.arguments as Map? ?? {};
 
-    final String orderId = _generateOrderId();
+    // ============================================
+    // CEK APAKAH DARI ACTIVE ORDER ATAU CHECKOUT
+    // ============================================
+    final bool isFromActiveOrder = args['fromActiveOrder'] == true;
 
-    // Ambil items dari args
-    final List<Map<String, dynamic>> orderItems = 
-        (args['items'] as List<dynamic>?)?.cast<Map<String, dynamic>>() ?? 
-        (args['orderItems'] as List<dynamic>?)?.cast<Map<String, dynamic>>() ?? 
-        [];
+    // ============================================
+    // AMBIL DAN PARSE DATA DARI ARGUMENTS
+    // ============================================
+    List<Map<String, dynamic>> orderItems = [];
+    
+    // Cek apakah ada itemsJson
+    if (args['itemsJson'] != null && args['itemsJson'].toString().isNotEmpty) {
+      orderItems = _decodeItemsFromJson(args['itemsJson'].toString());
+    }
+    
+    // Cek apakah ada orderItems langsung
+    if (orderItems.isEmpty && args['orderItems'] != null) {
+      if (args['orderItems'] is List) {
+        orderItems = (args['orderItems'] as List).cast<Map<String, dynamic>>();
+      }
+    }
+    
+    // Cek apakah ada items langsung
+    if (orderItems.isEmpty && args['items'] != null) {
+      if (args['items'] is List) {
+        orderItems = (args['items'] as List).cast<Map<String, dynamic>>();
+      }
+    }
 
-    final int totalQty = orderItems.fold(0, (sum, item) => sum + ((item['qty'] as int?) ?? 1));
-    final int totalPrice = orderItems.fold(0, (sum, item) {
-      final qty = (item['qty'] as int?) ?? 1;
-      final price = (item['price'] as int?) ?? 0;
-      return sum + (qty * price);
-    });
+    // Generate Order ID (hanya untuk checkout, untuk active order pakai yang sudah ada)
+    final String orderId = isFromActiveOrder 
+        ? (args['orderId']?.toString() ?? '000000')
+        : (args['orderId'] ?? _generateOrderId());
 
-    final String pickupTimeText = args['pickupTime'] ?? '-';
-    final String deliveryTimeText = args['deliveryTime'] ?? '-';
-    final String pickupAddress = args['address'] ?? 'Alamat belum diisi';
-    final String deliveryAddress = args['deliveryAddress'] ?? pickupAddress;
-    final int deliveryFee = args['deliveryFee'] ?? 5000;
+    // Hitung total quantity dan total harga dengan aman
+    int totalQty = 0;
+    int totalPrice = 0;
+    
+    if (orderItems.isNotEmpty) {
+      totalQty = orderItems.fold(0, (sum, item) => sum + _toInt(item['qty']));
+      totalPrice = orderItems.fold(0, (sum, item) {
+        final qty = _toInt(item['qty']);
+        final price = _toInt(item['price']);
+        return sum + (qty * price);
+      });
+    } else {
+      // Fallback untuk format lama
+      totalQty = _toInt(args['qty'] != null ? args['qty'] : 1);
+      totalPrice = _toInt(args['serviceFee'] != null ? args['serviceFee'] : 0);
+    }
+
+    // Ambil data lainnya dengan aman
+    final String pickupTimeText = args['pickupTime']?.toString() ?? '-';
+    final String deliveryTimeText = args['deliveryTime']?.toString() ?? '-';
+    final String pickupAddress = args['address']?.toString() ?? 'Alamat belum diisi';
+    final String deliveryAddress = args['deliveryAddress']?.toString() ?? pickupAddress;
+    
+    final int deliveryFee = _toInt(args['deliveryFee'] != null ? args['deliveryFee'] : 5000);
     final int grandTotal = totalPrice + deliveryFee;
 
+    // Service summary untuk display
+    final String serviceSummary = orderItems.isEmpty 
+        ? (args['service']?.toString() ?? 'Laundry')
+        : orderItems.map((item) => '${item['title'] ?? item['name']} (${item['qty']})').join(' + ');
+
+    // Hitung durasi
     final int durationMinutes = _calculateDurationMinutes(pickupTimeText, deliveryTimeText);
     final String durationText = durationMinutes >= 60
         ? '${(durationMinutes / 60).round()} jam'
         : '$durationMinutes menit';
 
-    // Service summary untuk display
-    final String serviceSummary = orderItems.isEmpty 
-        ? 'Laundry'
-        : orderItems.map((item) => '${item['title'] ?? item['name']} (${item['qty']})').join(' + ');
+    // Encode items ke JSON untuk disimpan (hanya untuk checkout)
+    final itemsJson = _encodeItemsToJson(orderItems);
 
     return Scaffold(
       backgroundColor: AppColors.headerNavy,
       appBar: NavyBackAppBar(
         title: 'Detail Pesanan',
         onBack: () async {
-          // Encode items ke JSON
-          final itemsJson = _encodeItemsToJson(orderItems);
-          
-          await _saveOrderToSharedPreferences(
-            orderId: orderId,
-            service: serviceSummary,
-            qty: totalQty.toString(),
-            pickupTime: pickupTimeText,
-            deliveryTime: deliveryTimeText,
-            totalPrice: 'Rp ${_formatRupiah(grandTotal)}',
-            address: pickupAddress,
-            itemsJson: itemsJson,
-          );
+          // Hanya simpan jika dari checkout, jika dari active order langsung back
+          if (!isFromActiveOrder) {
+            await _saveOrderToSharedPreferences(
+              orderId: orderId,
+              service: serviceSummary,
+              qty: totalQty.toString(),
+              pickupTime: pickupTimeText,
+              deliveryTime: deliveryTimeText,
+              totalPrice: _formatRupiah(grandTotal),
+              address: pickupAddress,
+              itemsJson: itemsJson,
+            );
 
-          if (!context.mounted) return;
+            if (!context.mounted) return;
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Pesanan $orderId berhasil dibuat!'),
-              backgroundColor: AppColors.success,
-              duration: const Duration(seconds: 2),
-            ),
-          );
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Pesanan $orderId berhasil dibuat!'),
+                backgroundColor: AppColors.success,
+                duration: const Duration(seconds: 2),
+              ),
+            );
 
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (_) => const MainShellScreen()),
-            (route) => false,
-          );
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const MainShellScreen()),
+              (route) => false,
+            );
+          } else {
+            // Jika dari active order, langsung back tanpa menyimpan
+            Navigator.pop(context);
+          }
         },
       ),
       body: Column(
@@ -286,6 +422,9 @@ class OrderDetailScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // ============================================
+                      // BOX STATUS PESANAN
+                      // ============================================
                       _box(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -365,16 +504,41 @@ class OrderDetailScreen extends StatelessWidget {
                           ],
                         ),
                       ),
+                      
                       const SizedBox(height: 20),
                       
-                      // ✅ BOX DAFTAR PESANAN
+                      // ============================================
+                      // BOX DAFTAR PESANAN
+                      // ============================================
                       if (orderItems.isNotEmpty)
                         _box(
                           child: _buildOrderItems(orderItems),
                         ),
+                      
+                      // Fallback jika orderItems kosong
+                      if (orderItems.isEmpty)
+                        _box(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Daftar Pesanan',
+                                style: AppTextStyles.sectionTitle.copyWith(fontSize: 16),
+                              ),
+                              const SizedBox(height: 12),
+                              _row(args['service']?.toString() ?? 'Laundry', 
+                                   '${args['qty'] ?? 1} x ${_formatRupiah(args['serviceFee'] ?? 0)}'),
+                              const Divider(),
+                              _row('Subtotal Pesanan', _formatRupiah(totalPrice)),
+                            ],
+                          ),
+                        ),
 
                       const SizedBox(height: 20),
 
+                      // ============================================
+                      // BOX DETAIL (WAKTU, ALAMAT, PEMBAYARAN)
+                      // ============================================
                       _box(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,100 +552,71 @@ class OrderDetailScreen extends StatelessWidget {
                             const SizedBox(height: 10),
                             Text('Detail Pembayaran', style: AppTextStyles.sectionTitle),
                             const SizedBox(height: 10),
-                            _row('Biaya Pengiriman', 'Rp ${_formatRupiah(deliveryFee)}'),
+                            _row('Biaya Pengiriman', _formatRupiah(deliveryFee)),
                             _row('Kode Promo', '-'),
                             const Divider(),
-                            _row('Total Pembayaran', 'Rp ${_formatRupiah(grandTotal)}', bold: true),
+                            _row('Total Pembayaran', _formatRupiah(grandTotal), bold: true),
                           ],
                         ),
                       ),
+                      
                       const SizedBox(height: 20),
 
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            final itemsJson = _encodeItemsToJson(orderItems);
-                            
-                            await _saveOrderToSharedPreferences(
-                              orderId: orderId,
-                              service: serviceSummary,
-                              qty: totalQty.toString(),
-                              pickupTime: pickupTimeText,
-                              deliveryTime: deliveryTimeText,
-                              totalPrice: 'Rp ${_formatRupiah(grandTotal)}',
-                              address: pickupAddress,
-                              itemsJson: itemsJson,
-                            );
-
-                            if (!context.mounted) return;
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Pesanan $orderId berhasil dibuat!'),
-                                backgroundColor: AppColors.success,
-                                duration: const Duration(seconds: 2),
-                              ),
-                            );
-
-                            Future.delayed(const Duration(seconds: 1), () {
-                              if (!context.mounted) return;
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(builder: (_) => const MainShellScreen()),
-                                (route) => false,
+                      // ============================================
+                      // TOMBOL KONFIRMASI PESANAN (HANYA UNTUK CHECKOUT)
+                      // ============================================
+                      if (!isFromActiveOrder) 
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              await _saveOrderToSharedPreferences(
+                                orderId: orderId,
+                                service: serviceSummary,
+                                qty: totalQty.toString(),
+                                pickupTime: pickupTimeText,
+                                deliveryTime: deliveryTimeText,
+                                totalPrice: _formatRupiah(grandTotal),
+                                address: pickupAddress,
+                                itemsJson: itemsJson,
                               );
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.headerNavy,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                          child: const Text(
-                            'Konfirmasi Pesanan',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+
+                              if (!context.mounted) return;
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Pesanan $orderId berhasil dibuat!'),
+                                  backgroundColor: AppColors.success,
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+
+                              Future.delayed(const Duration(seconds: 1), () {
+                                if (!context.mounted) return;
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const MainShellScreen()),
+                                  (route) => false,
+                                );
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.headerNavy,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            child: const Text(
+                              'Konfirmasi Pesanan',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+                            ),
                           ),
                         ),
-                      ),
                       const SizedBox(height: 20),
                     ],
                   ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _box({required Widget child}) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderLight),
-      ),
-      child: child,
-    );
-  }
-
-  Widget _row(String title, String value, {bool bold = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              title,
-              style: bold ? AppTextStyles.sectionTitle : AppTextStyles.body,
-            ),
-          ),
-          Text(
-            value,
-            style: bold ? AppTextStyles.sectionTitle : AppTextStyles.body,
           ),
         ],
       ),

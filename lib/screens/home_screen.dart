@@ -435,11 +435,34 @@ class _HomeScreenState
                                     behavior: HitTestBehavior
                                         .opaque,
                                     onTap: () {
+                                      // Parse itemsJson jika ada untuk menampilkan detail lengkap
+                                      final itemsJson = order['itemsJson'];
+                                      List<dynamic> orderItems = [];
+                                      
+                                      if (itemsJson != null && itemsJson.isNotEmpty) {
+                                        try {
+                                          // Decode itemsJson jika ada (format JSON string)
+                                          // Asumsikan itemsJson sudah dalam bentuk List atau Map
+                                          if (itemsJson is String) {
+                                            // Jika masih string JSON, parse dulu
+                                            // orderItems = jsonDecode(itemsJson);
+                                            // Untuk sementara, gunakan pendekatan sederhana
+                                            orderItems = [];
+                                          } else if (itemsJson is List) {
+                                            orderItems = itemsJson;
+                                          }
+                                        } catch (e) {
+                                          print('Error parsing itemsJson: $e');
+                                        }
+                                      }
+                                      
                                       Navigator.pushNamed(
                                         context,
                                         '/order-detail',
-                                        arguments:
-                                            order,
+                                        arguments: {
+                                          ...order,
+                                          'fromActiveOrder': true, // Tambahkan orderItems untuk detail lengkap
+                                        },
                                       );
                                     },
                                     child: Padding(

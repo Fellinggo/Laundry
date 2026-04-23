@@ -33,11 +33,14 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
     return 'Rp $result';
   }
 
-  int _calculateTotalServiceFee(List<dynamic> items) {
-    if (items.isEmpty) return 0;
+  // ============================================
+  // HITUNG TOTAL SERVICE FEE DARI ORDER ITEMS
+  // ============================================
+  int _calculateTotalServiceFee(List<dynamic> orderItems) {
+    if (orderItems.isEmpty) return 0;
     
     int total = 0;
-    for (var item in items) {
+    for (var item in orderItems) {
       if (item.containsKey('subtotal')) {
         total += (item['subtotal'] as int?) ?? 0;
       } else {
@@ -49,16 +52,19 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
     return total;
   }
 
+  // ============================================
+  // ENCODE ITEMS KE JSON STRING
+  // ============================================
   String _encodeItemsToJson(List<dynamic> items) {
     String jsonStr = '[';
     for (int i = 0; i < items.length; i++) {
       final item = items[i];
       jsonStr += '{';
-      jsonStr += '"title":"${item['title']}",';
+      jsonStr += '"title":"${item['title'] ?? item['name']}",';
       jsonStr += '"price":${item['price']},';
       jsonStr += '"qty":${item['qty']},';
-      jsonStr += '"subtotal":${item['subtotal']},';
-      jsonStr += '"image":"${item['image']}"';
+      jsonStr += '"subtotal":${item['subtotal'] ?? (item['qty'] * item['price'])},';
+      jsonStr += '"image":"${item['image'] ?? ''}"';
       jsonStr += '}';
       if (i < items.length - 1) jsonStr += ',';
     }
@@ -66,6 +72,9 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
     return jsonStr;
   }
 
+  // ============================================
+  // WIDGET UNTUK MENAMPILKAN ITEM PESANAN (DENGAN GAMBAR)
+  // ============================================
   Widget _buildOrderItem(Map<String, dynamic> item) {
     final name = item['title'] ?? item['name'] ?? 'Layanan';
     final qty = (item['qty'] as int?) ?? 1;
@@ -77,7 +86,7 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          if (item['image'] != null)
+          if (item['image'] != null && item['image'].toString().isNotEmpty)
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.asset(
@@ -95,7 +104,8 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                 },
               ),
             ),
-          if (item['image'] != null) const SizedBox(width: 12),
+          if (item['image'] != null && item['image'].toString().isNotEmpty) 
+            const SizedBox(width: 12),
           
           Expanded(
             child: Column(
@@ -131,26 +141,64 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
     );
   }
 
+  // ============================================
+  // WIDGET UNTUK MENAMPILKAN SEMUA LAYANAN YANG DIPESAN
+  // ============================================
   Widget _buildServiceSummary(Map args) {
-    final List<dynamic> items = args['items'] ?? [];
+    final List<dynamic> orderItems = args['orderItems'] ?? args['items'] ?? [];
     
-    if (items.isEmpty) {
+    if (orderItems.isEmpty) {
+      // Fallback jika tidak ada orderItems (format lama)
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.inputFill,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: const Center(
-          child: Text(
-            'Tidak ada layanan dipilih',
-            style: TextStyle(color: Colors.grey),
-          ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    args['service'] ?? 'Layanan',
+                    style: AppTextStyles.body.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${args['qty'] ?? 1} x ${_formatRp(args['serviceFee'] ?? 0)}',
+                    style: AppTextStyles.bodyMuted,
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  'Total Layanan',
+                  style: AppTextStyles.caption,
+                ),
+                Text(
+                  _formatRp(args['serviceFee'] ?? 0),
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryNavy,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       );
     }
 
-    final totalServiceFee = _calculateTotalServiceFee(items);
+    // Format dengan multiple items
+    final totalServiceFee = _calculateTotalServiceFee(orderItems);
     
     return Container(
       padding: const EdgeInsets.all(16),
@@ -160,10 +208,36 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
         children: [
-          ...items.map((item) => _buildOrderItem(item as Map<String, dynamic>)),
+          // Header
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Layanan',
+                  style: AppTextStyles.sectionTitle.copyWith(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  'Harga',
+                  style: AppTextStyles.caption.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // List layanan
+          ...orderItems.map((item) => _buildOrderItem(item as Map<String, dynamic>)),
+          
           const Divider(height: 24),
+          
+          // Total
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -188,6 +262,27 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
     );
   }
 
+  Widget _buildEditButton(VoidCallback onEdit) {
+    return TextButton.icon(
+      onPressed: onEdit,
+      icon: const Icon(Icons.edit_outlined, size: 16),
+      label: Text(
+        'Edit',
+        style: AppTextStyles.bodyMuted.copyWith(
+          color: AppColors.actionBlue,
+        ),
+      ),
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+    );
+  }
+
+  // ============================================
+  // PROSES PEMBAYARAN
+  // ============================================
   Future<void> _processPayment(Map args) async {
     setState(() => _payLoading = true);
     await Future.delayed(const Duration(milliseconds: 800));
@@ -195,29 +290,50 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
     final prefs = await SharedPreferences.getInstance();
     List<String> currentOrders = prefs.getStringList('active_orders') ?? [];
 
-    final List<dynamic> items = args['items'] ?? [];
+    final List<dynamic> orderItems = args['orderItems'] ?? args['items'] ?? [];
     
     String serviceSummary = '';
-    for (var item in items) {
-      final name = item['title'] ?? 'Layanan';
-      final qty = (item['qty'] as int?) ?? 1;
-      serviceSummary += '$name ($qty) + ';
+    int totalQty = 0;
+    
+    if (orderItems.isNotEmpty) {
+      // Format baru dengan multiple items
+      for (var item in orderItems) {
+        final name = item['title'] ?? item['name'] ?? 'Layanan';
+        final qty = (item['qty'] as int?) ?? 1;
+        serviceSummary += '$name ($qty) + ';
+        totalQty += qty;
+      }
+      if (serviceSummary.endsWith(' + ')) {
+        serviceSummary = serviceSummary.substring(0, serviceSummary.length - 3);
+      }
+      
+      final itemsJson = _encodeItemsToJson(orderItems);
+      
+      String newOrderRaw = 
+          "$serviceSummary|"
+          "${args['total'] ?? 0}|"
+          "${args['pickupTime'] ?? '-'}|"
+          "${args['deliveryTime'] ?? '-'}|"
+          "${args['address'] ?? '-'}|"
+          "$itemsJson";
+
+      currentOrders.add(newOrderRaw);
+    } else {
+      // Format lama (fallback)
+      serviceSummary = args['service'] ?? 'Laundry';
+      totalQty = args['qty'] ?? 1;
+      
+      String newOrderRaw = 
+          "service=$serviceSummary&"
+          "qty=$totalQty&"
+          "pickupTime=${args['pickupTime'] ?? '-'}&"
+          "deliveryTime=${args['deliveryTime'] ?? '-'}&"
+          "totalPrice=${args['total'] ?? 0}&"
+          "address=${args['address'] ?? '-'}";
+
+      currentOrders.add(newOrderRaw);
     }
-    if (serviceSummary.endsWith(' + ')) {
-      serviceSummary = serviceSummary.substring(0, serviceSummary.length - 3);
-    }
-
-    final itemsJson = _encodeItemsToJson(items);
-
-    String newOrderRaw = 
-        "$serviceSummary|"
-        "${args['total'] ?? 0}|"
-        "${args['pickupTime'] ?? '-'}|"
-        "${args['deliveryTime'] ?? '-'}|"
-        "${args['address'] ?? '-'}|"
-        "$itemsJson";
-
-    currentOrders.add(newOrderRaw);
+    
     await prefs.setStringList('active_orders', currentOrders);
 
     if (!mounted) return;
@@ -225,10 +341,10 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
 
     Navigator.pushNamed(
       context,
-      '/order-detail',
+      '/payment',
       arguments: {
         ...args,
-        'items': items,
+        'orderItems': orderItems,
         'serviceSummary': serviceSummary,
       },
     );
@@ -238,14 +354,16 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
   Widget build(BuildContext context) {
     final args = (ModalRoute.of(context)?.settings.arguments as Map?) ?? {};
     
-    final List<dynamic> items = args['items'] ?? [];
-    
-    final calculatedServiceFee = items.isNotEmpty 
-        ? _calculateTotalServiceFee(items) 
+    // ============================================
+    // HITUNG ULANG TOTAL JIKA PERLU
+    // ============================================
+    final List<dynamic> orderItems = args['orderItems'] ?? args['items'] ?? [];
+    final calculatedServiceFee = orderItems.isNotEmpty 
+        ? _calculateTotalServiceFee(orderItems) 
         : (args['serviceFee'] ?? 0);
     
     final deliveryFee = args['deliveryFee'] ?? 5000;
-    final totalPayment = args['total'] ?? (calculatedServiceFee + deliveryFee);
+    final totalPayment = calculatedServiceFee + deliveryFee;
 
     return Scaffold(
       backgroundColor: AppColors.headerNavy,
@@ -278,6 +396,7 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // ================= RINGKASAN PESANAN (tanpa edit) =================
                             Text(
                               'Ringkasan Pesanan',
                               style: AppTextStyles.sectionTitle.copyWith(
@@ -287,10 +406,12 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                             ),
                             const SizedBox(height: 12),
                             
+                            // ================= SERVICE SUMMARY =================
                             _buildServiceSummary(args),
                             
                             const SizedBox(height: 24),
                             
+                            // ================= DETAIL PENGIRIMAN DENGAN EDIT DI SAMPING =================
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -301,21 +422,7 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                TextButton.icon(
-                                  onPressed: () => Navigator.pop(context),
-                                  icon: const Icon(Icons.edit_outlined, size: 16),
-                                  label: Text(
-                                    'Edit',
-                                    style: AppTextStyles.bodyMuted.copyWith(
-                                      color: AppColors.actionBlue,
-                                    ),
-                                  ),
-                                  style: TextButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                    minimumSize: Size.zero,
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  ),
-                                ),
+                                _buildEditButton(() => Navigator.pop(context)),
                               ],
                             ),
                             const SizedBox(height: 12),
@@ -339,7 +446,7 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                                     valueBold: true,
                                   ),
                                   InfoKvRow(
-                                    label: 'Alamat',
+                                    label: 'Alamat Pengiriman',
                                     value: args['address'] ?? '-',
                                     valueBold: true,
                                   ),
@@ -349,6 +456,7 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                             
                             const SizedBox(height: 24),
                             
+                            // ================= DETAIL PEMBAYARAN =================
                             Text(
                               'Detail Pembayaran',
                               style: AppTextStyles.sectionTitle.copyWith(
@@ -433,7 +541,6 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                         ),
                         onPressed: _payLoading ? null : () => _processPayment({
                           ...args,
-                          'items': items,
                           'serviceFee': calculatedServiceFee,
                           'total': totalPayment,
                         }),
