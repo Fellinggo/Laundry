@@ -35,6 +35,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
     loadUser();
   }
 
+  Future<void> _editName() async {
+    final controller = TextEditingController(text: name);
+    
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Nama'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            labelText: 'Nama',
+            hintText: 'Masukkan nama baru',
+          ),
+          autofocus: true,
+          textCapitalization: TextCapitalization.words,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
+    );
+
+    if (newName != null && newName.isNotEmpty && newName != name) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('userName', newName);
+      
+      setState(() {
+        name = newName;
+      });
+    }
+  }
+
+
   // ============================================
   // GET STORAGE KEY BERDASARKAN EMAIL
   // ============================================
@@ -206,50 +246,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: 10),
 
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-          child: GestureDetector(
-            onTap: () => _handleProtectedAction(() {
-              debugPrint("Edit profil");
-            }),
-            child: Row(
-              children: [
-                const CircleAvatar(
-                  radius: 36,
-                  backgroundColor: AppColors.iconCircle,
-                  child: Icon(Icons.person,
-                      size: 40, color: AppColors.textSecondary),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        name,
-                        style: AppTextStyles.sectionTitle.copyWith(
-                          fontSize: 17,
-                          color: Colors.white,
+        GestureDetector(
+          onTap: () => _handleProtectedAction(() {
+            _editName();  // ← Panggil dialog edit
+          }),
+          child: Row(
+            children: [
+              const CircleAvatar(
+                radius: 36,
+                backgroundColor: AppColors.iconCircle,
+                child: Icon(Icons.person, size: 40, color: AppColors.textSecondary),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            name,
+                            style: AppTextStyles.sectionTitle.copyWith(
+                              fontSize: 17,
+                              color: Colors.white,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        email,
-                        style: AppTextStyles.bodyMuted.copyWith(
+                        const SizedBox(width: 6),
+                        const Icon(
+                          Icons.edit_outlined,
+                          size: 16,
                           color: Colors.white70,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      email,
+                      style: AppTextStyles.bodyMuted.copyWith(color: Colors.white70),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
+
       ],
     );
 

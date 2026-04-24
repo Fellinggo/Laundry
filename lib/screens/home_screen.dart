@@ -46,11 +46,11 @@ class HomeScreen
   createState() => _HomeScreenState();
 }
 
-class _HomeScreenState
-    extends
-        State<
-          HomeScreen
-        > {
+class _HomeScreenState extends State<HomeScreen> {
+
+  // ✅ TAMBAHAN
+  String? userFirstName;
+
   Widget _buildEmptyOrderBox() {
     return Container(
       width: double.infinity,
@@ -72,9 +72,7 @@ class _HomeScreenState
             color: Colors.grey.shade400,
             size: 40,
           ),
-          const SizedBox(
-            height: 8,
-          ),
+          const SizedBox(height: 8),
           Text(
             "Belum ada pesanan aktif",
             style: AppTextStyles.bodyMuted.copyWith(
@@ -86,21 +84,9 @@ class _HomeScreenState
     );
   }
 
-  List<
-    Map<
-      String,
-      dynamic
-    >
-  >
-  activeOrders = [];
+  List<Map<String, dynamic>> activeOrders = [];
 
-  final List<
-    Map<
-      String,
-      dynamic
-    >
-  >
-  items = [
+  final List<Map<String, dynamic>> items = [
     {
       'title': 'Cuci Regular',
       'price': 'Rp 20.000/plastik',
@@ -125,12 +111,31 @@ class _HomeScreenState
   void initState() {
     super.initState();
     loadActiveOrder();
+    _loadUserName(); // ✅ TAMBAHAN
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     loadActiveOrder();
+    _loadUserName(); // ✅ TAMBAHAN
+  }
+
+  // ✅ TAMBAHAN FUNCTION
+  Future<void> _loadUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+    if (isLoggedIn) {
+      final fullName = prefs.getString('userName') ?? 'User';
+      setState(() {
+        userFirstName = fullName.split(' ').first;
+      });
+    } else {
+      setState(() {
+        userFirstName = null;
+      });
+    }
   }
 
   // ✅ FUNGSI LOAD ORDER - SUDAH DIPERBAIKI
@@ -334,6 +339,8 @@ class _HomeScreenState
   Widget build(
     BuildContext context,
   ) {
+
+    _loadUserName();
     return ColoredBox(
       color: AppColors.headerNavy,
       child: Column(
@@ -360,10 +367,10 @@ class _HomeScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (widget.loggedIn &&
-                          widget.userFirstName !=
+                          userFirstName !=
                               null) ...[
                         Text(
-                          'Hi ${widget.userFirstName} 👋',
+                          'Hi ${userFirstName} 👋',
                           style: AppTextStyles.screenTitleNavy.copyWith(
                             fontSize: 18,
                           ),

@@ -48,6 +48,12 @@ class OrderDetailScreen
   }) async {
     final prefs = await SharedPreferences.getInstance();
 
+    final notif = "Pesanan $orderId berhasil dibuat - ${DateTime.now()}";
+
+    final list = prefs.getStringList('notifications') ?? [];
+    list.insert(0, notif);
+
+    await prefs.setStringList('notifications', list);
     final String orderString = Uri(
       queryParameters: {
         'orderId': orderId,
