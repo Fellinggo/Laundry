@@ -60,7 +60,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void _skip() {
     _controller.animateToPage(
-      _pages.length - 1, // ke halaman onboarding ke-4
+      _pages.length - 1, 
       duration: const Duration(milliseconds: 350),
       curve: Curves.easeOutCubic,
     );
@@ -107,7 +107,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
 
-            // DOT INDICATOR
             if (!page.finalPage)
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
@@ -133,7 +132,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             else
               const SizedBox(height: 20),
 
-            // BUTTON
             Padding(
               padding: const EdgeInsets.fromLTRB(
                 AppSpacing.xl,

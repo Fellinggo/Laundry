@@ -74,10 +74,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-
-  // ============================================
-  // GET STORAGE KEY BERDASARKAN EMAIL
-  // ============================================
   String get _addressKey => 'userAddresses_$email';
   String get _titlesKey => 'userAddressTitles_$email';
 
@@ -91,14 +87,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         name = prefs.getString('userName') ?? 'User';
         email = prefs.getString('userEmail') ?? '-';
 
-        // ============================================
-        // LOAD ALAMAT BERDASARKAN EMAIL
-        // ============================================
         final savedAddresses = prefs.getStringList(_addressKey) ?? [];
         final savedTitles = prefs.getStringList(_titlesKey) ?? [];
 
         if (savedAddresses.isNotEmpty) {
-          // Load alamat yang sudah tersimpan untuk email ini
           addresses = List.generate(savedAddresses.length, (i) {
             return {
               'title': i < savedTitles.length ? savedTitles[i] : 'Alamat',
@@ -106,14 +98,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             };
           });
         } else {
-          // Tidak ada alamat tersimpan untuk email ini
           final isSignup = prefs.getBool('isSignup') ?? false;
 
           if (isSignup) {
-            // SIGNUP → ALAMAT KOSONG
             addresses = [];
           } else {
-            // LOGIN → 2 ALAMAT DEFAULT
             addresses = [
               {
                 'title': 'Rumah',
@@ -124,12 +113,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 'address': 'Gedung Aurora Lt. 5, Jl. Sudirman',
               },
             ];
-            // Simpan alamat default ke SharedPreferences
             _saveAddressesToPrefs();
           }
         }
       } else {
-        // BELUM LOGIN → KOSONG
         name = 'Belum Login';
         email = 'Silakan login terlebih dahulu';
         addresses = [];
@@ -137,16 +124,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  // ============================================
-  // SIMPAN ALAMAT DENGAN KEY BERDASARKAN EMAIL
-  // ============================================
   Future<void> _saveAddressesToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     
     final addressList = addresses.map((addr) => addr['address']!).toList();
     final titleList = addresses.map((addr) => addr['title']!).toList();
     
-    // Simpan dengan key berdasarkan email
     await prefs.setStringList(_addressKey, addressList);
     await prefs.setStringList(_titlesKey, titleList);
   }
@@ -248,7 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         GestureDetector(
           onTap: () => _handleProtectedAction(() {
-            _editName();  // ← Panggil dialog edit
+            _editName(); 
           }),
           child: Row(
             children: [
@@ -323,7 +306,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 8),
 
-          // ================= ALAMAT LIST =================
           if (isLoggedIn && addresses.isNotEmpty)
             ...List.generate(addresses.length, (i) {
               return Column(

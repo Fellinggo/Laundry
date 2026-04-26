@@ -53,7 +53,6 @@ class _PinEntryScreenState
     );
   }
 
-  // 🔥 FINAL SAVE ORDER
   Future<
     void
   >
@@ -62,7 +61,6 @@ class _PinEntryScreenState
   ) async {
     final prefs = await SharedPreferences.getInstance();
 
-    // FLAG WAJIB
     await prefs.setBool(
       'active_order_exists',
       true,

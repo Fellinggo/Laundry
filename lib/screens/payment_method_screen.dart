@@ -56,7 +56,7 @@ class PaymentMethodScreen
                 '/pin',
                 arguments: {
                   'wallet': 'DANA',
-                  'order': args, // 🔥 PASS ORDER
+                  'order': args, 
                 },
               );
             },

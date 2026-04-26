@@ -22,9 +22,9 @@ class MyOrdersScreen extends StatefulWidget {
 
 class _MyOrdersScreenState extends State<MyOrdersScreen> {
   int _tab = 0;
-  List<Map<String, dynamic>> activeOrders = [];      // Tab 0: Pesanan
-  List<Map<String, dynamic>> processOrders = [];     // Tab 1: Proses
-  List<Map<String, dynamic>> completedOrders = [];   // Tab 2: Selesai
+  List<Map<String, dynamic>> activeOrders = [];     
+  List<Map<String, dynamic>> processOrders = [];     
+  List<Map<String, dynamic>> completedOrders = [];   
   bool _isLoading = true;
 
   @override
@@ -47,9 +47,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     }
   }
 
-  // ============================================
-  // LOAD ORDERS - DIPISAH PER TAB
-  // ============================================
   Future<void> _loadOrders() async {
     final prefs = await SharedPreferences.getInstance();
     final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
@@ -66,7 +63,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
 
     setState(() => _isLoading = true);
 
-    // Load dari 3 sumber berbeda
     final List<String> activeRaw = prefs.getStringList('active_orders') ?? [];
     final List<String> processRaw = prefs.getStringList('process_orders') ?? [];
     final List<String> completedRaw = prefs.getStringList('completed_orders') ?? [];
@@ -79,16 +75,12 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     });
   }
 
-  // ============================================
-  // PARSE LIST OF ORDER STRINGS
-  // ============================================
   List<Map<String, dynamic>> _parseOrdersList(List<String> ordersRaw) {
     final List<Map<String, dynamic>> orders = [];
     
     for (String orderString in ordersRaw) {
       final data = Uri.splitQueryString(orderString);
       
-      // Decode itemsJson
       List<Map<String, dynamic>> orderItems = [];
       if (data['itemsJson'] != null && data['itemsJson']!.isNotEmpty) {
         try {
@@ -117,9 +109,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     return orders;
   }
 
-  // ============================================
-  // FORMAT RUPIAH
-  // ============================================
   String _formatRupiah(dynamic value) {
     int number = 0;
     if (value is int) {
@@ -143,9 +132,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     return 'Rp ${buffer.toString().split('').reversed.join()}';
   }
 
-  // ============================================
-  // SAFE TO INT
-  // ============================================
   int _safeToInt(dynamic value) {
     if (value == null) return 1;
     if (value is int) return value;
@@ -156,9 +142,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     return 1;
   }
 
-  // ============================================
-  // GET SERVICE TITLE
-  // ============================================
   String _getServiceTitle(Map<String, dynamic> order) {
     final orderItems = order['orderItems'] as List<Map<String, dynamic>>?;
     if (orderItems != null && orderItems.isNotEmpty) {
@@ -168,9 +151,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     return order['service'] ?? 'Laundry';
   }
 
-  // ============================================
-  // GET TOTAL PRICE
-  // ============================================
   int _getTotalPrice(Map<String, dynamic> order) {
     final orderItems = order['orderItems'] as List<Map<String, dynamic>>?;
     if (orderItems != null && orderItems.isNotEmpty) {
@@ -187,9 +167,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     return number;
   }
 
-  // ============================================
-  // GET DATE LABEL
-  // ============================================
   String _getDateLabel(String pickupTime) {
     try {
       final pickup = DateTime.parse(pickupTime);
@@ -199,9 +176,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     }
   }
 
-  // ============================================
-  // GET MONTH NAME
-  // ============================================
   String _getMonthName(int month) {
     const months = [
       'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
@@ -250,9 +224,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     );
   }
 
-  // ============================================
-  // BUILD CONTENT BERDASARKAN TAB
-  // ============================================
   Widget _buildContent() {
     if (_isLoading) {
       return const Center(
@@ -260,7 +231,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       );
     }
 
-    // Tab 0: Pesanan (Active Orders)
     if (_tab == 0) {
       if (activeOrders.isEmpty) {
         return const _EmptyOrdersState(
@@ -270,7 +240,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       }
       return _buildOrderList(activeOrders, 'active');
     } 
-    // Tab 1: Proses
     else if (_tab == 1) {
       if (processOrders.isEmpty) {
         return const _EmptyOrdersState(
@@ -280,7 +249,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       }
       return _buildOrderList(processOrders, 'process');
     } 
-    // Tab 2: Selesai
     else {
       if (completedOrders.isEmpty) {
         return const _EmptyOrdersState(
@@ -292,9 +260,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     }
   }
 
-  // ============================================
-  // BUILD ORDER LIST - TANPA GAMBAR & SUBTOTAL
-  // ============================================
   Widget _buildOrderList(List<Map<String, dynamic>> orders, String status) {
     return ListView.builder(
       itemCount: orders.length,
@@ -307,7 +272,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
         final grandTotal = totalPrice + shippingFee;
         final dateLabel = _getDateLabel(order['pickupTime']);
         
-        // Hanya kirim data yang diperlukan ke card
         return PesananOrderCard(
           orderId: 'No. Pesanan $orderId',
           dateLabel: dateLabel,
@@ -331,7 +295,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
   }
 }
 
-/// ================= EMPTY STATE =================
 class _EmptyOrdersState extends StatelessWidget {
   const _EmptyOrdersState({
     this.message = 'Belum ada pesanan',

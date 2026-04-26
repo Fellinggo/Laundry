@@ -27,7 +27,6 @@ class _MainShellScreenState extends State<MainShellScreen> {
     loadUser();
   }
 
-  // Refresh data user saat shell aktif kembali
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -42,7 +41,6 @@ class _MainShellScreenState extends State<MainShellScreen> {
     });
   }
 
-  // ================= NOTIFIKASI =================
   void _handleNotificationTap() {
     if (!loggedIn) {
       showLoginModal(context);
@@ -51,7 +49,6 @@ class _MainShellScreenState extends State<MainShellScreen> {
     Navigator.pushNamed(context, '/notifications');
   }
 
-  // ================= NAV CONTROL =================
   void _goToServicesTab() => setState(() => _index = 2);
 
   void _goToServiceDetail(Map<String, dynamic> service) {
@@ -72,7 +69,6 @@ class _MainShellScreenState extends State<MainShellScreen> {
       body: IndexedStack(
         index: _index,
         children: [
-          // 1. HOME SCREEN
           HomeScreen(
             loggedIn: loggedIn,
             userFirstName: userFirstName,
@@ -80,26 +76,21 @@ class _MainShellScreenState extends State<MainShellScreen> {
             onOpenServices: _goToServicesTab,
             onOpenServiceDetail: _goToServiceDetail,
             onOpenDisc: _goToDisc,
-            // ✅ Parameter 'onOpenOffers' dihapus karena sudah tidak ada di HomeScreen
           ),
 
-          // 2. MY ORDERS
           const MyOrdersScreen(),
 
-          // 3. SERVICES
           ServicesScreen(
             loggedIn: loggedIn,
             onOpenNotifications: _handleNotificationTap,
           ),
 
-          // 4. OFFERS
           OffersScreen(
             loggedIn: loggedIn,
             onOpenNotifications: _handleNotificationTap,
             onOpenServices: _goToServicesTab,
           ),
 
-          // 5. PROFILE
           ProfileScreen(
             key: ValueKey(loggedIn),
           ),
@@ -109,7 +100,6 @@ class _MainShellScreenState extends State<MainShellScreen> {
         currentIndex: _index,
         onTap: (i) {
           setState(() => _index = i);
-          // Refresh status login setiap kali ganti tab
           loadUser();
         },
       ),

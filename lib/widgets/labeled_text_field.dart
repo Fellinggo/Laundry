@@ -32,7 +32,6 @@ class LabeledTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ================= LABEL =================
         Text(
           label,
           style: AppTextStyles.sectionTitle.copyWith(
@@ -42,7 +41,6 @@ class LabeledTextField extends StatelessWidget {
 
         const SizedBox(height: 8),
 
-        // ================= TEXT FIELD =================
         TextField(
           controller: controller,
           obscureText: obscure,
@@ -50,7 +48,6 @@ class LabeledTextField extends StatelessWidget {
           keyboardType: keyboardType,
           style: AppTextStyles.body,
 
-          // 🔥 GLOBAL CURSOR COLOR (SAMAKAN SEMUA FIELD)
           cursorColor: AppColors.primaryNavy,
 
           decoration: InputDecoration(
@@ -59,7 +56,6 @@ class LabeledTextField extends StatelessWidget {
             filled: true,
             fillColor: AppColors.white,
 
-            // 🔥 ERROR TEXT (muncul di bawah border otomatis)
             errorText: errorText,
 
             contentPadding: const EdgeInsets.symmetric(
@@ -67,7 +63,6 @@ class LabeledTextField extends StatelessWidget {
               vertical: 14,
             ),
 
-            // ================= PREFIX ICON =================
             prefixIcon: prefixIcon != null
                 ? Icon(
                     prefixIcon,
@@ -76,10 +71,8 @@ class LabeledTextField extends StatelessWidget {
                   )
                 : null,
 
-            // ================= SUFFIX =================
             suffixIcon: suffix,
 
-            // ================= BORDER NORMAL =================
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 AppSpacing.inputRadius,
@@ -89,7 +82,6 @@ class LabeledTextField extends StatelessWidget {
               ),
             ),
 
-            // ================= ENABLED BORDER =================
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 AppSpacing.inputRadius,
@@ -100,7 +92,6 @@ class LabeledTextField extends StatelessWidget {
               ),
             ),
 
-            // ================= FOCUSED BORDER =================
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 AppSpacing.inputRadius,
@@ -111,7 +102,6 @@ class LabeledTextField extends StatelessWidget {
               ),
             ),
 
-            // ================= ERROR BORDER =================
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 AppSpacing.inputRadius,
@@ -122,7 +112,6 @@ class LabeledTextField extends StatelessWidget {
               ),
             ),
 
-            // ================= FOCUSED ERROR =================
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 AppSpacing.inputRadius,

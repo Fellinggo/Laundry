@@ -28,7 +28,7 @@ class EtaBadge extends StatelessWidget {
         vertical: 6,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.65), // 🔥 FULL COLOR (bukan transparan lagi)
+        color: color.withOpacity(0.65), 
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: Colors.white.withOpacity(0.25),
@@ -38,7 +38,7 @@ class EtaBadge extends StatelessWidget {
       child: Text(
         label,
         style: TextStyle(
-          color: textColor, // 🔥 selalu kontras
+          color: textColor,
           fontSize: 11,
           fontWeight: FontWeight.w600,
         ),
@@ -49,13 +49,13 @@ class EtaBadge extends StatelessWidget {
   Color _resolveColor(EtaType type) {
     switch (type) {
       case EtaType.fast:
-        return const Color.fromARGB(255, 151, 192, 235); // biru lebih clean
+        return const Color.fromARGB(255, 151, 192, 235); 
       case EtaType.long:
-        return const Color.fromARGB(255, 193, 158, 222); // ungu modern
+        return const Color.fromARGB(255, 193, 158, 222); 
       case EtaType.express:
-        return const Color.fromARGB(255, 245, 138, 141); // merah tegas
+        return const Color.fromARGB(255, 245, 138, 141); 
       case EtaType.normal:
-        return const Color.fromARGB(255, 150, 219, 152); // hijau fresh
+        return const Color.fromARGB(255, 150, 219, 152);
     }
   }
   Color _darken(Color color, double amount) {

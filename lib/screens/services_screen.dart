@@ -56,11 +56,10 @@ class ServicesScreen extends StatelessWidget {
         ),
         child: ClipRRect(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-          // ✅ MENHILANGKAN EFEK OVER-SCROLL (GLOW/STRETCH)
           child: ScrollConfiguration(
             behavior: const ScrollBehavior().copyWith(overscroll: false),
             child: SingleChildScrollView(
-              physics: const ClampingScrollPhysics(), // Memastikan scroll berhenti di batas konten
+              physics: const ClampingScrollPhysics(), 
               padding: const EdgeInsets.all(AppSpacing.xl),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,11 +70,10 @@ class ServicesScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  // GRID LAYOUT UNTUK LAYANAN UTAMA
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(), // Agar scroll utama yang bekerja
+                    physics: const NeverScrollableScrollPhysics(), 
                     mainAxisSpacing: 16,
                     crossAxisSpacing: 16,
                     childAspectRatio: 0.85,
@@ -133,7 +131,6 @@ class ServicesScreen extends StatelessWidget {
 
                   const SizedBox(height: 20),
 
-                  // KARTU LEBAR UNTUK BED LINEN
                   _wideCard(
                     context,
                     title: 'Cuci Bedcover / Selimut / Sprei',
@@ -162,7 +159,6 @@ class ServicesScreen extends StatelessWidget {
     );
   }
 
-  // ================= GRID CARD =================
   Widget _gridCard(
     BuildContext context, {
     required String title,
@@ -253,7 +249,6 @@ class ServicesScreen extends StatelessWidget {
     );
   }
 
-  // ================= WIDE CARD =================
   Widget _wideCard(
     BuildContext context, {
     required String title,

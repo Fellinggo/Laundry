@@ -23,8 +23,6 @@ class PesananOrderCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-
-        // 🧊 BORDER TIPIS
         border: Border.all(
           color: const Color(0xFFE5E7EB),
         ),
@@ -41,29 +39,25 @@ class PesananOrderCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                // 🔵 ICON (SOFT BLUE)
                 Container(
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEAF2FF), // soft blue bg
+                    color: const Color(0xFFEAF2FF), 
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
                     Icons.local_laundry_service_rounded,
                     size: 20,
-                    color: Color.fromARGB(255, 40, 66, 107), // soft blue icon
+                    color: Color.fromARGB(255, 40, 66, 107), 
                   ),
                 ),
 
                 const SizedBox(width: 12),
-
-                // 📄 CONTENT
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // ORDER ID + DATE
                       Row(
                         children: [
                           Expanded(
@@ -90,7 +84,6 @@ class PesananOrderCard extends StatelessWidget {
 
                       const SizedBox(height: 4),
 
-                      // SERVICE
                       Text(
                         serviceTitle,
                         style: const TextStyle(
@@ -103,7 +96,6 @@ class PesananOrderCard extends StatelessWidget {
 
                       const SizedBox(height: 8),
 
-                      // TOTAL + ARROW
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -112,13 +104,13 @@ class PesananOrderCard extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: Color.fromARGB(255, 16, 47, 113), // 🔵 highlight
+                              color: Color.fromARGB(255, 16, 47, 113), 
                             ),
                           ),
                           const Icon(
                             Icons.chevron_right_rounded,
                             size: 18,
-                            color: Color.fromARGB(255, 43, 104, 174), // soft blue hint
+                            color: Color.fromARGB(255, 43, 104, 174),
                           ),
                         ],
                       ),

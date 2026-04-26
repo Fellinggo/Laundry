@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 class AppTextStyles {
-  const AppTextStyles._(); // prevent instantiation
+  const AppTextStyles._(); 
 
   static TextStyle _poppins({
     double fontSize = 14,
@@ -19,10 +19,6 @@ class AppTextStyles {
     );
   }
 
-  // =====================
-  // ONBOARDING
-  // =====================
-
   static TextStyle displayOnboardingTitle({Color? color}) => _poppins(
     fontSize: 25,
     fontWeight: FontWeight.w800,
@@ -34,10 +30,6 @@ class AppTextStyles {
     fontWeight: FontWeight.w400,
     color: color ?? AppColors.textSecondary,
   );
-
-  // =====================
-  // SCREENS
-  // =====================
 
   static final TextStyle screenTitleWhite = _poppins(
     fontSize: 18,
@@ -56,11 +48,7 @@ class AppTextStyles {
     fontWeight: FontWeight.w700,
     color: AppColors.headerNavy,
   );
-
-  // =====================
-  // BODY & UI
-  // =====================
-
+  
   static final TextStyle body =
   _poppins(fontSize: 14, color: AppColors.textDark);
 

@@ -48,7 +48,6 @@ class HomeScreen
 
 class _HomeScreenState extends State<HomeScreen> {
 
-  // ✅ TAMBAHAN
   String? userFirstName;
 
   Widget _buildEmptyOrderBox() {
@@ -111,17 +110,16 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     loadActiveOrder();
-    _loadUserName(); // ✅ TAMBAHAN
+    _loadUserName(); 
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     loadActiveOrder();
-    _loadUserName(); // ✅ TAMBAHAN
+    _loadUserName(); 
   }
 
-  // ✅ TAMBAHAN FUNCTION
   Future<void> _loadUserName() async {
     final prefs = await SharedPreferences.getInstance();
     final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
@@ -138,7 +136,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // ✅ FUNGSI LOAD ORDER - SUDAH DIPERBAIKI
   Future<
     void
   >
@@ -170,7 +167,6 @@ class _HomeScreenState extends State<HomeScreen> {
       'Jumlah pesanan di SharedPreferences: ${ordersRaw.length}',
     );
 
-    // ✅ FILTER: Hanya ambil yang valid
     final List<
       String
     >
@@ -190,15 +186,11 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     ).toList();
 
-    // Simpan ulang jika ada data tidak valid
     if (validOrders.length !=
         ordersRaw.length) {
       await prefs.setStringList(
         'active_orders',
         validOrders,
-      );
-      print(
-        '🧹 Data tidak valid dibersihkan. Sebelum: ${ordersRaw.length}, Sesudah: ${validOrders.length}',
       );
     }
 
@@ -210,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ) {
             final data = Uri.splitQueryString(
               e,
-            ); // ✅ MEMBACA DATA
+            ); 
             return {
               'orderId':
                   data['orderId'] ??
@@ -232,7 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   'Rp 0',
               'address':
                   data['address'] ??
-                  '-', // ✅ TAMBAHKAN
+                  '-', 
               'itemsJson':
                   data['itemsJson'] ??
                   '',
@@ -387,7 +379,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 12,
                       ),
 
-                      // BARIS LAYANAN
                       Row(
                         children: [
                           Expanded(
@@ -464,7 +455,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 12,
                       ),
 
-                      // Bagian Box Pesanan Aktif
+                  
                       SizedBox(
                         height: 180,
                         child: activeOrders.isEmpty
@@ -485,21 +476,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                       return GestureDetector(
                                         behavior: HitTestBehavior.opaque,
                                         onTap: () {
-                                          // Parse itemsJson jika ada untuk menampilkan detail lengkap
                                           final itemsJson = order['itemsJson'];
 
                                           if (itemsJson !=
                                                   null &&
                                               itemsJson.isNotEmpty) {
                                             try {
-                                              // Decode itemsJson jika ada (format JSON string)
-                                              // Asumsikan itemsJson sudah dalam bentuk List atau Map
                                               if (itemsJson
-                                                  is String) {
-                                                // Jika masih string JSON, parse dulu
-                                                // orderItems = jsonDecode(itemsJson);
-                                                // Untuk sementara, gunakan pendekatan sederhana
-                                              } else if (itemsJson
+                                                  is String) {} else if (itemsJson
                                                   is List) {}
                                             } catch (
                                               e
@@ -515,7 +499,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             '/order-detail',
                                             arguments: {
                                               ...order,
-                                              'fromActiveOrder': true, // Tambahkan orderItems untuk detail lengkap
+                                              'fromActiveOrder': true, 
                                             },
                                           );
                                         },

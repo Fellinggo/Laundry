@@ -32,7 +32,6 @@ class OffersScreen extends StatelessWidget {
       backgroundColor: AppColors.headerNavy,
       body: Column(
         children: [
-          /// ================= NAVY APP BAR =================
           NavyCenterTitleAppBar(
             title: 'Tawaranku',
             actions: [
@@ -48,10 +47,7 @@ class OffersScreen extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-
-          /// ================= WHITE CONTENT =================
-          Expanded(
+          ),Expanded(
             child: Container(
               margin: const EdgeInsets.only(top: 12),
               decoration: const BoxDecoration(
@@ -111,8 +107,6 @@ class OffersScreen extends StatelessWidget {
       ),
     );
   }
-
- /// ================= PROMO CARD (GAMBAR SAJA) =================
   Widget _promoCard({
     required BuildContext context,
     required String imagePath,
@@ -120,13 +114,11 @@ class OffersScreen extends StatelessWidget {
   }) {
     return GestureDetector(
       onTap: () async {
-        // 1. CEK STATUS LOGIN TERLEBIH DAHULU
         if (!loggedIn) {
           showLoginModal(context);
-          return; // Hentikan eksekusi kode di bawah jika belum login
+          return; 
         }
 
-        // 2. JALANKAN LOGIKA JIKA SUDAH LOGIN
         if (promoCode != null) {
           await Clipboard.setData(
             ClipboardData(text: promoCode),
@@ -139,8 +131,7 @@ class OffersScreen extends StatelessWidget {
             ),
           );
         }
-
-        // 🔥 TAMBAH DELAY
+        
         await Future.delayed(const Duration(milliseconds: 500));
 
         onOpenServices?.call();

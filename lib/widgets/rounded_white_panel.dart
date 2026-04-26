@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_spacing.dart';
 
-/// White sheet overlapping navy header (home, profile, etc.).
 class RoundedWhitePanel extends StatelessWidget {
   const RoundedWhitePanel({
     super.key,

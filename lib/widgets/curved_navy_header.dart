@@ -20,14 +20,12 @@ class CurvedNavyHeader extends StatelessWidget {
       height: height,
       child: Stack(
         children: [
-          // ✅ BIRU (LURUS, FULL)
           Container(
             width: double.infinity,
             height: height,
             color: AppColors.headerNavy,
           ),
 
-          // ✅ PUTIH MELENGKUNG
           Positioned(
             bottom: 0,
             left: 0,
@@ -43,7 +41,6 @@ class CurvedNavyHeader extends StatelessWidget {
             ),
           ),
 
-          // ✅ CONTENT (LOGO + TEXT)
           Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,

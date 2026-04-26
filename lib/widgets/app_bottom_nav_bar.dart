@@ -88,7 +88,6 @@ class AppBottomNavBar extends StatelessWidget {
                 ),
               ),
 
-              /// CENTER ACTION BUTTON
               Positioned(
                 top: -10,
                 child: GestureDetector(

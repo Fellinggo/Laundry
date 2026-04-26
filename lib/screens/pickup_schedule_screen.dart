@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // ← TAMBAHKAN IMPORT INI
+import 'package:shared_preferences/shared_preferences.dart'; 
 import '../constants/app_colors.dart';
 import '../constants/app_spacing.dart';
 import '../constants/app_text_styles.dart';
@@ -27,21 +27,15 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
 
   String _selectedAddressType = 'Rumah';
 
-  // ============================================
-  // UBAH DARI HARDCODED MENJADI LOAD DARI SHARED PREFERENCES
-  // ============================================
   Map<String, String> _addresses = {};
   bool _isLoadingAddresses = true;
 
   @override
   void initState() {
     super.initState();
-    _loadAddressesFromPrefs(); // ← TAMBAHKAN INI
+    _loadAddressesFromPrefs(); 
   }
 
-  // ============================================
-  // TAMBAHKAN METHOD INI
-  // ============================================
   Future<void> _loadAddressesFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     
@@ -57,9 +51,6 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
       return;
     }
 
-    // ============================================
-    // LOAD DENGAN KEY BERDASARKAN EMAIL
-    // ============================================
     final addressKey = 'userAddresses_$email';
     final titlesKey = 'userAddressTitles_$email';
     
@@ -127,9 +118,6 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
     final args =
         ModalRoute.of(context)?.settings.arguments as Map? ?? {};
 
-    // ============================================
-    // UBAH BAGIAN INI
-    // ============================================
     final selectedAddress = _selectedAddressType == 'Custom'
         ? _customAddressController.text
         : (_selectedAddressType.isNotEmpty && _addresses.containsKey(_selectedAddressType)
@@ -153,7 +141,6 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ================= PICKUP =================
                     Text(
                       'Waktu Pengambilan',
                       style: AppTextStyles.sectionTitle.copyWith(fontSize: 15),
@@ -233,7 +220,6 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
 
                     const SizedBox(height: AppSpacing.xl),
 
-                    // ================= DELIVERY =================
                     Text(
                       'Waktu Pengantaran',
                       style: AppTextStyles.sectionTitle.copyWith(fontSize: 15),
@@ -312,17 +298,11 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
                     _iconField('Diantar', Icons.person_outline),
 
                     const SizedBox(height: AppSpacing.xl),
-
-                    // ================= ADDRESS =================
                     Text(
                       'Alamat Pengiriman',
                       style: AppTextStyles.sectionTitle.copyWith(fontSize: 14),
                     ),
                     const SizedBox(height: 8),
-
-                    // ============================================
-                    // TAMBAHKAN LOADING STATE
-                    // ============================================
                     if (_isLoadingAddresses)
                       Container(
                         width: double.infinity,
@@ -343,9 +323,6 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
                         ),
                       )
                     else if (_addresses.isEmpty)
-                      // ============================================
-                      // TAMPILKAN PESAN JIKA TIDAK ADA ALAMAT
-                      // ============================================
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
@@ -372,9 +349,6 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
                         ),
                       )
                     else
-                      // ============================================
-                      // TAMPILKAN ADDRESS SELECTOR
-                      // ============================================
                       GestureDetector(
                         onTap: () {
                           setState(() {
@@ -417,9 +391,6 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
                         ),
                       ),
 
-                    // ============================================
-                    // ADDRESS OPTIONS - GUNAKAN _addresses YANG SUDAH DILOAD
-                    // ============================================
                     if (!_isLoadingAddresses && _addresses.isNotEmpty)
                       AnimatedCrossFade(
                         duration: const Duration(milliseconds: 200),
@@ -430,9 +401,6 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
                         secondChild: Column(
                           children: [
                             const SizedBox(height: 10),
-                            // ============================================
-                            // LOOP SEMUA ALAMAT DARI _addresses
-                            // ============================================
                             ..._addresses.keys.map((key) => _addressOption(key)),
                             const SizedBox(height: 10),
 
@@ -471,7 +439,6 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
 
                     const SizedBox(height: AppSpacing.xl),
 
-                    // ================= CATATAN =================
                     Text(
                       'Tambah catatan',
                       style: AppTextStyles.sectionTitle.copyWith(fontSize: 14),
@@ -495,7 +462,6 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
 
                     const SizedBox(height: AppSpacing.xxl),
 
-                    // ================= BUTTON =================
                     PrimaryButton(
                       label: 'Selanjutnya',
                       onPressed: () {
@@ -515,9 +481,6 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
                           return;
                         }
 
-                        // ============================================
-                        // AMBIL items DARI args DAN TERUSKAN
-                        // ============================================
                         final items = args['items'] ?? [];
                         final serviceFee = args['serviceFee'] ?? 0;
                         final deliveryFee = args['deliveryFee'] ?? 5000;
@@ -527,7 +490,7 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
                           context,
                           '/order-review',
                           arguments: {
-                            'items': items,                    // ← TERUSKAN items
+                            'items': items,                    
                             'serviceFee': serviceFee,
                             'deliveryFee': deliveryFee,
                             'total': total,

@@ -84,7 +84,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onTap: () => Navigator.pushNamed(context, '/about'),
             ),
 
-            // Bagian ini hanya muncul jika isLoggedIn == true
             if (isLoggedIn) ...[
               const SizedBox(height: AppSpacing.xl),
               Text(
@@ -158,23 +157,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // ============================================
-  // LOGOUT - HANYA HAPUS STATUS LOGIN
-  // DATA USER (EMAIL, ALAMAT) TETAP DISIMPAN
-  // ============================================
   Future<void> _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     
-    // HANYA hapus status login
     await prefs.setBool('isLoggedIn', false);
     
-    // DATA INI TETAP DISIMPAN (TIDAK DIHAPUS):
-    // - userEmail
-    // - userName
-    // - isSignup
-    // - userAddresses_$email
-    // - userAddressTitles_$email
-
     if (!mounted) return;
     Navigator.pushNamedAndRemoveUntil(
       context,
@@ -183,13 +170,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // ============================================
-  // HAPUS AKUN - HAPUS SEMUA DATA PERMANEN
-  // ============================================
   Future<void> _deleteAccount(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     
-    // Hapus SEMUA data
     await prefs.clear();
 
     if (!mounted) return;
@@ -199,7 +182,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       (route) => false,
     );
     
-    // Tampilkan pesan sukses
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Akun berhasil dihapus'),
@@ -265,7 +247,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 }
 
-// ================= LANGUAGE SHEET =================
 class _LanguageSheetBody extends StatefulWidget {
   const _LanguageSheetBody();
 

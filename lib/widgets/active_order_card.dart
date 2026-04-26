@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_spacing.dart';
 import '../constants/app_text_styles.dart';
-import 'step_progress_bar.dart';  // ✅ IMPORT SESUAI NAMA FILE ANDA
+import 'step_progress_bar.dart';  
 
 class ActiveOrderCard extends StatelessWidget {
   const ActiveOrderCard({
@@ -99,7 +99,7 @@ class ActiveOrderCard extends StatelessWidget {
                         ],
                       ),
                       const Spacer(),
-                      OrderStepProgressBar(activeIndex: currentStep),  // ✅ NAMA CLASS OrderStepProgressBar
+                      OrderStepProgressBar(activeIndex: currentStep),   
                     ],
                   ),
           ),

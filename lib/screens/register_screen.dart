@@ -20,7 +20,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController(); // ✅ FIX
+  final TextEditingController phoneController = TextEditingController(); 
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
 
@@ -103,7 +103,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     await prefs.setBool('isSignup', true);
     await prefs.setString('userName', name);
     await prefs.setString('userEmail', email);
-    await prefs.remove('userAddresses');     // ← TAMBAHKAN INI (opsional)
+    await prefs.remove('userAddresses');   
     await prefs.remove('userAddressTitles');
     Navigator.pushNamedAndRemoveUntil(
       context,
@@ -155,7 +155,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                       const SizedBox(height: 10),
 
-                      _phoneField(), // ✅ FIX OK
+                      _phoneField(), 
 
                       const SizedBox(height: 10),
 
@@ -216,7 +216,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // ================= PHONE FIELD (SUDAH FIX DI DALAM CLASS) =================
   Widget _phoneField() {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -238,7 +237,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
           errorText: phoneError,
 
-          // 🔥 SAMAKAN BORDER DENGAN FIELD LAIN
           border: OutlineInputBorder(
             borderRadius:
                 BorderRadius.circular(AppSpacing.inputRadius),
@@ -290,7 +288,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 }
 }
 
-// ================= NO OVERSCROLL =================
 class _NoOverscrollBehavior extends ScrollBehavior {
   const _NoOverscrollBehavior();
 

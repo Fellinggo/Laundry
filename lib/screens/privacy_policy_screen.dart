@@ -34,7 +34,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 Text(
                   'Kami menghormati privasi Anda. Data pribadi digunakan untuk memproses pesanan, komunikasi layanan, dan peningkatan pengalaman aplikasi.',
                   style: AppTextStyles.bodyMuted,
-                  textAlign: TextAlign.justify, // ✅ Justify
+                  textAlign: TextAlign.justify, 
                 ),
                 const SizedBox(height: AppSpacing.xl),
                 Text(
@@ -82,7 +82,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
             child: Text(
               t,
               style: AppTextStyles.bodyMuted,
-              textAlign: TextAlign.justify, // ✅ Justify untuk isi bullet
+              textAlign: TextAlign.justify,
             ),
           ),
         ],

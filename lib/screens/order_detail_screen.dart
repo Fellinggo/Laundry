@@ -17,9 +17,6 @@ class OrderDetailScreen
     super.key,
   });
 
-  // ============================================
-  // GENERATE ORDER ID 6 DIGIT ACAK
-  // ============================================
   String _generateOrderId() {
     final random = Random();
     final int orderNumber =
@@ -30,9 +27,6 @@ class OrderDetailScreen
     return orderNumber.toString();
   }
 
-  // ============================================
-  // FUNGSI SIMPAN PESANAN KE SHARED PREFERENCES
-  // ============================================
   Future<
     void
   >
@@ -62,7 +56,7 @@ class OrderDetailScreen
         'pickupTime': pickupTime,
         'deliveryTime': deliveryTime,
         'totalPrice': totalPrice,
-        'address': address, // ✅ sekarang aman
+        'address': address, 
         'itemsJson': itemsJson,
       },
     ).query;
@@ -84,16 +78,13 @@ class OrderDetailScreen
     );
 
     debugPrint(
-      '✅ Pesanan baru disimpan: $orderId',
+      'Pesanan baru disimpan: $orderId',
     );
     debugPrint(
-      '📦 Total pesanan aktif: ${existingOrders.length}',
+      'Total pesanan aktif: ${existingOrders.length}',
     );
   }
 
-  // ============================================
-  // ENCODE ITEMS KE JSON STRING
-  // ============================================
   String _encodeItemsToJson(
     List<
       Map<
@@ -117,9 +108,6 @@ class OrderDetailScreen
     }
   }
 
-  // ============================================
-  // DECODE ITEMS DARI JSON STRING
-  // ============================================
   List<
     Map<
       String,
@@ -159,9 +147,6 @@ class OrderDetailScreen
     }
   }
 
-  // ============================================
-  // HITUNG DURASI DALAM MENIT
-  // ============================================
   int _calculateDurationMinutes(
     String pickup,
     String delivery,
@@ -184,10 +169,6 @@ class OrderDetailScreen
       return 120;
     }
   }
-
-  // ============================================
-  // FORMAT RUPIAH
-  // ============================================
   String _formatRupiah(
     dynamic value,
   ) {
@@ -234,9 +215,6 @@ class OrderDetailScreen
     return 'Rp ${buffer.toString().split('').reversed.join()}';
   }
 
-  // ============================================
-  // EKSTRAK NILAI INT DARI DYNAMIC
-  // ============================================
   int _toInt(
     dynamic value,
   ) {
@@ -258,9 +236,6 @@ class OrderDetailScreen
     return 0;
   }
 
-  // ============================================
-  // WIDGET ITEM PESANAN DENGAN GAMBAR
-  // ============================================
   Widget _buildOrderItemRow(
     Map<
       String,
@@ -370,9 +345,6 @@ class OrderDetailScreen
     );
   }
 
-  // ============================================
-  // BUILD ORDER ITEMS WIDGET
-  // ============================================
   Widget _buildOrderItems(
     List<
       Map<
@@ -465,9 +437,6 @@ class OrderDetailScreen
     );
   }
 
-  // ============================================
-  // WIDGET BOX
-  // ============================================
   Widget _box({
     required Widget child,
   }) {
@@ -488,9 +457,6 @@ class OrderDetailScreen
     );
   }
 
-  // ============================================
-  // WIDGET ROW
-  // ============================================
   Widget _row(
     String title,
     String value, {
@@ -532,16 +498,10 @@ class OrderDetailScreen
             as Map? ??
         {};
 
-    // ============================================
-    // CEK APAKAH DARI ACTIVE ORDER ATAU CHECKOUT
-    // ============================================
     final bool isFromActiveOrder =
         args['fromActiveOrder'] ==
         true;
 
-    // ============================================
-    // AMBIL DAN PARSE DATA DARI ARGUMENTS
-    // ============================================
     List<
       Map<
         String,
@@ -550,7 +510,6 @@ class OrderDetailScreen
     >
     orderItems = [];
 
-    // Cek apakah ada itemsJson
     if (args['itemsJson'] !=
             null &&
         args['itemsJson'].toString().isNotEmpty) {
@@ -559,7 +518,6 @@ class OrderDetailScreen
       );
     }
 
-    // Cek apakah ada orderItems langsung
     if (orderItems.isEmpty &&
         args['orderItems'] !=
             null) {
@@ -577,7 +535,6 @@ class OrderDetailScreen
       }
     }
 
-    // Cek apakah ada items langsung
     if (orderItems.isEmpty &&
         args['items'] !=
             null) {
@@ -595,14 +552,13 @@ class OrderDetailScreen
       }
     }
 
-    // Generate Order ID (hanya untuk checkout, untuk active order pakai yang sudah ada)
+   
     final String orderId = isFromActiveOrder
         ? (args['orderId']?.toString() ??
               '000000')
         : (args['orderId'] ??
               _generateOrderId());
 
-    // Hitung total quantity dan total harga dengan aman
     int totalQty = 0;
     int totalPrice = 0;
 
@@ -636,7 +592,6 @@ class OrderDetailScreen
         },
       );
     } else {
-      // Fallback untuk format lama
       totalQty = _toInt(
         args['qty'] !=
                 null
@@ -651,7 +606,6 @@ class OrderDetailScreen
       );
     }
 
-    // Ambil data lainnya dengan aman
     final String pickupTimeText =
         args['pickupTime']?.toString() ??
         '-';
@@ -675,7 +629,6 @@ class OrderDetailScreen
         totalPrice +
         deliveryFee;
 
-    // Service summary untuk display
     final String serviceSummary = orderItems.isEmpty
         ? (args['service']?.toString() ??
               'Laundry')
@@ -689,7 +642,6 @@ class OrderDetailScreen
                 ' + ',
               );
 
-    // Hitung durasi
     final int durationMinutes = _calculateDurationMinutes(
       pickupTimeText,
       deliveryTimeText,
@@ -700,7 +652,6 @@ class OrderDetailScreen
         ? '${(durationMinutes / 60).round()} jam'
         : '$durationMinutes menit';
 
-    // Encode items ke JSON untuk disimpan (hanya untuk checkout)
     final itemsJson = _encodeItemsToJson(
       orderItems,
     );
@@ -710,7 +661,6 @@ class OrderDetailScreen
       appBar: NavyBackAppBar(
         title: 'Detail Pesanan',
         onBack: () async {
-          // Hanya simpan jika dari checkout, jika dari active order langsung back
           if (!isFromActiveOrder) {
             await _saveOrderToSharedPreferences(
               orderId: orderId,
@@ -754,7 +704,6 @@ class OrderDetailScreen
               ) => false,
             );
           } else {
-            // Jika dari active order, langsung back tanpa menyimpan
             Navigator.pop(
               context,
             );
@@ -791,9 +740,6 @@ class OrderDetailScreen
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // ============================================
-                          // BOX STATUS PESANAN
-                          // ============================================
                           _box(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -951,9 +897,6 @@ class OrderDetailScreen
                             height: 20,
                           ),
 
-                          // ============================================
-                          // BOX DAFTAR PESANAN
-                          // ============================================
                           if (orderItems.isNotEmpty)
                             _box(
                               child: _buildOrderItems(
@@ -961,7 +904,6 @@ class OrderDetailScreen
                               ),
                             ),
 
-                          // Fallback jika orderItems kosong
                           if (orderItems.isEmpty)
                             _box(
                               child: Column(
@@ -996,9 +938,6 @@ class OrderDetailScreen
                             height: 20,
                           ),
 
-                          // ============================================
-                          // BOX DETAIL (WAKTU, ALAMAT, PEMBAYARAN)
-                          // ============================================
                           _box(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1054,9 +993,6 @@ class OrderDetailScreen
                             height: 20,
                           ),
 
-                          // ============================================
-                          // TOMBOL KONFIRMASI PESANAN (HANYA UNTUK CHECKOUT)
-                          // ============================================
                           if (!isFromActiveOrder)
                             SizedBox(
                               width: double.infinity,

@@ -8,7 +8,6 @@ abstract final class AppSpacing {
   static const double sheetTopRadius = 28;
   static const double cardRadius = 16;
   static const double buttonRadius = 14;
-  /// Onboarding / splash primary buttons
   static const double onboardingButtonRadius = 30;
   static const double inputRadius = 12;
 }

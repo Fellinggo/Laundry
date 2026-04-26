@@ -88,15 +88,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       ),
     );
   }
-
-  // =========================
-  // SEMUA NOTIF
-  // =========================
   List<Widget> _buildAll() {
     return [
       _dateHeader('Hari Ini'),
 
-      // notif sistem
       NotificationListTile(
         leading: const NotificationIconBubble(
           icon: Icons.settings_outlined,
@@ -109,7 +104,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
       const SizedBox(height: 10),
 
-      // notif pesanan
       if (notifications.isEmpty)
         const Text("")
       else
@@ -127,9 +121,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     ];
   }
 
-  // =========================
-  // KHUSUS PESANAN
-  // =========================
   List<Widget> _buildOrdersOnly() {
     if (notifications.isEmpty) {
       return [

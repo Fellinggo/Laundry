@@ -134,7 +134,6 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ================= CHIP =================
                   SizedBox(
                     height: 44,
                     child: ListView.builder(
@@ -179,7 +178,6 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
 
                   const SizedBox(height: 12),
 
-                  // ================= LIST =================
                   Expanded(
                     child: selectedServices.isEmpty
                         ? const Center(

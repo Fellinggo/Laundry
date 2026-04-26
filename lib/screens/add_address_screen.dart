@@ -88,7 +88,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Tipe Alamat
             Text(
               'Tipe Alamat',
               style: AppTextStyles.sectionTitle.copyWith(fontSize: 15),
@@ -147,8 +146,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               ),
 
             const SizedBox(height: 24),
-
-            // Alamat Lengkap
             LabeledTextField(
               label: 'Alamat Lengkap',
               hint: 'Masukkan alamat lengkap',
@@ -169,7 +166,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
             const SizedBox(height: 40),
 
-            // Tombol Simpan
             PrimaryButton(
               label: 'Simpan Alamat',
               onPressed: _saveAddress,

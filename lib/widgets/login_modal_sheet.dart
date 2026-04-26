@@ -49,7 +49,6 @@ class _LoginModalCard
           ),
           child: Stack(
             children: [
-              // ====== TOMBOL CLOSE ======
               Positioned(
                 top: 8,
                 right: 8,
@@ -66,7 +65,6 @@ class _LoginModalCard
                 ),
               ),
 
-              // ====== CONTENT ======
               Padding(
                 padding: const EdgeInsets.all(
                   AppSpacing.xxl,
@@ -101,7 +99,6 @@ class _LoginModalCard
                       height: 22,
                     ),
 
-                    // ====== LOGIN EMAIL ======
                     PrimaryButton(
                       label: 'Masuk dengan Email',
                       leading: const Icon(
@@ -124,7 +121,6 @@ class _LoginModalCard
                       height: 16,
                     ),
 
-                    // ====== SIGN UP ======
                     PrimaryButton(
                       label: 'Sign Up',
                       backgroundColor: AppColors.accentBlue,

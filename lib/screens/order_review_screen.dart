@@ -33,9 +33,6 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
     return 'Rp $result';
   }
 
-  // ============================================
-  // HITUNG TOTAL SERVICE FEE DARI ORDER ITEMS
-  // ============================================
   int _calculateTotalServiceFee(List<dynamic> orderItems) {
     if (orderItems.isEmpty) return 0;
     
@@ -52,9 +49,6 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
     return total;
   }
 
-  // ============================================
-  // ENCODE ITEMS KE JSON STRING
-  // ============================================
   String _encodeItemsToJson(List<dynamic> items) {
     String jsonStr = '[';
     for (int i = 0; i < items.length; i++) {
@@ -72,9 +66,6 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
     return jsonStr;
   }
 
-  // ============================================
-  // WIDGET UNTUK MENAMPILKAN ITEM PESANAN (DENGAN GAMBAR)
-  // ============================================
   Widget _buildOrderItem(Map<String, dynamic> item) {
     final name = item['title'] ?? item['name'] ?? 'Layanan';
     final qty = (item['qty'] as int?) ?? 1;
@@ -141,14 +132,10 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
     );
   }
 
-  // ============================================
-  // WIDGET UNTUK MENAMPILKAN SEMUA LAYANAN YANG DIPESAN
-  // ============================================
   Widget _buildServiceSummary(Map args) {
     final List<dynamic> orderItems = args['orderItems'] ?? args['items'] ?? [];
     
     if (orderItems.isEmpty) {
-      // Fallback jika tidak ada orderItems (format lama)
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -197,7 +184,6 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
       );
     }
 
-    // Format dengan multiple items
     final totalServiceFee = _calculateTotalServiceFee(orderItems);
     
     return Container(
@@ -209,7 +195,6 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: Row(
@@ -232,12 +217,10 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
             ),
           ),
           
-          // List layanan
           ...orderItems.map((item) => _buildOrderItem(item as Map<String, dynamic>)),
           
           const Divider(height: 24),
           
-          // Total
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -280,9 +263,6 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
     );
   }
 
-  // ============================================
-  // PROSES PEMBAYARAN
-  // ============================================
   Future<void> _processPayment(Map args) async {
     setState(() => _payLoading = true);
     await Future.delayed(const Duration(milliseconds: 800));
@@ -296,7 +276,6 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
     int totalQty = 0;
     
     if (orderItems.isNotEmpty) {
-      // Format baru dengan multiple items
       for (var item in orderItems) {
         final name = item['title'] ?? item['name'] ?? 'Layanan';
         final qty = (item['qty'] as int?) ?? 1;
@@ -319,7 +298,6 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
 
       currentOrders.add(newOrderRaw);
     } else {
-      // Format lama (fallback)
       serviceSummary = args['service'] ?? 'Laundry';
       totalQty = args['qty'] ?? 1;
       
@@ -354,9 +332,6 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
   Widget build(BuildContext context) {
     final args = (ModalRoute.of(context)?.settings.arguments as Map?) ?? {};
     
-    // ============================================
-    // HITUNG ULANG TOTAL JIKA PERLU
-    // ============================================
     final List<dynamic> orderItems = args['orderItems'] ?? args['items'] ?? [];
     final calculatedServiceFee = orderItems.isNotEmpty 
         ? _calculateTotalServiceFee(orderItems) 
@@ -385,9 +360,6 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
               ),
               child: Column(
                 children: [
-                  // ============================================
-                  // SCROLLABLE CONTENT - NO OVERSCROLL
-                  // ============================================
                   Expanded(
                     child: ScrollConfiguration(
                       behavior: const _NoOverscrollBehavior(),
@@ -396,7 +368,6 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // ================= RINGKASAN PESANAN (tanpa edit) =================
                             Text(
                               'Ringkasan Pesanan',
                               style: AppTextStyles.sectionTitle.copyWith(
@@ -406,12 +377,10 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                             ),
                             const SizedBox(height: 12),
                             
-                            // ================= SERVICE SUMMARY =================
                             _buildServiceSummary(args),
                             
                             const SizedBox(height: 24),
                             
-                            // ================= DETAIL PENGIRIMAN DENGAN EDIT DI SAMPING =================
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -456,7 +425,6 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                             
                             const SizedBox(height: 24),
                             
-                            // ================= DETAIL PEMBAYARAN =================
                             Text(
                               'Detail Pembayaran',
                               style: AppTextStyles.sectionTitle.copyWith(
@@ -513,9 +481,6 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                     ),
                   ),
                   
-                  // ============================================
-                  // FIXED BUTTON DI BAWAH
-                  // ============================================
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                     decoration: BoxDecoration(
@@ -573,9 +538,6 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
   }
 }
 
-// ============================================
-// CUSTOM SCROLL BEHAVIOR - NO OVERSCROLL
-// ============================================
 class _NoOverscrollBehavior extends ScrollBehavior {
   const _NoOverscrollBehavior();
 

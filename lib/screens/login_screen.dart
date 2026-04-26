@@ -29,16 +29,12 @@ class _LoginScreenState extends State<LoginScreen> {
     _checkAutoLogin();
   }
 
-  // ============================================
-  // AUTO LOGIN JIKA TETAP MASUK AKTIF
-  // ============================================
   Future<void> _checkAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
     final staySignedIn = prefs.getBool('staySignedIn') ?? false;
     final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
     
     if (staySignedIn && isLoggedIn) {
-      // Langsung ke main screen
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushNamedAndRemoveUntil(
           context,
@@ -62,7 +58,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
     bool hasError = false;
 
-    // ================= EMAIL VALIDASI =================
     bool isEmailValid = RegExp(
       r'^[a-zA-Z0-9._%+-]+@('
       r'gmail\.com|'
@@ -81,7 +76,6 @@ class _LoginScreenState extends State<LoginScreen> {
       hasError = true;
     }
 
-    // ================= PASSWORD VALIDASI =================
     bool hasMinLength = password.length >= 6;
     bool hasUppercase = password.contains(RegExp(r'[A-Z]'));
     bool hasLowercase = password.contains(RegExp(r'[a-z]'));
@@ -97,23 +91,14 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    // ============================================
-    // SUCCESS LOGIN
-    // ============================================
     String namaUser = email.split('@')[0];
 
-    // Set status login
     await prefs.setBool('isLoggedIn', true);
-    await prefs.setBool('isSignup', false); // ← PENTING: false untuk login
+    await prefs.setBool('isSignup', false); 
     await prefs.setString('userName', namaUser);
     await prefs.setString('userEmail', email);
-    
-    // Simpan status "Tetap Masuk"
+ 
     await prefs.setBool('staySignedIn', _staySignedIn);
-
-    // JANGAN hapus alamat! Alamat akan diload berdasarkan email di ProfileScreen
-    // await prefs.remove('userAddresses'); // ← JANGAN LAKUKAN INI
-    // await prefs.remove('userAddressTitles'); // ← JANGAN LAKUKAN INI
 
     if (!mounted) return;
     Navigator.pushNamedAndRemoveUntil(
@@ -168,7 +153,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // ================= EMAIL =================
                     TextField(
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
@@ -195,8 +179,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
 
                     const SizedBox(height: AppSpacing.lg),
-
-                    // ================= PASSWORD =================
                     TextField(
                       controller: passwordController,
                       obscureText: _obscure,
@@ -234,8 +216,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
 
                     const SizedBox(height: AppSpacing.md),
-
-                    // ================= OPTIONS =================
                     Row(
                       children: [
                         InkWell(
@@ -265,7 +245,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         const Spacer(),
                         TextButton(
                           onPressed: () {
-                            // TODO: Implement lupa password
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Fitur lupa password akan segera hadir'),
@@ -281,16 +260,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
 
                     const SizedBox(height: AppSpacing.xl),
-
-                    // ================= LOGIN BUTTON =================
                     PrimaryButton(
                       label: 'Masuk',
                       onPressed: handleLogin,
                     ),
 
                     const SizedBox(height: AppSpacing.xl),
-
-                    // ================= REGISTER =================
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

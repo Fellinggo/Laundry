@@ -8,7 +8,6 @@ class OrderStepProgressBar extends StatelessWidget {
     this.activeIndex = 0,
   });
 
-  /// -1 = Belum mulai, 0 = Dijemput, 1 = Diambil, 2 = Dicuci, 3 = Diantar, 4 = Sampai
   final int activeIndex;
 
   static const _labels = [

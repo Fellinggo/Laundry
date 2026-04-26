@@ -108,7 +108,7 @@ class TermsConditionsScreen extends StatelessWidget {
             child: Text(
               t,
               style: AppTextStyles.bodyMuted,
-              textAlign: TextAlign.justify, // ✅ Teks poin sekarang rata kanan-kiri
+              textAlign: TextAlign.justify, 
             ),
           ),
         ], 

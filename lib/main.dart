@@ -70,7 +70,6 @@ class WushLaundryApp
             settings,
           ) {
             switch (settings.name) {
-              // ================= SPLASH =================
               case '/':
                 return MaterialPageRoute(
                   builder:
@@ -80,7 +79,6 @@ class WushLaundryApp
                   settings: settings,
                 );
 
-              // ================= ONBOARDING =================
               case '/onboarding':
                 return MaterialPageRoute(
                   builder:
@@ -90,7 +88,6 @@ class WushLaundryApp
                   settings: settings,
                 );
 
-              // ================= MAIN =================
               case '/main':
                 return MaterialPageRoute(
                   builder:
@@ -100,7 +97,6 @@ class WushLaundryApp
                   settings: settings,
                 );
 
-              // ================= AUTH =================
               case '/login':
                 return MaterialPageRoute(
                   builder:
@@ -119,7 +115,6 @@ class WushLaundryApp
                   settings: settings,
                 );
 
-              // ================= SERVICE FLOW =================
               case '/services':
                 return MaterialPageRoute(
                   builder:
@@ -135,7 +130,7 @@ class WushLaundryApp
                   settings: settings,
                 );
 
-              case '/add-address': // ← TAMBAHKAN ROUTE INI
+              case '/add-address': 
                 return MaterialPageRoute(
                   builder: (_) => const AddAddressScreen(),
                   settings: settings,
@@ -169,7 +164,6 @@ class WushLaundryApp
                   settings: settings,
                 );
 
-              // ================= PAYMENT =================
               case '/payment':
                 return MaterialPageRoute(
                   builder:
@@ -179,7 +173,6 @@ class WushLaundryApp
                   settings: settings,
                 );
 
-              // ================= PIN (FIXED HERE 🔥) =================
               case '/pin':
                 final args =
                     settings.arguments
@@ -200,7 +193,6 @@ class WushLaundryApp
                   settings: settings,
                 );
 
-              // ================= ORDER DETAIL (FIXED SAFE) =================
               case '/order-detail':
                 return MaterialPageRoute(
                   builder:
@@ -210,7 +202,6 @@ class WushLaundryApp
                   settings: settings,
                 );
 
-              // ================= OTHER SCREENS =================
               case '/notifications':
                 return MaterialPageRoute(
                   builder:
@@ -284,8 +275,7 @@ class WushLaundryApp
                 );
 
             }
-
-            // ================= FALLBACK =================
+            
             return MaterialPageRoute(
               builder:
                   (
