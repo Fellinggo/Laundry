@@ -230,9 +230,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 10),
 
         GestureDetector(
-          onTap: () => _handleProtectedAction(() {
-            _editName(); 
-          }),
+        onTap: () => _handleProtectedAction(() {
+          _editName(); 
+        }),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16), // 🔥 ini jaraknya
           child: Row(
             children: [
               const CircleAvatar(
@@ -279,7 +281,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
         ),
-
+        )
       ],
     );
 
