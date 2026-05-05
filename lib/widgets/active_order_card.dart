@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_spacing.dart';
 import '../constants/app_text_styles.dart';
-import 'step_progress_bar.dart';  
+import 'step_progress_bar.dart';
 
-class ActiveOrderCard extends StatelessWidget {
+class ActiveOrderCard
+    extends
+        StatelessWidget {
   const ActiveOrderCard({
     super.key,
     required this.statusTitle,
@@ -27,25 +29,40 @@ class ActiveOrderCard extends StatelessWidget {
   static const double _cardHeight = 180;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
     return SizedBox(
       height: _cardHeight,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+          borderRadius: BorderRadius.circular(
+            AppSpacing.cardRadius,
+          ),
           child: Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: const EdgeInsets.all(
+              AppSpacing.lg,
+            ),
             decoration: BoxDecoration(
               color: AppColors.white,
-              borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-              border: Border.all(color: AppColors.borderLight),
+              borderRadius: BorderRadius.circular(
+                AppSpacing.cardRadius,
+              ),
+              border: Border.all(
+                color: AppColors.borderLight,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withOpacity(
+                    0.05,
+                  ),
                   blurRadius: 12,
-                  offset: const Offset(0, 4),
+                  offset: const Offset(
+                    0,
+                    4,
+                  ),
                 ),
               ],
             ),
@@ -74,7 +91,9 @@ class ActiveOrderCard extends StatelessWidget {
                           _buildBadge(),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(
+                        height: 8,
+                      ),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -87,7 +106,8 @@ class ActiveOrderCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          if (totalPrice != null)
+                          if (totalPrice !=
+                              null)
                             Text(
                               totalPrice!,
                               style: AppTextStyles.sectionTitle.copyWith(
@@ -99,7 +119,9 @@ class ActiveOrderCard extends StatelessWidget {
                         ],
                       ),
                       const Spacer(),
-                      OrderStepProgressBar(activeIndex: currentStep),   
+                      OrderStepProgressBar(
+                        activeIndex: currentStep,
+                      ),
                     ],
                   ),
           ),
@@ -110,10 +132,15 @@ class ActiveOrderCard extends StatelessWidget {
 
   Widget _buildBadge() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 4,
+      ),
       decoration: BoxDecoration(
         color: AppColors.successBg,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(
+          20,
+        ),
       ),
       child: Text(
         badgeLabel,

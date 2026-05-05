@@ -46,8 +46,11 @@ class HomeScreen
   createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-
+class _HomeScreenState
+    extends
+        State<
+          HomeScreen
+        > {
   String? userFirstName;
 
   Widget _buildEmptyOrderBox() {
@@ -71,7 +74,9 @@ class _HomeScreenState extends State<HomeScreen> {
             color: Colors.grey.shade400,
             size: 40,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(
+            height: 8,
+          ),
           Text(
             "Belum ada pesanan aktif",
             style: AppTextStyles.bodyMuted.copyWith(
@@ -83,9 +88,21 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  List<Map<String, dynamic>> activeOrders = [];
+  List<
+    Map<
+      String,
+      dynamic
+    >
+  >
+  activeOrders = [];
 
-  final List<Map<String, dynamic>> items = [
+  final List<
+    Map<
+      String,
+      dynamic
+    >
+  >
+  items = [
     {
       'title': 'Cuci Regular',
       'price': 'Rp 20.000/plastik',
@@ -110,30 +127,99 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     loadActiveOrder();
-    _loadUserName(); 
+    _loadUserName();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     loadActiveOrder();
-    _loadUserName(); 
+    _loadUserName();
   }
 
-  Future<void> _loadUserName() async {
+  Future<
+    void
+  >
+  _loadUserName() async {
     final prefs = await SharedPreferences.getInstance();
-    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    final isLoggedIn =
+        prefs.getBool(
+          'isLoggedIn',
+        ) ??
+        false;
 
     if (isLoggedIn) {
-      final fullName = prefs.getString('userName') ?? 'User';
-      setState(() {
-        userFirstName = fullName.split(' ').first;
-      });
+      final fullName =
+          prefs.getString(
+            'userName',
+          ) ??
+          'User';
+      setState(
+        () {
+          userFirstName = fullName
+              .split(
+                ' ',
+              )
+              .first;
+        },
+      );
     } else {
-      setState(() {
-        userFirstName = null;
-      });
+      setState(
+        () {
+          userFirstName = null;
+        },
+      );
     }
+  }
+
+  int _parseRupiahToInt(
+    String rupiah,
+  ) {
+    if (rupiah.isEmpty) return 0;
+    String cleaned = rupiah
+        .replaceAll(
+          'Rp ',
+          '',
+        )
+        .replaceAll(
+          '.',
+          '',
+        );
+    return int.tryParse(
+          cleaned,
+        ) ??
+        0;
+  }
+
+  String _formatRupiah(
+    int number,
+  ) {
+    final s = number.toString();
+    final buffer = StringBuffer();
+    int count = 0;
+    for (
+      int i =
+          s.length -
+          1;
+      i >=
+          0;
+      i--
+    ) {
+      buffer.write(
+        s[i],
+      );
+      count++;
+      if (count %
+                  3 ==
+              0 &&
+          i !=
+              0) {
+        buffer.write(
+          '.',
+        );
+      }
+    }
+    return 'Rp ${buffer.toString().split('').reversed.join()}';
   }
 
   Future<
@@ -157,14 +243,39 @@ class _HomeScreenState extends State<HomeScreen> {
     final List<
       String
     >
-    ordersRaw =
+    activeRaw =
         prefs.getStringList(
           'active_orders',
         ) ??
         [];
+    final List<
+      String
+    >
+    processRaw =
+        prefs.getStringList(
+          'process_orders',
+        ) ??
+        [];
+
+    final List<
+      String
+    >
+    ordersRaw = [
+      ...activeRaw,
+      ...processRaw,
+    ];
 
     print(
+      '========== HOME SCREEN ==========',
+    );
+    print(
       'Jumlah pesanan di SharedPreferences: ${ordersRaw.length}',
+    );
+    print(
+      'active_orders: ${activeRaw.length}',
+    );
+    print(
+      'process_orders: ${processRaw.length}',
     );
 
     final List<
@@ -186,14 +297,6 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     ).toList();
 
-    if (validOrders.length !=
-        ordersRaw.length) {
-      await prefs.setStringList(
-        'active_orders',
-        validOrders,
-      );
-    }
-
     setState(
       () {
         activeOrders = validOrders.map(
@@ -202,7 +305,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ) {
             final data = Uri.splitQueryString(
               e,
-            ); 
+            );
             return {
               'orderId':
                   data['orderId'] ??
@@ -224,7 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   'Rp 0',
               'address':
                   data['address'] ??
-                  '-', 
+                  '-',
               'itemsJson':
                   data['itemsJson'] ??
                   '',
@@ -242,6 +345,9 @@ class _HomeScreenState extends State<HomeScreen> {
         '   - Order ID: ${order['orderId']}',
       );
     }
+    print(
+      '==================================',
+    );
   }
 
   void _handleServiceTap(
@@ -331,7 +437,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(
     BuildContext context,
   ) {
-
     _loadUserName();
     return ColoredBox(
       color: AppColors.headerNavy,
@@ -455,7 +560,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 12,
                       ),
 
-                  
                       SizedBox(
                         height: 180,
                         child: activeOrders.isEmpty
@@ -473,6 +577,32 @@ class _HomeScreenState extends State<HomeScreen> {
                                       index,
                                     ) {
                                       final order = activeOrders[index];
+
+                                      final bool isDummyOrder =
+                                          order['orderId'] ==
+                                          '100001';
+
+                                      final int currentStep = isDummyOrder
+                                          ? 2
+                                          : 0;
+                                      final String badgeLabel = isDummyOrder
+                                          ? 'Dicuci'
+                                          : 'Diproses';
+
+                                      String rawTotal =
+                                          order['totalPrice']?.toString() ??
+                                          'Rp 0';
+                                      int totalNominal = _parseRupiahToInt(
+                                        rawTotal,
+                                      );
+                                      int finalTotal = isDummyOrder
+                                          ? totalNominal +
+                                                5000
+                                          : totalNominal;
+                                      String displayTotal = _formatRupiah(
+                                        finalTotal,
+                                      );
+
                                       return GestureDetector(
                                         behavior: HitTestBehavior.opaque,
                                         onTap: () {
@@ -483,7 +613,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                               itemsJson.isNotEmpty) {
                                             try {
                                               if (itemsJson
-                                                  is String) {} else if (itemsJson
+                                                  is String) {
+                                              } else if (itemsJson
                                                   is List) {}
                                             } catch (
                                               e
@@ -499,7 +630,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             '/order-detail',
                                             arguments: {
                                               ...order,
-                                              'fromActiveOrder': true, 
+                                              'fromActiveOrder': true,
                                             },
                                           );
                                         },
@@ -510,8 +641,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                           child: ActiveOrderCard(
                                             statusTitle: 'Pesanan ${order['orderId']}',
                                             subtitle: 'Pickup: ${order['pickupTime']}\nDelivery: ${order['deliveryTime']}',
-                                            totalPrice: order['totalPrice'],
-                                            currentStep: 0,
+                                            totalPrice: displayTotal,
+                                            currentStep: currentStep,
+                                            badgeLabel: badgeLabel,
                                           ),
                                         ),
                                       );
@@ -553,7 +685,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// ================= HEADER =================
 class HomeNavyHeaderBlock
     extends
         StatelessWidget {
@@ -601,7 +732,6 @@ class HomeNavyHeaderBlock
   }
 }
 
-// ================= NO OVERSCROLL BEHAVIOR =================
 class _NoOverscrollBehavior
     extends
         ScrollBehavior {

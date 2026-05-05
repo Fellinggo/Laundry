@@ -39,15 +39,27 @@ class OrderDetailScreen
     required String totalPrice,
     required String address,
     required String itemsJson,
+    required int deliveryFee,
   }) async {
     final prefs = await SharedPreferences.getInstance();
 
     final notif = "Pesanan $orderId berhasil dibuat - ${DateTime.now()}";
 
-    final list = prefs.getStringList('notifications') ?? [];
-    list.insert(0, notif);
+    final list =
+        prefs.getStringList(
+          'notifications',
+        ) ??
+        [];
+    list.insert(
+      0,
+      notif,
+    );
 
-    await prefs.setStringList('notifications', list);
+    await prefs.setStringList(
+      'notifications',
+      list,
+    );
+
     final String orderString = Uri(
       queryParameters: {
         'orderId': orderId,
@@ -56,8 +68,9 @@ class OrderDetailScreen
         'pickupTime': pickupTime,
         'deliveryTime': deliveryTime,
         'totalPrice': totalPrice,
-        'address': address, 
+        'address': address,
         'itemsJson': itemsJson,
+        'deliveryFee': deliveryFee.toString(),
       },
     ).query;
 
@@ -78,7 +91,7 @@ class OrderDetailScreen
     );
 
     debugPrint(
-      'Pesanan baru disimpan: $orderId',
+      'Pesanan baru disimpan: $orderId dengan total: $totalPrice',
     );
     debugPrint(
       'Total pesanan aktif: ${existingOrders.length}',
@@ -169,6 +182,7 @@ class OrderDetailScreen
       return 120;
     }
   }
+
   String _formatRupiah(
     dynamic value,
   ) {
@@ -178,9 +192,18 @@ class OrderDetailScreen
       number = value;
     } else if (value
         is String) {
+      String cleaned = value
+          .replaceAll(
+            'Rp ',
+            '',
+          )
+          .replaceAll(
+            '.',
+            '',
+          );
       number =
           int.tryParse(
-            value,
+            cleaned,
           ) ??
           0;
     } else {
@@ -225,11 +248,21 @@ class OrderDetailScreen
         is int)
       return value;
     if (value
-        is String)
+        is String) {
+      String cleaned = value
+          .replaceAll(
+            'Rp ',
+            '',
+          )
+          .replaceAll(
+            '.',
+            '',
+          );
       return int.tryParse(
-            value,
+            cleaned,
           ) ??
           0;
+    }
     if (value
         is double)
       return value.toInt();
@@ -501,6 +534,20 @@ class OrderDetailScreen
     final bool isFromActiveOrder =
         args['fromActiveOrder'] ==
         true;
+    final bool isFromProcessOrder =
+        args['fromProcessOrder'] ==
+        true;
+
+    final String orderIdTemp =
+        args['orderId']?.toString() ??
+        '';
+    final bool isDummyOrder =
+        orderIdTemp ==
+        '100001';
+
+    final int activeStepIndex = isDummyOrder
+        ? 2
+        : 0;
 
     List<
       Map<
@@ -552,15 +599,16 @@ class OrderDetailScreen
       }
     }
 
-   
-    final String orderId = isFromActiveOrder
+    final String orderId =
+        (isFromActiveOrder ||
+            isFromProcessOrder)
         ? (args['orderId']?.toString() ??
               '000000')
         : (args['orderId'] ??
               _generateOrderId());
 
     int totalQty = 0;
-    int totalPrice = 0;
+    int totalProductPrice = 0;
 
     if (orderItems.isNotEmpty) {
       totalQty = orderItems.fold(
@@ -574,7 +622,7 @@ class OrderDetailScreen
               item['qty'],
             ),
       );
-      totalPrice = orderItems.fold(
+      totalProductPrice = orderItems.fold(
         0,
         (
           sum,
@@ -598,7 +646,7 @@ class OrderDetailScreen
             ? args['qty']
             : 1,
       );
-      totalPrice = _toInt(
+      totalProductPrice = _toInt(
         args['serviceFee'] !=
                 null
             ? args['serviceFee']
@@ -625,9 +673,21 @@ class OrderDetailScreen
           ? args['deliveryFee']
           : 5000,
     );
-    final int grandTotal =
-        totalPrice +
-        deliveryFee;
+
+    final int grandTotal;
+    if (isFromActiveOrder ||
+        isFromProcessOrder) {
+      final String savedTotalPrice =
+          args['totalPrice']?.toString() ??
+          'Rp 0';
+      grandTotal = _toInt(
+        savedTotalPrice,
+      );
+    } else {
+      grandTotal =
+          totalProductPrice +
+          deliveryFee;
+    }
 
     final String serviceSummary = orderItems.isEmpty
         ? (args['service']?.toString() ??
@@ -656,12 +716,17 @@ class OrderDetailScreen
       orderItems,
     );
 
+    final String statusText = isDummyOrder
+        ? 'Dicuci'
+        : 'Diproses';
+
     return Scaffold(
       backgroundColor: AppColors.headerNavy,
       appBar: NavyBackAppBar(
         title: 'Detail Pesanan',
         onBack: () async {
-          if (!isFromActiveOrder) {
+          if (!isFromActiveOrder &&
+              !isFromProcessOrder) {
             await _saveOrderToSharedPreferences(
               orderId: orderId,
               service: serviceSummary,
@@ -673,6 +738,7 @@ class OrderDetailScreen
               ),
               address: pickupAddress,
               itemsJson: itemsJson,
+              deliveryFee: deliveryFee,
             );
 
             if (!context.mounted) return;
@@ -748,7 +814,9 @@ class OrderDetailScreen
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        'Pesanan kamu akan segera diambil',
+                                        isDummyOrder
+                                            ? 'Pesanan sedang dicuci'
+                                            : 'Pesanan kamu akan segera diambil',
                                         style: AppTextStyles.sectionTitle.copyWith(
                                           fontSize: 16,
                                         ),
@@ -766,7 +834,7 @@ class OrderDetailScreen
                                         ),
                                       ),
                                       child: Text(
-                                        'Diproses',
+                                        statusText,
                                         style: AppTextStyles.caption.copyWith(
                                           color: AppColors.success,
                                           fontWeight: FontWeight.w700,
@@ -790,8 +858,8 @@ class OrderDetailScreen
                                 const SizedBox(
                                   height: 16,
                                 ),
-                                const OrderStepProgressBar(
-                                  activeIndex: 0,
+                                OrderStepProgressBar(
+                                  activeIndex: activeStepIndex,
                                 ),
                                 const SizedBox(
                                   height: 16,
@@ -927,7 +995,7 @@ class OrderDetailScreen
                                   _row(
                                     'Subtotal Pesanan',
                                     _formatRupiah(
-                                      totalPrice,
+                                      totalProductPrice,
                                     ),
                                   ),
                                 ],
@@ -993,7 +1061,8 @@ class OrderDetailScreen
                             height: 20,
                           ),
 
-                          if (!isFromActiveOrder)
+                          if (!isFromActiveOrder &&
+                              !isFromProcessOrder)
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
@@ -1009,6 +1078,7 @@ class OrderDetailScreen
                                     ),
                                     address: pickupAddress,
                                     itemsJson: itemsJson,
+                                    deliveryFee: deliveryFee,
                                   );
 
                                   if (!context.mounted) return;
