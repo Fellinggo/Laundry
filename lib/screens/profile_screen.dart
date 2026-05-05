@@ -4,6 +4,7 @@ import 'package:wushlaundry/widgets/rounded_white_panel.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_spacing.dart';
 import '../constants/app_text_styles.dart';
+import '../data/address_dummy.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({
@@ -102,17 +103,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           if (isSignup) {
             addresses = [];
-          } else {
-            addresses = [
-              {
-                'title': 'Rumah',
-                'address': 'Jl. Melati No. 12, Jakarta Selatan',
-              },
-              {
-                'title': 'Kantor',
-                'address': 'Gedung Aurora Lt. 5, Jl. Sudirman',
-              },
-            ];
+              } else {
+                addresses = addressDummy.map((e) => {
+              'title': e.title,
+              'address': e.address,
+              }).toList();
             _saveAddressesToPrefs();
           }
         }

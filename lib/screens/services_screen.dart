@@ -5,6 +5,7 @@ import '../constants/app_text_styles.dart';
 import '../widgets/eta_badge.dart';
 import '../widgets/navy_app_bar.dart';
 import '../widgets/login_modal_sheet.dart';
+import '../data/service_dummy.dart';
 
 class ServicesScreen extends StatelessWidget {
   const ServicesScreen({
@@ -77,77 +78,34 @@ class ServicesScreen extends StatelessWidget {
                     mainAxisSpacing: 16,
                     crossAxisSpacing: 16,
                     childAspectRatio: 0.85,
-                    children: [
-                      _gridCard(
-                        context,
-                        title: 'Cuci Regular',
-                        price: 'Rp 20.000 / Plastik',
-                        eta: 'ETA 10 jam',
-                        etaType: EtaType.normal,
-                        imagePath: 'assets/images/Cucireg.png',
-                      ),
-                      _gridCard(
-                        context,
-                        title: 'Cuci Setrika',
-                        price: 'Rp 28.000 / Plastik',
-                        eta: 'ETA 11 jam',
-                        etaType: EtaType.fast,
-                        imagePath: 'assets/images/Cucisetrika.png',
-                      ),
-                      _gridCard(
-                        context,
-                        title: 'Cuci Kering',
-                        price: 'Rp 23.000 / Plastik',
-                        eta: 'ETA 12 jam',
-                        etaType: EtaType.long,
-                        imagePath: 'assets/images/kering.png',
-                      ),
-                      _gridCard(
-                        context,
-                        title: 'Paket Service',
-                        price: 'Rp 48.000 / Plastik',
-                        eta: 'Express',
-                        etaType: EtaType.express,
-                        imagePath: 'assets/images/paket.png',
-                      ),
-                      _gridCard(
-                        context,
-                        title: 'Cuci Jas / Gaun',
-                        price: 'Rp 23.000 / item',
-                        eta: 'Express',
-                        etaType: EtaType.express,
-                        imagePath: 'assets/images/jasgaun.png',
-                      ),
-                      _gridCard(
-                        context,
-                        title: 'Setrika Saja',
-                        price: 'Rp 21.000 / Plastik',
-                        eta: 'ETA 11 jam',
-                        etaType: EtaType.fast,
-                        imagePath: 'assets/images/setrikasaja.png',
-                      ),
-                    ],
+                    children: serviceDummy
+                      .where((e) => !e.isWide)
+                      .map((service) => _gridCard(
+                            context,
+                            title: service.title,
+                            price: service.price,
+                            eta: service.eta,
+                            etaType: service.etaType,
+                            imagePath: service.imagePath,
+                          ))
+                      .toList(),
                   ),
 
                   const SizedBox(height: 20),
 
-                  _wideCard(
-                    context,
-                    title: 'Cuci Bedcover / Selimut / Sprei',
-                    price: 'Rp 25.000 / Item',
-                    eta: 'ETA 12 jam',
-                    imagePath: 'assets/images/sprei.png',
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  _wideCard(
-                    context,
-                    title: 'Cuci Sepatu',
-                    price: 'Rp 20.000 / Item',
-                    eta: 'ETA 12 jam',
-                    imagePath: 'assets/images/sepatu.png',
-                  ),
+                  ...serviceDummy
+                    .where((e) => e.isWide)
+                    .map((service) => Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: _wideCard(
+                            context,
+                            title: service.title,
+                            price: service.price,
+                            eta: service.eta,
+                            imagePath: service.imagePath,
+                          ),
+                        ))
+                    .toList(),
 
                   const SizedBox(height: 80),
                 ],
