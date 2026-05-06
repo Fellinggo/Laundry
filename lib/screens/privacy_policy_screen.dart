@@ -6,9 +6,7 @@ import '../widgets/navy_app_bar.dart';
 import '../widgets/rounded_white_panel.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
-  const PrivacyPolicyScreen({
-    super.key,
-  });
+  const PrivacyPolicyScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -34,25 +32,25 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 Text(
                   'Kami menghormati privasi Anda. Data pribadi digunakan untuk memproses pesanan, komunikasi layanan, dan peningkatan pengalaman aplikasi.',
                   style: AppTextStyles.bodyMuted,
-                  textAlign: TextAlign.justify, 
+                  textAlign: TextAlign.justify,
                 ),
                 const SizedBox(height: AppSpacing.xl),
-                Text(
-                  'Pedoman Pengguna',
-                  style: AppTextStyles.sectionTitle,
-                ),
+                Text('Pedoman Pengguna', style: AppTextStyles.sectionTitle),
                 const SizedBox(height: 8),
                 _bullet('Gunakan layanan sesuai ketentuan yang berlaku.'),
                 _bullet('Pastikan informasi alamat dan kontak akurat.'),
-                _bullet('Segala bentuk penyalahgunaan dapat mengakibatkan penangguhan akun.'),
-                const SizedBox(height: AppSpacing.xl),
-                Text(
-                  'Penggunaan Data',
-                  style: AppTextStyles.sectionTitle,
+                _bullet(
+                  'Segala bentuk penyalahgunaan dapat mengakibatkan penangguhan akun.',
                 ),
+                const SizedBox(height: AppSpacing.xl),
+                Text('Penggunaan Data', style: AppTextStyles.sectionTitle),
                 const SizedBox(height: 8),
-                _bullet('Data lokasi dipakai untuk penjemputan dan pengantaran.'),
-                _bullet('Riwayat pesanan disimpan untuk keperluan garansi layanan.'),
+                _bullet(
+                  'Data lokasi dipakai untuk penjemputan dan pengantaran.',
+                ),
+                _bullet(
+                  'Riwayat pesanan disimpan untuk keperluan garansi layanan.',
+                ),
                 TextButton(
                   onPressed: () {},
                   style: TextButton.styleFrom(padding: EdgeInsets.zero),

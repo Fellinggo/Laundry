@@ -7,10 +7,7 @@ import '../constants/app_text_styles.dart';
 import '../data/address_dummy.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({
-    super.key,
-    this.embedded = false,
-  });
+  const ProfileScreen({super.key, this.embedded = false});
 
   final bool embedded;
 
@@ -38,7 +35,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _editName() async {
     final controller = TextEditingController(text: name);
-    
     final newName = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
@@ -68,7 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (newName != null && newName.isNotEmpty && newName != name) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('userName', newName);
-      
+
       setState(() {
         name = newName;
       });
@@ -103,11 +99,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           if (isSignup) {
             addresses = [];
-              } else {
-                addresses = addressDummy.map((e) => {
-              'title': e.title,
-              'address': e.address,
-              }).toList();
+          } else {
+            addresses = addressDummy
+                .map((e) => {'title': e.title, 'address': e.address})
+                .toList();
             _saveAddressesToPrefs();
           }
         }
@@ -121,10 +116,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _saveAddressesToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     final addressList = addresses.map((addr) => addr['address']!).toList();
     final titleList = addresses.map((addr) => addr['title']!).toList();
-    
+
     await prefs.setStringList(_addressKey, addressList);
     await prefs.setStringList(_titlesKey, titleList);
   }
@@ -138,31 +133,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
       action();
     }
   }
-
   void _deleteAddress(int index) async {
     setState(() {
       addresses.removeAt(index);
     });
     await _saveAddressesToPrefs();
   }
-
   Future<void> _addNewAddress() async {
-    final result = await Navigator.pushNamed(
-      context,
-      '/add-address',
-    );
+    final result = await Navigator.pushNamed(context, '/add-address');
 
     if (result != null && result is Map) {
       setState(() {
-        addresses.add({
-          'title': result['title'],
-          'address': result['address'],
-        });
+        addresses.add({'title': result['title'], 'address': result['address']});
       });
       await _saveAddressesToPrefs();
     }
   }
-
   Future<void> _editAddress(int index) async {
     final result = await Navigator.pushNamed(
       context,
@@ -225,58 +211,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 10),
 
         GestureDetector(
-        onTap: () => _handleProtectedAction(() {
-          _editName(); 
-        }),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16), // 🔥 ini jaraknya
-          child: Row(
-            children: [
-              const CircleAvatar(
-                radius: 36,
-                backgroundColor: AppColors.iconCircle,
-                child: Icon(Icons.person, size: 40, color: AppColors.textSecondary),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            name,
-                            style: AppTextStyles.sectionTitle.copyWith(
-                              fontSize: 17,
-                              color: Colors.white,
+          onTap: () => _handleProtectedAction(() {
+            _editName();
+          }),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+            ), // 🔥 ini jaraknya
+            child: Row(
+              children: [
+                const CircleAvatar(
+                  radius: 36,
+                  backgroundColor: AppColors.iconCircle,
+                  child: Icon(
+                    Icons.person,
+                    size: 40,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              name,
+                              style: AppTextStyles.sectionTitle.copyWith(
+                                fontSize: 17,
+                                color: Colors.white,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        const Icon(
-                          Icons.edit_outlined,
-                          size: 16,
+                          const SizedBox(width: 6),
+                          const Icon(
+                            Icons.edit_outlined,
+                            size: 16,
+                            color: Colors.white70,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        email,
+                        style: AppTextStyles.bodyMuted.copyWith(
                           color: Colors.white70,
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      email,
-                      style: AppTextStyles.bodyMuted.copyWith(color: Colors.white70),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-        )
       ],
     );
 
@@ -369,10 +363,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ],
     );
 
-    return Scaffold(
-      backgroundColor: AppColors.profileNavy,
-      body: bodyContent,
-    );
+    return Scaffold(backgroundColor: AppColors.profileNavy, body: bodyContent);
   }
 
   Widget _addressCard({
@@ -388,8 +379,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.location_on_outlined,
-              color: AppColors.actionBlue),
+          const Icon(Icons.location_on_outlined, color: AppColors.actionBlue),
           const SizedBox(width: 10),
 
           Expanded(
@@ -413,10 +403,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           GestureDetector(
             onTap: () => _editAddress(index),
-            child: const Icon(
-              Icons.edit_outlined,
-              size: 18,
-            ),
+            child: const Icon(Icons.edit_outlined, size: 18),
           ),
 
           const SizedBox(width: 10),

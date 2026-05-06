@@ -4,23 +4,12 @@ import '../constants/app_spacing.dart';
 import '../constants/app_text_styles.dart';
 import '../widgets/payment_method_tile.dart';
 
-class PaymentMethodScreen
-    extends
-        StatelessWidget {
-  const PaymentMethodScreen({
-    super.key,
-  });
+class PaymentMethodScreen extends StatelessWidget {
+  const PaymentMethodScreen({super.key});
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final args =
-        ModalRoute.of(
-              context,
-            )?.settings.arguments
-            as Map? ??
-        {};
+  Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)?.settings.arguments as Map? ?? {};
 
     return Scaffold(
       backgroundColor: AppColors.pageBg,
@@ -32,99 +21,58 @@ class PaymentMethodScreen
           'Pilih Metode Pembayaran',
           style: AppTextStyles.screenTitleNavy,
         ),
-        iconTheme: const IconThemeData(
-          color: AppColors.headerNavy,
-        ),
+        iconTheme: const IconThemeData(color: AppColors.headerNavy),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(
-          AppSpacing.xl,
-        ),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         children: [
           PaymentMethodTile(
             title: 'DANA',
             connected: true,
-            leading: const WalletLogoBox(
-              label: 'D',
-              color: Color(
-                0xFF118EEA,
-              ),
-            ),
+            leading: const WalletLogoBox(label: 'D', color: Color(0xFF118EEA)),
             onTap: () {
               Navigator.pushNamed(
                 context,
                 '/pin',
-                arguments: {
-                  'wallet': 'DANA',
-                  'order': args, 
-                },
+                arguments: {'wallet': 'DANA', 'order': args},
               );
             },
           ),
 
-          const SizedBox(
-            height: 12,
-          ),
+          const SizedBox(height: 12),
 
           PaymentMethodTile(
             title: 'OVO',
             connected: true,
-            leading: const WalletLogoBox(
-              label: 'O',
-              color: Color(
-                0xFF6B2C91,
-              ),
-            ),
+            leading: const WalletLogoBox(label: 'O', color: Color(0xFF6B2C91)),
             onTap: () {
               Navigator.pushNamed(
                 context,
                 '/pin',
-                arguments: {
-                  'wallet': 'OVO',
-                  'order': args,
-                },
+                arguments: {'wallet': 'OVO', 'order': args},
               );
             },
           ),
 
-          const SizedBox(
-            height: 12,
-          ),
+          const SizedBox(height: 12),
 
           const PaymentMethodTile(
             title: 'BCA',
-            leading: WalletLogoBox(
-              label: 'B',
-              color: AppColors.headerNavy,
-            ),
+            leading: WalletLogoBox(label: 'B', color: AppColors.headerNavy),
           ),
 
-          const SizedBox(
-            height: 12,
-          ),
+          const SizedBox(height: 12),
 
           const PaymentMethodTile(
             title: 'BNI',
-            leading: WalletLogoBox(
-              label: 'N',
-              color: Color(
-                0xFF00529C,
-              ),
-            ),
+            leading: WalletLogoBox(label: 'N', color: Color(0xFF00529C)),
           ),
 
-          const SizedBox(
-            height: 12,
-          ),
+          const SizedBox(height: 12),
 
           const PaymentMethodTile(
             title: 'Mandiri',
-            leading: WalletLogoBox(
-              label: 'M',
-              color: Color(
-                0xFFFF6B00,
-              ),
-            ),
+            leading: WalletLogoBox(label: 'M', color: Color(0xFFFF6B00)),
           ),
         ],
       ),

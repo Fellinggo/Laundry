@@ -7,25 +7,14 @@ import 'package:wushlaundry/widgets/primary_button.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_spacing.dart';
 
-class RegisterScreen
-    extends
-        StatefulWidget {
-  const RegisterScreen({
-    super.key,
-  });
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<
-    RegisterScreen
-  >
-  createState() => _RegisterScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState
-    extends
-        State<
-          RegisterScreen
-        > {
+class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscure1 = true;
   bool _obscure2 = true;
 
@@ -33,16 +22,15 @@ class _RegisterScreenState
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   String? emailError;
   String? phoneError;
   String? passwordError;
   String? confirmPasswordError;
 
-  bool _isValidEmail(
-    String email,
-  ) {
+  bool _isValidEmail(String email) {
     return RegExp(
       r'^[a-zA-Z0-9._%+-]+@('
       r'gmail\.com|'
@@ -54,49 +42,21 @@ class _RegisterScreenState
       r'[a-zA-Z0-9-.]+\.ac\.id|'
       r'[a-zA-Z0-9-.]+\.edu'
       r')$',
-    ).hasMatch(
-      email,
-    );
+    ).hasMatch(email);
   }
 
-  bool _isPhoneValid(
-    String phone,
-  ) {
-    return phone.length >=
-            11 &&
-        RegExp(
-          r'^[0-9]+$',
-        ).hasMatch(
-          phone,
-        );
+  bool _isPhoneValid(String phone) {
+    return phone.length >= 11 && RegExp(r'^[0-9]+$').hasMatch(phone);
   }
 
-  bool _isStrongPassword(
-    String pass,
-  ) {
-    return pass.length >=
-            6 &&
-        pass.contains(
-          RegExp(
-            r'[A-Z]',
-          ),
-        ) &&
-        pass.contains(
-          RegExp(
-            r'[a-z]',
-          ),
-        ) &&
-        pass.contains(
-          RegExp(
-            r'[0-9]',
-          ),
-        );
+  bool _isStrongPassword(String pass) {
+    return pass.length >= 6 &&
+        pass.contains(RegExp(r'[A-Z]')) &&
+        pass.contains(RegExp(r'[a-z]')) &&
+        pass.contains(RegExp(r'[0-9]'));
   }
 
-  Future<
-    void
-  >
-  handleRegister() async {
+  Future<void> handleRegister() async {
     final prefs = await SharedPreferences.getInstance();
 
     String name = nameController.text.trim();
@@ -105,108 +65,68 @@ class _RegisterScreenState
     String password = passwordController.text.trim();
     String confirmPassword = confirmPasswordController.text.trim();
 
-    setState(
-      () {
-        emailError = null;
-        phoneError = null;
-        passwordError = null;
-        confirmPasswordError = null;
-      },
-    );
+    setState(() {
+      emailError = null;
+      phoneError = null;
+      passwordError = null;
+      confirmPasswordError = null;
+    });
 
     bool hasError = false;
 
-    if (!_isValidEmail(
-      email,
-    )) {
+    if (!_isValidEmail(email)) {
       emailError = "Email tidak valid";
       hasError = true;
     }
 
-    if (!_isPhoneValid(
-      phone,
-    )) {
+    if (!_isPhoneValid(phone)) {
       phoneError = "Nomor HP tidak valid";
       hasError = true;
     }
 
-    if (!_isStrongPassword(
-      password,
-    )) {
+    if (!_isStrongPassword(password)) {
       passwordError = "Min 6 karakter + huruf besar, kecil, dan angka";
       hasError = true;
     }
 
-    if (password !=
-        confirmPassword) {
+    if (password != confirmPassword) {
       confirmPasswordError = "Password tidak sama";
       hasError = true;
     }
 
     if (hasError) {
-      setState(
-        () {},
-      );
+      setState(() {});
       return;
     }
 
-    await prefs.setBool(
-      'isLoggedIn',
-      true,
-    );
-    await prefs.setBool(
-      'isSignup',
-      true,
-    );
-    await prefs.setString(
-      'userName',
-      name,
-    );
-    await prefs.setString(
-      'userEmail',
-      email,
-    );
+    await prefs.setBool('isLoggedIn', true);
+    await prefs.setBool('isSignup', true);
+    await prefs.setString('userName', name);
+    await prefs.setString('userEmail', email);
 
-    await prefs.setString(
-      'login_method',
-      'signup',
-    );
+    await prefs.setString('login_method', 'signup');
 
-    await prefs.remove(
-      'userAddresses',
-    );
-    await prefs.remove(
-      'userAddressTitles',
-    );
+    await prefs.remove('userAddresses');
+    await prefs.remove('userAddressTitles');
 
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/main',
-      (
-        route,
-      ) => false,
-    );
+    Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
   }
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.pageBg,
       body: Column(
         children: [
           const CurvedNavyHeader(
             heightFraction: 0.40,
-            subtitle: 'Daftar untuk pengalaman laundry yang lebih personal dan praktis',
+            subtitle:
+                'Daftar untuk pengalaman laundry yang lebih personal dan praktis',
           ),
 
           Expanded(
             child: Transform.translate(
-              offset: const Offset(
-                0,
-                -50,
-              ),
+              offset: const Offset(0, -50),
               child: ScrollConfiguration(
                 behavior: const _NoOverscrollBehavior(),
                 child: SingleChildScrollView(
@@ -223,9 +143,7 @@ class _RegisterScreenState
                         controller: nameController,
                       ),
 
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 10),
 
                       LabeledTextField(
                         label: 'Email',
@@ -235,15 +153,11 @@ class _RegisterScreenState
                         errorText: emailError,
                       ),
 
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 10),
 
                       _phoneField(),
 
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 10),
 
                       LabeledTextField(
                         label: 'Password',
@@ -253,11 +167,9 @@ class _RegisterScreenState
                         obscure: _obscure1,
                         errorText: passwordError,
                         suffix: IconButton(
-                          onPressed: () => setState(
-                            () {
-                              _obscure1 = !_obscure1;
-                            },
-                          ),
+                          onPressed: () => setState(() {
+                            _obscure1 = !_obscure1;
+                          }),
                           icon: Icon(
                             _obscure1
                                 ? Icons.visibility_off_outlined
@@ -266,9 +178,7 @@ class _RegisterScreenState
                         ),
                       ),
 
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 10),
 
                       LabeledTextField(
                         label: 'Konfirmasi Password',
@@ -278,11 +188,9 @@ class _RegisterScreenState
                         obscure: _obscure2,
                         errorText: confirmPasswordError,
                         suffix: IconButton(
-                          onPressed: () => setState(
-                            () {
-                              _obscure2 = !_obscure2;
-                            },
-                          ),
+                          onPressed: () => setState(() {
+                            _obscure2 = !_obscure2;
+                          }),
                           icon: Icon(
                             _obscure2
                                 ? Icons.visibility_off_outlined
@@ -291,14 +199,9 @@ class _RegisterScreenState
                         ),
                       ),
 
-                      const SizedBox(
-                        height: 18,
-                      ),
+                      const SizedBox(height: 18),
 
-                      PrimaryButton(
-                        label: 'Daftar',
-                        onPressed: handleRegister,
-                      ),
+                      PrimaryButton(label: 'Daftar', onPressed: handleRegister),
                     ],
                   ),
                 ),
@@ -316,13 +219,9 @@ class _RegisterScreenState
       children: [
         Text(
           'No. HP',
-          style: AppTextStyles.sectionTitle.copyWith(
-            fontSize: 14,
-          ),
+          style: AppTextStyles.sectionTitle.copyWith(fontSize: 14),
         ),
-        const SizedBox(
-          height: 8,
-        ),
+        const SizedBox(height: 8),
 
         TextField(
           controller: phoneController,
@@ -334,52 +233,32 @@ class _RegisterScreenState
             fillColor: AppColors.white,
             errorText: phoneError,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
-              borderSide: const BorderSide(
-                color: AppColors.borderLight,
-              ),
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+              borderSide: const BorderSide(color: AppColors.borderLight),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
               borderSide: const BorderSide(
                 color: AppColors.borderLight,
                 width: 1.2,
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
               borderSide: const BorderSide(
                 color: AppColors.primaryNavy,
                 width: 1.4,
               ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
-              borderSide: const BorderSide(
-                color: Colors.red,
-                width: 1.2,
-              ),
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+              borderSide: const BorderSide(color: Colors.red, width: 1.2),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
-              borderSide: const BorderSide(
-                color: Colors.red,
-                width: 1.4,
-              ),
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+              borderSide: const BorderSide(color: Colors.red, width: 1.4),
             ),
-            prefixIcon: const Icon(
-              Icons.phone,
-            ),
+            prefixIcon: const Icon(Icons.phone),
           ),
         ),
       ],
@@ -387,9 +266,7 @@ class _RegisterScreenState
   }
 }
 
-class _NoOverscrollBehavior
-    extends
-        ScrollBehavior {
+class _NoOverscrollBehavior extends ScrollBehavior {
   const _NoOverscrollBehavior();
 
   @override
@@ -402,9 +279,7 @@ class _NoOverscrollBehavior
   }
 
   @override
-  ScrollPhysics getScrollPhysics(
-    BuildContext context,
-  ) {
+  ScrollPhysics getScrollPhysics(BuildContext context) {
     return const ClampingScrollPhysics();
   }
 }

@@ -25,7 +25,11 @@ class ServiceSummaryTile extends StatelessWidget {
             width: 56,
             height: 56,
             color: AppColors.serviceCardTint,
-            child: const Icon(Icons.local_laundry_service, color: AppColors.actionBlue, size: 32),
+            child: const Icon(
+              Icons.local_laundry_service,
+              color: AppColors.actionBlue,
+              size: 32,
+            ),
           ),
         ),
         const SizedBox(width: 12),
@@ -33,7 +37,10 @@ class ServiceSummaryTile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: AppTextStyles.sectionTitle.copyWith(fontSize: 15)),
+              Text(
+                title,
+                style: AppTextStyles.sectionTitle.copyWith(fontSize: 15),
+              ),
               const SizedBox(height: 4),
               Text(priceLabel, style: AppTextStyles.bodyMuted),
             ],

@@ -4,10 +4,7 @@ import '../constants/app_spacing.dart';
 import '../constants/app_text_styles.dart';
 import 'primary_button.dart';
 
-void
-showLoginModal(
-  BuildContext context,
-) {
+void showLoginModal(BuildContext context) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -15,79 +12,54 @@ showLoginModal(
     isDismissible: true,
     enableDrag: true,
     backgroundColor: Colors.transparent,
-    builder:
-        (
-          _,
-        ) => const _LoginModalCard(),
+    builder: (_) => const _LoginModalCard(),
   );
 }
 
-class _LoginModalCard
-    extends
-        StatelessWidget {
+class _LoginModalCard extends StatelessWidget {
   const _LoginModalCard();
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
         left: AppSpacing.xl,
         right: AppSpacing.xl,
-        bottom:
-            MediaQuery.paddingOf(
-              context,
-            ).bottom +
-            AppSpacing.xl,
+        bottom: MediaQuery.paddingOf(context).bottom + AppSpacing.xl,
       ),
       child: Center(
         child: Material(
           color: AppColors.white,
-          borderRadius: BorderRadius.circular(
-            20,
-          ),
+          borderRadius: BorderRadius.circular(20),
           child: Stack(
             children: [
               Positioned(
                 top: 8,
                 right: 8,
                 child: IconButton(
-                  icon: const Icon(
-                    Icons.close,
-                  ),
+                  icon: const Icon(Icons.close),
                   color: AppColors.textMuted,
                   onPressed: () {
-                    Navigator.pop(
-                      context,
-                    );
+                    Navigator.pop(context);
                   },
                 ),
               ),
 
               Padding(
-                padding: const EdgeInsets.all(
-                  AppSpacing.xxl,
-                ),
+                padding: const EdgeInsets.all(AppSpacing.xxl),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(
-                      height: 8,
-                    ),
+                    const SizedBox(height: 8),
 
                     Text(
                       'Masuk ke Akun Anda',
                       textAlign: TextAlign.center,
-                      style: AppTextStyles.sectionTitle.copyWith(
-                        fontSize: 18,
-                      ),
+                      style: AppTextStyles.sectionTitle.copyWith(fontSize: 18),
                     ),
 
-                    const SizedBox(
-                      height: 10,
-                    ),
+                    const SizedBox(height: 10),
 
                     Text(
                       'Anda harus masuk terlebih dahulu untuk melanjutkan tindakan ini.',
@@ -95,9 +67,7 @@ class _LoginModalCard
                       style: AppTextStyles.bodyMuted,
                     ),
 
-                    const SizedBox(
-                      height: 22,
-                    ),
+                    const SizedBox(height: 22),
 
                     PrimaryButton(
                       label: 'Masuk dengan Email',
@@ -107,19 +77,12 @@ class _LoginModalCard
                         size: 22,
                       ),
                       onPressed: () {
-                        Navigator.pop(
-                          context,
-                        );
-                        Navigator.pushNamed(
-                          context,
-                          '/login',
-                        );
+                        Navigator.pop(context);
+                        Navigator.pushNamed(context, '/login');
                       },
                     ),
 
-                    const SizedBox(
-                      height: 16,
-                    ),
+                    const SizedBox(height: 16),
 
                     PrimaryButton(
                       label: 'Sign Up',
@@ -130,13 +93,8 @@ class _LoginModalCard
                         size: 22,
                       ),
                       onPressed: () {
-                        Navigator.pop(
-                          context,
-                        );
-                        Navigator.pushNamed(
-                          context,
-                          '/register',
-                        );
+                        Navigator.pop(context);
+                        Navigator.pushNamed(context, '/register');
                       },
                     ),
                   ],

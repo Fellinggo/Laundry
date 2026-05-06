@@ -47,14 +47,13 @@ class OffersScreen extends StatelessWidget {
                 ),
               ),
             ],
-          ),Expanded(
+          ),
+          Expanded(
             child: Container(
               margin: const EdgeInsets.only(top: 12),
               decoration: const BoxDecoration(
                 color: AppColors.white,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(28),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: SingleChildScrollView(
                 physics: const ClampingScrollPhysics(),
@@ -81,10 +80,7 @@ class OffersScreen extends StatelessWidget {
 
                     const SizedBox(height: AppSpacing.xl),
 
-                    Text(
-                      'Penawaran Khusus',
-                      style: AppTextStyles.sectionTitle,
-                    ),
+                    Text('Penawaran Khusus', style: AppTextStyles.sectionTitle),
                     const SizedBox(height: AppSpacing.md),
 
                     _promoCard(
@@ -107,6 +103,7 @@ class OffersScreen extends StatelessWidget {
       ),
     );
   }
+
   Widget _promoCard({
     required BuildContext context,
     required String imagePath,
@@ -116,13 +113,11 @@ class OffersScreen extends StatelessWidget {
       onTap: () async {
         if (!loggedIn) {
           showLoginModal(context);
-          return; 
+          return;
         }
 
         if (promoCode != null) {
-          await Clipboard.setData(
-            ClipboardData(text: promoCode),
-          );
+          await Clipboard.setData(ClipboardData(text: promoCode));
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -131,7 +126,7 @@ class OffersScreen extends StatelessWidget {
             ),
           );
         }
-        
+
         await Future.delayed(const Duration(milliseconds: 500));
 
         onOpenServices?.call();
@@ -140,10 +135,7 @@ class OffersScreen extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
-          child: Image.asset(
-            imagePath,
-            fit: BoxFit.contain,
-          ),
+          child: Image.asset(imagePath, fit: BoxFit.contain),
         ),
       ),
     );

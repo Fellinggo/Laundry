@@ -34,9 +34,7 @@ class CurvedNavyHeader extends StatelessWidget {
               height: 75,
               decoration: const BoxDecoration(
                 color: AppColors.pageBg,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(40),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
               ),
             ),
           ),
@@ -54,9 +52,7 @@ class CurvedNavyHeader extends StatelessWidget {
                 Text(
                   subtitle,
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.body.copyWith(
-                    color: Colors.white,
-                  ),
+                  style: AppTextStyles.body.copyWith(color: Colors.white),
                 ),
               ],
             ),

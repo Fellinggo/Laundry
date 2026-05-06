@@ -25,7 +25,10 @@ class QuantityStepper extends StatelessWidget {
           _btn(Icons.remove, () => onChanged(value > 1 ? value - 1 : 1)),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: Text('$value', style: AppTextStyles.sectionTitle.copyWith(fontSize: 16)),
+            child: Text(
+              '$value',
+              style: AppTextStyles.sectionTitle.copyWith(fontSize: 16),
+            ),
           ),
           _btn(Icons.add, () => onChanged(value + 1)),
         ],

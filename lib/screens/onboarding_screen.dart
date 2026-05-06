@@ -60,7 +60,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void _skip() {
     _controller.animateToPage(
-      _pages.length - 1, 
+      _pages.length - 1,
       duration: const Duration(milliseconds: 350),
       curve: Curves.easeOutCubic,
     );
@@ -194,11 +194,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           flex: 13,
                           child: SizedBox(
                             height: 50,
-                            child: ElevatedButton( 
+                            child: ElevatedButton(
                               onPressed: _next,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    AppColors.wushOnboardingNavy,
+                                backgroundColor: AppColors.wushOnboardingNavy,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(
                                     AppSpacing.onboardingButtonRadius,

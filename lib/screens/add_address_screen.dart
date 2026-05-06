@@ -14,7 +14,7 @@ class AddAddressScreen extends StatefulWidget {
 
 class _AddAddressScreenState extends State<AddAddressScreen> {
   final TextEditingController addressController = TextEditingController();
-  
+
   String? selectedTitle;
   String? addressError;
   String? titleError;
@@ -93,15 +93,15 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               style: AppTextStyles.sectionTitle.copyWith(fontSize: 15),
             ),
             const SizedBox(height: 12),
-            
+
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
                 color: AppColors.white,
                 borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
                 border: Border.all(
-                  color: titleError != null 
-                      ? Colors.red 
+                  color: titleError != null
+                      ? Colors.red
                       : AppColors.borderLight,
                 ),
               ),
@@ -110,18 +110,13 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                   value: selectedTitle,
                   hint: Text(
                     'Pilih Tipe Alamat',
-                    style: AppTextStyles.body.copyWith(
-                      color: Colors.grey,
-                    ),
+                    style: AppTextStyles.body.copyWith(color: Colors.grey),
                   ),
                   isExpanded: true,
                   items: titleOptions.map((String title) {
                     return DropdownMenuItem<String>(
                       value: title,
-                      child: Text(
-                        title,
-                        style: AppTextStyles.body,
-                      ),
+                      child: Text(title, style: AppTextStyles.body),
                     );
                   }).toList(),
                   onChanged: (String? newValue) {
@@ -138,10 +133,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                 padding: const EdgeInsets.only(top: 8, left: 12),
                 child: Text(
                   titleError!,
-                  style: const TextStyle(
-                    color: Colors.red,
-                    fontSize: 12,
-                  ),
+                  style: const TextStyle(color: Colors.red, fontSize: 12),
                 ),
               ),
 
@@ -156,20 +148,15 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
             ),
 
             const SizedBox(height: 8),
-            
+
             Text(
               'Contoh: Jl. Melati No. 12, Kel. Cilandak, Kec. Cilandak, Jakarta Selatan, DKI Jakarta 12430',
-              style: AppTextStyles.bodyMuted.copyWith(
-                fontSize: 11,
-              ),
+              style: AppTextStyles.bodyMuted.copyWith(fontSize: 11),
             ),
 
             const SizedBox(height: 40),
 
-            PrimaryButton(
-              label: 'Simpan Alamat',
-              onPressed: _saveAddress,
-            ),
+            PrimaryButton(label: 'Simpan Alamat', onPressed: _saveAddress),
           ],
         ),
       ),

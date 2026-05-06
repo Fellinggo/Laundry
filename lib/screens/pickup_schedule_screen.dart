@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart'; 
+import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_spacing.dart';
 import '../constants/app_text_styles.dart';
@@ -33,15 +33,15 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
   @override
   void initState() {
     super.initState();
-    _loadAddressesFromPrefs(); 
+    _loadAddressesFromPrefs();
   }
 
   Future<void> _loadAddressesFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
     final email = prefs.getString('userEmail') ?? '';
-    
+
     if (!isLoggedIn) {
       setState(() {
         _addresses = {};
@@ -53,7 +53,7 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
 
     final addressKey = 'userAddresses_$email';
     final titlesKey = 'userAddressTitles_$email';
-    
+
     final savedAddresses = prefs.getStringList(addressKey) ?? [];
     final savedTitles = prefs.getStringList(titlesKey) ?? [];
 
@@ -61,10 +61,14 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
       if (savedAddresses.isNotEmpty) {
         _addresses = {};
         for (int i = 0; i < savedAddresses.length; i++) {
-          final title = i < savedTitles.length ? savedTitles[i] : 'Alamat ${i + 1}';
+          final title = i < savedTitles.length
+              ? savedTitles[i]
+              : 'Alamat ${i + 1}';
           _addresses[title] = savedAddresses[i];
         }
-        _selectedAddressType = savedTitles.isNotEmpty ? savedTitles[0] : 'Alamat 1';
+        _selectedAddressType = savedTitles.isNotEmpty
+            ? savedTitles[0]
+            : 'Alamat 1';
       } else {
         _addresses = {};
         _selectedAddressType = '';
@@ -115,14 +119,14 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map? ?? {};
+    final args = ModalRoute.of(context)?.settings.arguments as Map? ?? {};
 
     final selectedAddress = _selectedAddressType == 'Custom'
         ? _customAddressController.text
-        : (_selectedAddressType.isNotEmpty && _addresses.containsKey(_selectedAddressType)
-            ? _addresses[_selectedAddressType]!
-            : '');
+        : (_selectedAddressType.isNotEmpty &&
+                  _addresses.containsKey(_selectedAddressType)
+              ? _addresses[_selectedAddressType]!
+              : '');
 
     return Scaffold(
       backgroundColor: AppColors.headerNavy,
@@ -173,12 +177,16 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
                                   Container(
                                     height: 52,
                                     alignment: Alignment.centerLeft,
-                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: AppColors.inputFill,
                                       borderRadius: BorderRadius.circular(14),
                                       border: Border.all(
-                                        color: _pickupError ? Colors.red : Colors.transparent,
+                                        color: _pickupError
+                                            ? Colors.red
+                                            : Colors.transparent,
                                         width: 1.5,
                                       ),
                                     ),
@@ -252,12 +260,16 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
                                   Container(
                                     height: 52,
                                     alignment: Alignment.centerLeft,
-                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: AppColors.inputFill,
                                       borderRadius: BorderRadius.circular(14),
                                       border: Border.all(
-                                        color: _deliveryError ? Colors.red : Colors.transparent,
+                                        color: _deliveryError
+                                            ? Colors.red
+                                            : Colors.transparent,
                                         width: 1.5,
                                       ),
                                     ),
@@ -266,7 +278,9 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
                                         const Icon(Icons.access_time, size: 20),
                                         const SizedBox(width: 8),
                                         Expanded(
-                                          child: Text(_formatTime(_deliveryTime)),
+                                          child: Text(
+                                            _formatTime(_deliveryTime),
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -332,7 +346,10 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
                         ),
                         child: Column(
                           children: [
-                            const Icon(Icons.location_off_outlined, color: Colors.grey),
+                            const Icon(
+                              Icons.location_off_outlined,
+                              color: Colors.grey,
+                            ),
                             const SizedBox(height: 8),
                             const Text(
                               'Belum ada alamat tersimpan',
@@ -401,7 +418,9 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
                         secondChild: Column(
                           children: [
                             const SizedBox(height: 10),
-                            ..._addresses.keys.map((key) => _addressOption(key)),
+                            ..._addresses.keys.map(
+                              (key) => _addressOption(key),
+                            ),
                             const SizedBox(height: 10),
 
                             TextField(
@@ -453,8 +472,9 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
                         filled: true,
                         fillColor: AppColors.inputFill,
                         border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.inputRadius),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.inputRadius,
+                          ),
                           borderSide: BorderSide.none,
                         ),
                       ),
@@ -471,11 +491,13 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
                         });
 
                         if (_pickupError || _deliveryError) return;
-                        
+
                         if (selectedAddress.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Silakan pilih alamat terlebih dahulu'),
+                              content: Text(
+                                'Silakan pilih alamat terlebih dahulu',
+                              ),
                             ),
                           );
                           return;
@@ -484,13 +506,14 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
                         final items = args['items'] ?? [];
                         final serviceFee = args['serviceFee'] ?? 0;
                         final deliveryFee = args['deliveryFee'] ?? 5000;
-                        final total = args['total'] ?? (serviceFee + deliveryFee);
+                        final total =
+                            args['total'] ?? (serviceFee + deliveryFee);
 
                         Navigator.pushNamed(
                           context,
                           '/order-review',
                           arguments: {
-                            'items': items,                    
+                            'items': items,
                             'serviceFee': serviceFee,
                             'deliveryFee': deliveryFee,
                             'total': total,
@@ -538,11 +561,7 @@ class _PickupScheduleScreenState extends State<PickupScheduleScreen> {
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
-        children: [
-          Icon(icon, size: 20),
-          const SizedBox(width: 8),
-          Text(text),
-        ],
+        children: [Icon(icon, size: 20), const SizedBox(width: 8), Text(text)],
       ),
     );
   }

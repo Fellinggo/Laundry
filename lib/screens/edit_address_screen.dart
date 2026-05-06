@@ -18,8 +18,7 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final args =
-        ModalRoute.of(context)!.settings.arguments as Map?;
+    final args = ModalRoute.of(context)!.settings.arguments as Map?;
 
     if (args != null) {
       titleController.text = args['title'] ?? '';
@@ -36,29 +35,21 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
         backgroundColor: AppColors.profileNavy,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text(
-          "Edit Alamat",
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text("Edit Alamat", style: TextStyle(color: Colors.white)),
       ),
 
       body: Container(
         margin: const EdgeInsets.only(top: 12),
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(28),
-          ),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.xl),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "Judul Alamat",
-                style: AppTextStyles.sectionTitle,
-              ),
+              Text("Judul Alamat", style: AppTextStyles.sectionTitle),
 
               const SizedBox(height: 8),
 
@@ -77,10 +68,7 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
 
               const SizedBox(height: AppSpacing.lg),
 
-              Text(
-                "Alamat Lengkap",
-                style: AppTextStyles.sectionTitle,
-              ),
+              Text("Alamat Lengkap", style: AppTextStyles.sectionTitle),
 
               const SizedBox(height: 8),
 
@@ -105,9 +93,7 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryNavy,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 14,
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),

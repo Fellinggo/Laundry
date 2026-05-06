@@ -20,7 +20,9 @@ class NotificationFilterTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = selected ? (activeColor ?? AppColors.skyTab) : AppColors.textMuted;
+    final c = selected
+        ? (activeColor ?? AppColors.skyTab)
+        : AppColors.textMuted;
     return Expanded(
       child: Material(
         color: Colors.transparent,

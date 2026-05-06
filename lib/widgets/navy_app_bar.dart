@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 
-class NavyCenterTitleAppBar extends StatelessWidget implements PreferredSizeWidget {
+class NavyCenterTitleAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
   const NavyCenterTitleAppBar({
     super.key,
     required this.title,
@@ -90,7 +91,11 @@ class NavyBackAppBar extends StatelessWidget implements PreferredSizeWidget {
                     color: AppColors.iconCircle,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.chevron_left, color: AppColors.headerNavy, size: 28),
+                  child: const Icon(
+                    Icons.chevron_left,
+                    color: AppColors.headerNavy,
+                    size: 28,
+                  ),
                 ),
               ),
               Expanded(

@@ -35,10 +35,8 @@ class ServicesScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 20),
             child: GestureDetector(
-              onTap: () => _handleTap(
-                context,
-                () => onOpenNotifications?.call(),
-              ),
+              onTap: () =>
+                  _handleTap(context, () => onOpenNotifications?.call()),
               child: const Icon(
                 Icons.notifications_none_rounded,
                 color: Colors.white,
@@ -60,7 +58,7 @@ class ServicesScreen extends StatelessWidget {
           child: ScrollConfiguration(
             behavior: const ScrollBehavior().copyWith(overscroll: false),
             child: SingleChildScrollView(
-              physics: const ClampingScrollPhysics(), 
+              physics: const ClampingScrollPhysics(),
               padding: const EdgeInsets.all(AppSpacing.xl),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,28 +72,31 @@ class ServicesScreen extends StatelessWidget {
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(), 
+                    physics: const NeverScrollableScrollPhysics(),
                     mainAxisSpacing: 16,
                     crossAxisSpacing: 16,
                     childAspectRatio: 0.85,
                     children: serviceDummy
-                      .where((e) => !e.isWide)
-                      .map((service) => _gridCard(
+                        .where((e) => !e.isWide)
+                        .map(
+                          (service) => _gridCard(
                             context,
                             title: service.title,
                             price: service.price,
                             eta: service.eta,
                             etaType: service.etaType,
                             imagePath: service.imagePath,
-                          ))
-                      .toList(),
+                          ),
+                        )
+                        .toList(),
                   ),
 
                   const SizedBox(height: 20),
 
                   ...serviceDummy
-                    .where((e) => e.isWide)
-                    .map((service) => Padding(
+                      .where((e) => e.isWide)
+                      .map(
+                        (service) => Padding(
                           padding: const EdgeInsets.only(bottom: 20),
                           child: _wideCard(
                             context,
@@ -104,8 +105,9 @@ class ServicesScreen extends StatelessWidget {
                             eta: service.eta,
                             imagePath: service.imagePath,
                           ),
-                        ))
-                    .toList(),
+                        ),
+                      )
+                      .toList(),
 
                   const SizedBox(height: 80),
                 ],
@@ -147,9 +149,7 @@ class ServicesScreen extends StatelessWidget {
               () => Navigator.pushNamed(
                 context,
                 '/service-detail',
-                arguments: {
-                  'title': title,
-                },
+                arguments: {'title': title},
               ),
             ),
             child: Column(
@@ -237,9 +237,7 @@ class ServicesScreen extends StatelessWidget {
               () => Navigator.pushNamed(
                 context,
                 '/service-detail',
-                arguments: {
-                  'title': title,
-                },
+                arguments: {'title': title},
               ),
             ),
             child: Column(

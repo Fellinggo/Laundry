@@ -35,7 +35,7 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
 
   int _calculateTotalServiceFee(List<dynamic> orderItems) {
     if (orderItems.isEmpty) return 0;
-    
+
     int total = 0;
     for (var item in orderItems) {
       if (item.containsKey('subtotal')) {
@@ -57,7 +57,8 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
       jsonStr += '"title":"${item['title'] ?? item['name']}",';
       jsonStr += '"price":${item['price']},';
       jsonStr += '"qty":${item['qty']},';
-      jsonStr += '"subtotal":${item['subtotal'] ?? (item['qty'] * item['price'])},';
+      jsonStr +=
+          '"subtotal":${item['subtotal'] ?? (item['qty'] * item['price'])},';
       jsonStr += '"image":"${item['image'] ?? ''}"';
       jsonStr += '}';
       if (i < items.length - 1) jsonStr += ',';
@@ -71,7 +72,7 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
     final qty = (item['qty'] as int?) ?? 1;
     final price = (item['price'] as int?) ?? 0;
     final subtotal = item['subtotal'] ?? (qty * price);
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -95,9 +96,9 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                 },
               ),
             ),
-          if (item['image'] != null && item['image'].toString().isNotEmpty) 
+          if (item['image'] != null && item['image'].toString().isNotEmpty)
             const SizedBox(width: 12),
-          
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,14 +113,12 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                 ),
                 Text(
                   '${_formatRp(price)} x $qty',
-                  style: AppTextStyles.bodyMuted.copyWith(
-                    fontSize: 12,
-                  ),
+                  style: AppTextStyles.bodyMuted.copyWith(fontSize: 12),
                 ),
               ],
             ),
           ),
-          
+
           Text(
             _formatRp(subtotal),
             style: AppTextStyles.body.copyWith(
@@ -134,7 +133,7 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
 
   Widget _buildServiceSummary(Map args) {
     final List<dynamic> orderItems = args['orderItems'] ?? args['items'] ?? [];
-    
+
     if (orderItems.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(16),
@@ -165,10 +164,7 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
-                  'Total Layanan',
-                  style: AppTextStyles.caption,
-                ),
+                Text('Total Layanan', style: AppTextStyles.caption),
                 Text(
                   _formatRp(args['serviceFee'] ?? 0),
                   style: AppTextStyles.body.copyWith(
@@ -185,7 +181,7 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
     }
 
     final totalServiceFee = _calculateTotalServiceFee(orderItems);
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -216,19 +212,19 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
               ],
             ),
           ),
-          
-          ...orderItems.map((item) => _buildOrderItem(item as Map<String, dynamic>)),
-          
+
+          ...orderItems.map(
+            (item) => _buildOrderItem(item as Map<String, dynamic>),
+          ),
+
           const Divider(height: 24),
-          
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Total Pesanan',
-                style: AppTextStyles.body.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
               ),
               Text(
                 _formatRp(totalServiceFee),
@@ -251,9 +247,7 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
       icon: const Icon(Icons.edit_outlined, size: 16),
       label: Text(
         'Edit',
-        style: AppTextStyles.bodyMuted.copyWith(
-          color: AppColors.actionBlue,
-        ),
+        style: AppTextStyles.bodyMuted.copyWith(color: AppColors.actionBlue),
       ),
       style: TextButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -271,10 +265,10 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
     List<String> currentOrders = prefs.getStringList('active_orders') ?? [];
 
     final List<dynamic> orderItems = args['orderItems'] ?? args['items'] ?? [];
-    
+
     String serviceSummary = '';
     int totalQty = 0;
-    
+
     if (orderItems.isNotEmpty) {
       for (var item in orderItems) {
         final name = item['title'] ?? item['name'] ?? 'Layanan';
@@ -285,10 +279,10 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
       if (serviceSummary.endsWith(' + ')) {
         serviceSummary = serviceSummary.substring(0, serviceSummary.length - 3);
       }
-      
+
       final itemsJson = _encodeItemsToJson(orderItems);
-      
-      String newOrderRaw = 
+
+      String newOrderRaw =
           "$serviceSummary|"
           "${args['total'] ?? 0}|"
           "${args['pickupTime'] ?? '-'}|"
@@ -300,8 +294,8 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
     } else {
       serviceSummary = args['service'] ?? 'Laundry';
       totalQty = args['qty'] ?? 1;
-      
-      String newOrderRaw = 
+
+      String newOrderRaw =
           "service=$serviceSummary&"
           "qty=$totalQty&"
           "pickupTime=${args['pickupTime'] ?? '-'}&"
@@ -311,7 +305,7 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
 
       currentOrders.add(newOrderRaw);
     }
-    
+
     await prefs.setStringList('active_orders', currentOrders);
 
     if (!mounted) return;
@@ -331,12 +325,12 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
   @override
   Widget build(BuildContext context) {
     final args = (ModalRoute.of(context)?.settings.arguments as Map?) ?? {};
-    
+
     final List<dynamic> orderItems = args['orderItems'] ?? args['items'] ?? [];
-    final calculatedServiceFee = orderItems.isNotEmpty 
-        ? _calculateTotalServiceFee(orderItems) 
+    final calculatedServiceFee = orderItems.isNotEmpty
+        ? _calculateTotalServiceFee(orderItems)
         : (args['serviceFee'] ?? 0);
-    
+
     final deliveryFee = args['deliveryFee'] ?? 5000;
     final totalPayment = calculatedServiceFee + deliveryFee;
 
@@ -376,11 +370,11 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                               ),
                             ),
                             const SizedBox(height: 12),
-                            
+
                             _buildServiceSummary(args),
-                            
+
                             const SizedBox(height: 24),
-                            
+
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -395,7 +389,7 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                               ],
                             ),
                             const SizedBox(height: 12),
-                            
+
                             Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
@@ -422,9 +416,9 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                                 ],
                               ),
                             ),
-                            
+
                             const SizedBox(height: 24),
-                            
+
                             Text(
                               'Detail Pembayaran',
                               style: AppTextStyles.sectionTitle.copyWith(
@@ -433,7 +427,7 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                               ),
                             ),
                             const SizedBox(height: 12),
-                            
+
                             Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
@@ -452,7 +446,8 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                                   ),
                                   const Divider(height: 16),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         'Total Pembayaran',
@@ -473,16 +468,18 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                                 ],
                               ),
                             ),
-                            
+
                             const SizedBox(height: 24),
                           ],
                         ),
                       ),
                     ),
                   ),
-                  
+
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.md,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       boxShadow: [
@@ -501,14 +498,18 @@ class _OrderReviewScreenState extends State<OrderReviewScreen> {
                           backgroundColor: AppColors.headerNavy,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.buttonRadius,
+                            ),
                           ),
                         ),
-                        onPressed: _payLoading ? null : () => _processPayment({
-                          ...args,
-                          'serviceFee': calculatedServiceFee,
-                          'total': totalPayment,
-                        }),
+                        onPressed: _payLoading
+                            ? null
+                            : () => _processPayment({
+                                ...args,
+                                'serviceFee': calculatedServiceFee,
+                                'total': totalPayment,
+                              }),
                         child: _payLoading
                             ? const SizedBox(
                                 height: 20,

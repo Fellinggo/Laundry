@@ -32,12 +32,7 @@ class LabeledTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: AppTextStyles.sectionTitle.copyWith(
-            fontSize: 14,
-          ),
-        ),
+        Text(label, style: AppTextStyles.sectionTitle.copyWith(fontSize: 14)),
 
         const SizedBox(height: 8),
 
@@ -64,28 +59,18 @@ class LabeledTextField extends StatelessWidget {
             ),
 
             prefixIcon: prefixIcon != null
-                ? Icon(
-                    prefixIcon,
-                    color: AppColors.textSecondary,
-                    size: 22,
-                  )
+                ? Icon(prefixIcon, color: AppColors.textSecondary, size: 22)
                 : null,
 
             suffixIcon: suffix,
 
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
-              borderSide: const BorderSide(
-                color: AppColors.borderLight,
-              ),
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+              borderSide: const BorderSide(color: AppColors.borderLight),
             ),
 
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
               borderSide: const BorderSide(
                 color: AppColors.borderLight,
                 width: 1.2,
@@ -93,9 +78,7 @@ class LabeledTextField extends StatelessWidget {
             ),
 
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
               borderSide: const BorderSide(
                 color: AppColors.primaryNavy,
                 width: 1.4,
@@ -103,23 +86,13 @@ class LabeledTextField extends StatelessWidget {
             ),
 
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
-              borderSide: const BorderSide(
-                color: Colors.red,
-                width: 1.2,
-              ),
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+              borderSide: const BorderSide(color: Colors.red, width: 1.2),
             ),
 
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
-              borderSide: const BorderSide(
-                color: Colors.red,
-                width: 1.4,
-              ),
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+              borderSide: const BorderSide(color: Colors.red, width: 1.4),
             ),
           ),
         ),

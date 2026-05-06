@@ -42,10 +42,7 @@ class PrimaryButton extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (leading != null) ...[
-                leading!,
-                const SizedBox(width: 8),
-              ],
+              if (leading != null) ...[leading!, const SizedBox(width: 8)],
               Text(
                 label,
                 style: AppTextStyles.button.copyWith(color: foregroundColor),

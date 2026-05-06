@@ -3,7 +3,11 @@ import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 
 class PinKeypad extends StatelessWidget {
-  const PinKeypad({super.key, required this.onDigit, required this.onBackspace});
+  const PinKeypad({
+    super.key,
+    required this.onDigit,
+    required this.onBackspace,
+  });
 
   final ValueChanged<int> onDigit;
   final VoidCallback onBackspace;
@@ -21,9 +25,18 @@ class PinKeypad extends StatelessWidget {
           Row(
             children: [
               const Expanded(child: SizedBox()),
-              Expanded(child: _key(Text('0', style: _numStyle), () => onDigit(0))),
               Expanded(
-                child: _key(const Icon(Icons.backspace_outlined, color: AppColors.textDark, size: 22), onBackspace),
+                child: _key(Text('0', style: _numStyle), () => onDigit(0)),
+              ),
+              Expanded(
+                child: _key(
+                  const Icon(
+                    Icons.backspace_outlined,
+                    color: AppColors.textDark,
+                    size: 22,
+                  ),
+                  onBackspace,
+                ),
               ),
             ],
           ),
@@ -32,7 +45,10 @@ class PinKeypad extends StatelessWidget {
     );
   }
 
-  static final TextStyle _numStyle = AppTextStyles.sectionTitle.copyWith(fontSize: 26, color: AppColors.textDark);
+  static final TextStyle _numStyle = AppTextStyles.sectionTitle.copyWith(
+    fontSize: 26,
+    color: AppColors.textDark,
+  );
 
   Widget _row(List<int> nums) {
     return Row(

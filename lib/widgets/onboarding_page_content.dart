@@ -23,34 +23,43 @@ class OnboardingPageContent extends StatelessWidget {
           flex: 11,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
-            child: Center(
-              child: illustration,
-            ),
+            child: Center(child: illustration),
           ),
         ),
         Expanded(
           flex: 9,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 8, AppSpacing.xl, 4),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.xl,
+              8,
+              AppSpacing.xl,
+              4,
+            ),
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
                   physics: const ClampingScrollPhysics(),
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           title,
                           textAlign: TextAlign.center,
-                          style: AppTextStyles.displayOnboardingTitle(color: AppColors.textPrimary),
+                          style: AppTextStyles.displayOnboardingTitle(
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         Text(
                           description,
                           textAlign: TextAlign.center,
-                          style: AppTextStyles.onboardingBody(color: AppColors.textSecondary),
+                          style: AppTextStyles.onboardingBody(
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ],
                     ),

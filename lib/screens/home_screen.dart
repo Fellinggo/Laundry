@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wushlaundry/widgets/eta_badge.dart';
 import 'package:wushlaundry/widgets/login_modal_sheet.dart';
 import 'package:wushlaundry/widgets/offer_image_slider.dart';
 import 'package:wushlaundry/widgets/rounded_white_panel.dart';
@@ -12,10 +11,9 @@ import 'package:wushlaundry/widgets/active_order_card.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_spacing.dart';
 import '../constants/app_text_styles.dart';
+import '../data/service_dummy.dart';
 
-class HomeScreen
-    extends
-        StatefulWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({
     super.key,
     this.loggedIn = false,
@@ -30,37 +28,24 @@ class HomeScreen
   final String? userFirstName;
   final VoidCallback? onOpenNotifications;
   final VoidCallback? onOpenServices;
-  final Function(
-    Map<
-      String,
-      dynamic
-    >,
-  )?
-  onOpenServiceDetail;
+  final Function(Map<String, dynamic>)? onOpenServiceDetail;
   final VoidCallback? onOpenDisc;
 
   @override
-  State<
-    HomeScreen
-  >
-  createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState
-    extends
-        State<
-          HomeScreen
-        > {
+class _HomeScreenState extends State<HomeScreen> {
   String? userFirstName;
+
+  final homeServices = serviceDummy.where((e) => !e.isWide).take(3).toList();
 
   Widget _buildEmptyOrderBox() {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(
-          AppSpacing.cardRadius,
-        ),
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         border: Border.all(
           color: AppColors.borderLight,
           style: BorderStyle.solid,
@@ -74,9 +59,7 @@ class _HomeScreenState
             color: Colors.grey.shade400,
             size: 40,
           ),
-          const SizedBox(
-            height: 8,
-          ),
+          const SizedBox(height: 8),
           Text(
             "Belum ada pesanan aktif",
             style: AppTextStyles.bodyMuted.copyWith(
@@ -88,40 +71,7 @@ class _HomeScreenState
     );
   }
 
-  List<
-    Map<
-      String,
-      dynamic
-    >
-  >
-  activeOrders = [];
-
-  final List<
-    Map<
-      String,
-      dynamic
-    >
-  >
-  items = [
-    {
-      'title': 'Cuci Regular',
-      'price': 'Rp 20.000/plastik',
-      'eta': 'ETA 10 jam',
-      'type': EtaType.normal,
-    },
-    {
-      'title': 'Cuci Setrika',
-      'price': 'Rp 28.000/plastik',
-      'eta': 'ETA 11 jam',
-      'type': EtaType.fast,
-    },
-    {
-      'title': 'Cuci Kering',
-      'price': 'Rp 23.000/plastik',
-      'eta': 'ETA 12 jam',
-      'type': EtaType.long,
-    },
-  ];
+  List<Map<String, dynamic>> activeOrders = [];
 
   @override
   void initState() {
@@ -137,315 +87,140 @@ class _HomeScreenState
     _loadUserName();
   }
 
-  Future<
-    void
-  >
-  _loadUserName() async {
+  Future<void> _loadUserName() async {
     final prefs = await SharedPreferences.getInstance();
-    final isLoggedIn =
-        prefs.getBool(
-          'isLoggedIn',
-        ) ??
-        false;
+    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
     if (isLoggedIn) {
-      final fullName =
-          prefs.getString(
-            'userName',
-          ) ??
-          'User';
-      setState(
-        () {
-          userFirstName = fullName
-              .split(
-                ' ',
-              )
-              .first;
-        },
-      );
+      final fullName = prefs.getString('userName') ?? 'User';
+      setState(() {
+        userFirstName = fullName.split(' ').first;
+      });
     } else {
-      setState(
-        () {
-          userFirstName = null;
-        },
-      );
+      setState(() {
+        userFirstName = null;
+      });
     }
   }
 
-  int _parseRupiahToInt(
-    String rupiah,
-  ) {
+  int _parseRupiahToInt(String rupiah) {
     if (rupiah.isEmpty) return 0;
-    String cleaned = rupiah
-        .replaceAll(
-          'Rp ',
-          '',
-        )
-        .replaceAll(
-          '.',
-          '',
-        );
-    return int.tryParse(
-          cleaned,
-        ) ??
-        0;
+    String cleaned = rupiah.replaceAll('Rp ', '').replaceAll('.', '');
+    return int.tryParse(cleaned) ?? 0;
   }
 
-  String _formatRupiah(
-    int number,
-  ) {
+  String _formatRupiah(int number) {
     final s = number.toString();
     final buffer = StringBuffer();
     int count = 0;
-    for (
-      int i =
-          s.length -
-          1;
-      i >=
-          0;
-      i--
-    ) {
-      buffer.write(
-        s[i],
-      );
+    for (int i = s.length - 1; i >= 0; i--) {
+      buffer.write(s[i]);
       count++;
-      if (count %
-                  3 ==
-              0 &&
-          i !=
-              0) {
-        buffer.write(
-          '.',
-        );
+      if (count % 3 == 0 && i != 0) {
+        buffer.write('.');
       }
     }
     return 'Rp ${buffer.toString().split('').reversed.join()}';
   }
 
-  Future<
-    void
-  >
-  loadActiveOrder() async {
+  Future<void> loadActiveOrder() async {
     final prefs = await SharedPreferences.getInstance();
-    final isLogin =
-        prefs.getBool(
-          'isLoggedIn',
-        ) ??
-        false;
+    final isLogin = prefs.getBool('isLoggedIn') ?? false;
 
     if (!isLogin) {
-      setState(
-        () => activeOrders = [],
-      );
+      setState(() => activeOrders = []);
       return;
     }
 
-    final List<
-      String
-    >
-    activeRaw =
-        prefs.getStringList(
-          'active_orders',
-        ) ??
-        [];
-    final List<
-      String
-    >
-    processRaw =
-        prefs.getStringList(
-          'process_orders',
-        ) ??
-        [];
+    final List<String> activeRaw = prefs.getStringList('active_orders') ?? [];
+    final List<String> processRaw = prefs.getStringList('process_orders') ?? [];
 
-    final List<
-      String
-    >
-    ordersRaw = [
-      ...activeRaw,
-      ...processRaw,
-    ];
+    final List<String> ordersRaw = [...activeRaw, ...processRaw];
 
-    print(
-      '========== HOME SCREEN ==========',
-    );
-    print(
-      'Jumlah pesanan di SharedPreferences: ${ordersRaw.length}',
-    );
-    print(
-      'active_orders: ${activeRaw.length}',
-    );
-    print(
-      'process_orders: ${processRaw.length}',
-    );
+    print('========== HOME SCREEN ==========');
+    print('Jumlah pesanan di SharedPreferences: ${ordersRaw.length}');
+    print('active_orders: ${activeRaw.length}');
+    print('process_orders: ${processRaw.length}');
 
-    final List<
-      String
-    >
-    validOrders = ordersRaw.where(
-      (
-        orderString,
-      ) {
-        final data = Uri.splitQueryString(
-          orderString,
-        );
-        final String orderId =
-            data['orderId'] ??
-            '';
-        return orderId.isNotEmpty &&
-            orderId !=
-                '000000';
-      },
-    ).toList();
+    final List<String> validOrders = ordersRaw.where((orderString) {
+      final data = Uri.splitQueryString(orderString);
+      final String orderId = data['orderId'] ?? '';
+      return orderId.isNotEmpty && orderId != '000000';
+    }).toList();
 
-    setState(
-      () {
-        activeOrders = validOrders.map(
-          (
-            e,
-          ) {
-            final data = Uri.splitQueryString(
-              e,
-            );
-            return {
-              'orderId':
-                  data['orderId'] ??
-                  '000000',
-              'service':
-                  data['service'] ??
-                  'Cuci Regular',
-              'qty':
-                  data['qty'] ??
-                  '1',
-              'pickupTime':
-                  data['pickupTime'] ??
-                  '-',
-              'deliveryTime':
-                  data['deliveryTime'] ??
-                  '-',
-              'totalPrice':
-                  data['totalPrice'] ??
-                  'Rp 0',
-              'address':
-                  data['address'] ??
-                  '-',
-              'itemsJson':
-                  data['itemsJson'] ??
-                  '',
-            };
-          },
-        ).toList();
-      },
-    );
+    setState(() {
+      activeOrders = validOrders.map((e) {
+        final data = Uri.splitQueryString(e);
+        return {
+          'orderId': data['orderId'] ?? '000000',
+          'service': data['service'] ?? 'Cuci Regular',
+          'qty': data['qty'] ?? '1',
+          'pickupTime': data['pickupTime'] ?? '-',
+          'deliveryTime': data['deliveryTime'] ?? '-',
+          'totalPrice': data['totalPrice'] ?? 'Rp 0',
+          'address': data['address'] ?? '-',
+          'itemsJson': data['itemsJson'] ?? '',
+        };
+      }).toList();
+    });
 
-    print(
-      'Active orders loaded: ${activeOrders.length}',
-    );
+    print('Active orders loaded: ${activeOrders.length}');
     for (var order in activeOrders) {
-      print(
-        '   - Order ID: ${order['orderId']}',
-      );
+      print('   - Order ID: ${order['orderId']}');
     }
-    print(
-      '==================================',
-    );
+    print('==================================');
   }
 
-  void _handleServiceTap(
-    BuildContext context,
-    Map<
-      String,
-      dynamic
-    >
-    service,
-  ) {
+  void _handleServiceTap(BuildContext context, Map<String, dynamic> service) {
     if (!widget.loggedIn) {
-      showLoginModal(
-        context,
-      );
+      showLoginModal(context);
       return;
     }
-    widget.onOpenServiceDetail?.call(
-      service,
-    );
+    widget.onOpenServiceDetail?.call(service);
   }
 
-  void _handleNotificationTap(
-    BuildContext context,
-  ) {
+  void _handleNotificationTap(BuildContext context) {
     if (!widget.loggedIn) {
-      showLoginModal(
-        context,
-      );
+      showLoginModal(context);
       return;
     }
     widget.onOpenNotifications?.call();
   }
 
-  void _handleOfferTap(
-    BuildContext context,
-    int index,
-  ) async {
+  void _handleOfferTap(BuildContext context, int index) async {
     if (!widget.loggedIn) {
-      showLoginModal(
-        context,
-      );
+      showLoginModal(context);
       return;
     }
 
-    List<
-      String?
-    >
-    promoCodes = [
-      'SSSd789',
-      'PAYDAYWUSH',
-      'BERSIHSPREI',
-    ];
+    List<String?> promoCodes = ['SSSd789', 'PAYDAYWUSH', 'BERSIHSPREI'];
     String? code = promoCodes[index];
 
-    if (code !=
-        null) {
-      await Clipboard.setData(
-        ClipboardData(
-          text: code,
-        ),
-      );
+    if (code != null) {
+      await Clipboard.setData(ClipboardData(text: code));
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              'Kode $code berhasil disalin',
-            ),
-            duration: const Duration(
-              milliseconds: 800,
-            ),
+            content: Text('Kode $code berhasil disalin'),
+            duration: const Duration(milliseconds: 800),
           ),
         );
       }
     }
 
-    await Future.delayed(
-      const Duration(
-        milliseconds: 500,
-      ),
-    );
+    await Future.delayed(const Duration(milliseconds: 500));
     widget.onOpenServices?.call();
   }
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     _loadUserName();
     return ColoredBox(
       color: AppColors.headerNavy,
       child: Column(
         children: [
           HomeNavyHeaderBlock(
-            onNotification: () => _handleNotificationTap(
-              context,
-            ),
+            onNotification: () => _handleNotificationTap(context),
           ),
           Expanded(
             child: RoundedWhitePanel(
@@ -463,26 +238,18 @@ class _HomeScreenState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (widget.loggedIn &&
-                          userFirstName !=
-                              null) ...[
+                      if (widget.loggedIn && userFirstName != null) ...[
                         Text(
                           'Hi ${userFirstName} 👋',
                           style: AppTextStyles.screenTitleNavy.copyWith(
                             fontSize: 18,
                           ),
                         ),
-                        const SizedBox(
-                          height: 6,
-                        ),
+                        const SizedBox(height: 6),
                       ],
 
-                      const SectionHeaderRow(
-                        title: 'Layanan Laundry Kami',
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
+                      const SectionHeaderRow(title: 'Layanan Laundry Kami'),
+                      const SizedBox(height: 12),
 
                       Row(
                         children: [
@@ -491,39 +258,37 @@ class _HomeScreenState
                               children: [
                                 Expanded(
                                   child: ServiceCardCompact(
-                                    title: items[0]['title'],
-                                    priceLabel: items[0]['price'],
-                                    etaLabel: items[0]['eta'],
-                                    etaType: items[0]['type'],
-                                    selected: false,
-                                    onTap: () => _handleServiceTap(
-                                      context,
-                                      items[0],
-                                    ),
+                                    title: homeServices[0].title,
+                                    priceLabel: homeServices[0].price,
+                                    etaLabel: homeServices[0].eta,
+                                    etaType: homeServices[0].etaType,
+                                    onTap: () => _handleServiceTap(context, {
+                                      'title': homeServices[0].title,
+                                      'price': homeServices[0].price,
+                                      'eta': homeServices[0].eta,
+                                      'type': homeServices[0].etaType,
+                                    }),
                                   ),
                                 ),
-                                const SizedBox(
-                                  width: 12,
-                                ),
+                                const SizedBox(width: 12),
                                 Expanded(
                                   child: ServiceCardCompact(
-                                    title: items[1]['title'],
-                                    priceLabel: items[1]['price'],
-                                    etaLabel: items[1]['eta'],
-                                    etaType: items[1]['type'],
-                                    selected: false,
-                                    onTap: () => _handleServiceTap(
-                                      context,
-                                      items[1],
-                                    ),
+                                    title: homeServices[1].title,
+                                    priceLabel: homeServices[1].price,
+                                    etaLabel: homeServices[1].eta,
+                                    etaType: homeServices[1].etaType,
+                                    onTap: () => _handleServiceTap(context, {
+                                      'title': homeServices[1].title,
+                                      'price': homeServices[1].price,
+                                      'eta': homeServices[1].eta,
+                                      'type': homeServices[1].etaType,
+                                    }),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(
-                            width: 10,
-                          ),
+                          const SizedBox(width: 10),
                           GestureDetector(
                             onTap: () => widget.onOpenServices?.call(),
                             child: Container(
@@ -531,12 +296,8 @@ class _HomeScreenState
                               width: 50,
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(
-                                  14,
-                                ),
-                                border: Border.all(
-                                  color: Colors.grey.shade300,
-                                ),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(color: Colors.grey.shade300),
                               ),
                               child: const Center(
                                 child: Icon(
@@ -550,15 +311,9 @@ class _HomeScreenState
                         ],
                       ),
 
-                      const SizedBox(
-                        height: AppSpacing.xl,
-                      ),
-                      const SectionHeaderRow(
-                        title: 'Pesanan Aktif',
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
+                      const SizedBox(height: AppSpacing.xl),
+                      const SectionHeaderRow(title: 'Pesanan Aktif'),
+                      const SizedBox(height: 12),
 
                       SizedBox(
                         height: 180,
@@ -571,89 +326,71 @@ class _HomeScreenState
                                 ),
                                 itemCount: activeOrders.length,
                                 padEnds: false,
-                                itemBuilder:
-                                    (
-                                      context,
-                                      index,
-                                    ) {
-                                      final order = activeOrders[index];
+                                itemBuilder: (context, index) {
+                                  final order = activeOrders[index];
 
-                                      final bool isDummyOrder =
-                                          order['orderId'] ==
-                                          '100001';
+                                  final bool isDummyOrder =
+                                      order['orderId'] == '100001';
 
-                                      final int currentStep = isDummyOrder
-                                          ? 2
-                                          : 0;
-                                      final String badgeLabel = isDummyOrder
-                                          ? 'Dicuci'
-                                          : 'Diproses';
+                                  final int currentStep = isDummyOrder ? 2 : 0;
+                                  final String badgeLabel = isDummyOrder
+                                      ? 'Dicuci'
+                                      : 'Diproses';
 
-                                      String rawTotal =
-                                          order['totalPrice']?.toString() ??
-                                          'Rp 0';
-                                      int totalNominal = _parseRupiahToInt(
-                                        rawTotal,
-                                      );
-                                      int finalTotal = isDummyOrder
-                                          ? totalNominal +
-                                                5000
-                                          : totalNominal;
-                                      String displayTotal = _formatRupiah(
-                                        finalTotal,
-                                      );
+                                  String rawTotal =
+                                      order['totalPrice']?.toString() ?? 'Rp 0';
+                                  int totalNominal = _parseRupiahToInt(
+                                    rawTotal,
+                                  );
+                                  int finalTotal = isDummyOrder
+                                      ? totalNominal + 5000
+                                      : totalNominal;
+                                  String displayTotal = _formatRupiah(
+                                    finalTotal,
+                                  );
 
-                                      return GestureDetector(
-                                        behavior: HitTestBehavior.opaque,
-                                        onTap: () {
-                                          final itemsJson = order['itemsJson'];
+                                  return GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: () {
+                                      final itemsJson = order['itemsJson'];
 
-                                          if (itemsJson !=
-                                                  null &&
-                                              itemsJson.isNotEmpty) {
-                                            try {
-                                              if (itemsJson
-                                                  is String) {
-                                              } else if (itemsJson
-                                                  is List) {}
-                                            } catch (
-                                              e
-                                            ) {
-                                              print(
-                                                'Error parsing itemsJson: $e',
-                                              );
-                                            }
-                                          }
+                                      if (itemsJson != null &&
+                                          itemsJson.isNotEmpty) {
+                                        try {
+                                          if (itemsJson is String) {
+                                          } else if (itemsJson is List) {}
+                                        } catch (e) {
+                                          print('Error parsing itemsJson: $e');
+                                        }
+                                      }
 
-                                          Navigator.pushNamed(
-                                            context,
-                                            '/order-detail',
-                                            arguments: {
-                                              ...order,
-                                              'fromActiveOrder': true,
-                                            },
-                                          );
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/order-detail',
+                                        arguments: {
+                                          ...order,
+                                          'fromActiveOrder': true,
                                         },
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            right: 12,
-                                          ),
-                                          child: ActiveOrderCard(
-                                            statusTitle: 'Pesanan ${order['orderId']}',
-                                            subtitle: 'Pickup: ${order['pickupTime']}\nDelivery: ${order['deliveryTime']}',
-                                            totalPrice: displayTotal,
-                                            currentStep: currentStep,
-                                            badgeLabel: badgeLabel,
-                                          ),
-                                        ),
                                       );
                                     },
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(right: 12),
+                                      child: ActiveOrderCard(
+                                        statusTitle:
+                                            'Pesanan ${order['orderId']}',
+                                        subtitle:
+                                            'Pickup: ${order['pickupTime']}\nDelivery: ${order['deliveryTime']}',
+                                        totalPrice: displayTotal,
+                                        currentStep: currentStep,
+                                        badgeLabel: badgeLabel,
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
                       ),
 
-                      const SizedBox(
-                        height: AppSpacing.xl,
-                      ),
+                      const SizedBox(height: AppSpacing.xl),
                       SectionHeaderRow(
                         title: 'Penawaran Khusus',
                         actionLabel: 'Lainnya',
@@ -661,18 +398,10 @@ class _HomeScreenState
                       ),
 
                       OfferImageAutoSlider(
-                        onTap:
-                            (
-                              index,
-                            ) => _handleOfferTap(
-                              context,
-                              index,
-                            ),
+                        onTap: (index) => _handleOfferTap(context, index),
                       ),
 
-                      const SizedBox(
-                        height: 24,
-                      ),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
@@ -685,39 +414,21 @@ class _HomeScreenState
   }
 }
 
-class HomeNavyHeaderBlock
-    extends
-        StatelessWidget {
-  const HomeNavyHeaderBlock({
-    super.key,
-    this.onNotification,
-  });
+class HomeNavyHeaderBlock extends StatelessWidget {
+  const HomeNavyHeaderBlock({super.key, this.onNotification});
 
   final VoidCallback? onNotification;
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final top = MediaQuery.of(
-      context,
-    ).padding.top;
+  Widget build(BuildContext context) {
+    final top = MediaQuery.of(context).padding.top;
 
     return Container(
       color: AppColors.headerNavy,
-      padding: EdgeInsets.fromLTRB(
-        20,
-        top +
-            15,
-        20,
-        20,
-      ),
+      padding: EdgeInsets.fromLTRB(20, top + 15, 20, 20),
       child: Row(
         children: [
-          Image.asset(
-            'assets/images/logo_white.png',
-            height: 75,
-          ),
+          Image.asset('assets/images/logo_white.png', height: 75),
           const Spacer(),
           IconButton(
             onPressed: onNotification,
@@ -732,9 +443,7 @@ class HomeNavyHeaderBlock
   }
 }
 
-class _NoOverscrollBehavior
-    extends
-        ScrollBehavior {
+class _NoOverscrollBehavior extends ScrollBehavior {
   const _NoOverscrollBehavior();
 
   @override
@@ -747,9 +456,7 @@ class _NoOverscrollBehavior
   }
 
   @override
-  ScrollPhysics getScrollPhysics(
-    BuildContext context,
-  ) {
+  ScrollPhysics getScrollPhysics(BuildContext context) {
     return const ClampingScrollPhysics();
   }
 }

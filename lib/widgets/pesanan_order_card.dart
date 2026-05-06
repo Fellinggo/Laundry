@@ -23,9 +23,7 @@ class PesananOrderCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFFE5E7EB),
-        ),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
       child: Material(
         color: Colors.transparent,
@@ -33,23 +31,20 @@ class PesananOrderCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 14,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
             child: Row(
               children: [
                 Container(
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEAF2FF), 
+                    color: const Color(0xFFEAF2FF),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
                     Icons.local_laundry_service_rounded,
                     size: 20,
-                    color: Color.fromARGB(255, 40, 66, 107), 
+                    color: Color.fromARGB(255, 40, 66, 107),
                   ),
                 ),
 
@@ -104,7 +99,7 @@ class PesananOrderCard extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: Color.fromARGB(255, 16, 47, 113), 
+                              color: Color.fromARGB(255, 16, 47, 113),
                             ),
                           ),
                           const Icon(

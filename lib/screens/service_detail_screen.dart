@@ -7,6 +7,7 @@ import '../widgets/navy_app_bar.dart';
 import '../widgets/primary_button.dart';
 import '../widgets/quantity_stepper.dart';
 import '../widgets/rounded_white_panel.dart';
+import '../data/service_dummy.dart';
 
 class ServiceDetailScreen extends StatefulWidget {
   const ServiceDetailScreen({super.key});
@@ -18,59 +19,49 @@ class ServiceDetailScreen extends StatefulWidget {
 class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
   bool _isInit = true;
 
-  final List<Map<String, dynamic>> services = [
-    {
-      'title': 'Cuci Regular',
-      'price': 'Rp 20.000 / Plastik',
-      'icon': Icons.local_laundry_service,
-      'image': 'assets/images/Cucireg.png',
-    },
-    {
-      'title': 'Cuci Setrika',
-      'price': 'Rp 28.000 / Plastik',
-      'icon': Icons.iron,
-      'image': 'assets/images/Cucisetrika.png',
-    },
-    {
-      'title': 'Cuci Kering',
-      'price': 'Rp 23.000 / Plastik',
-      'icon': Icons.dry_cleaning_outlined,
-      'image': 'assets/images/kering.png',
-    },
-    {
-      'title': 'Paket Service',
-      'price': 'Rp 48.000 / Plastik',
-      'icon': Icons.inventory_2_outlined,
-      'image': 'assets/images/paket.png',
-    },
-    {
-      'title': 'Cuci Jas / Gaun',
-      'price': 'Rp 23.000 / Item',
-      'icon': Icons.checkroom,
-      'image': 'assets/images/jasgaun.png',
-    },
-    {
-      'title': 'Setrika Saja',
-      'price': 'Rp 21.000 / Plastik',
-      'icon': Icons.iron_outlined,
-      'image': 'assets/images/setrikasaja.png',
-    },
-    {
-      'title': 'Cuci Bedcover / Selimut / Sprei',
-      'displayTitle': 'Cuci Bedcover /\nSelimut / Sprei',
-      'price': 'Rp 25.000 / Item',
-      'icon': Icons.bed,
-      'image': 'assets/images/sprei.png',
-    },
-    {
-      'title': 'Cuci Sepatu',
-      'price': 'Rp 20.000 / Item',
-      'icon': Icons.hiking,
-      'image': 'assets/images/sepatu.png',
-    },
-  ];
+  late final List<Map<String, dynamic>> services;
 
   final Map<int, int> selectedServices = {};
+
+  @override
+  void initState() {
+    super.initState();
+
+    services = serviceDummy.map((e) {
+      return {
+        'title': e.title,
+        'displayTitle': e.title == 'Cuci Bedcover / Selimut / Sprei'
+            ? 'Cuci Bedcover /\nSelimut / Sprei'
+            : e.title,
+        'price': e.price,
+        'image': e.imagePath,
+        'icon': _getIcon(e.title),
+      };
+    }).toList();
+  }
+
+  IconData _getIcon(String title) {
+    switch (title) {
+      case 'Cuci Regular':
+        return Icons.local_laundry_service;
+      case 'Cuci Setrika':
+        return Icons.iron;
+      case 'Cuci Kering':
+        return Icons.dry_cleaning_outlined;
+      case 'Paket Service':
+        return Icons.inventory_2_outlined;
+      case 'Cuci Jas / Gaun':
+        return Icons.checkroom;
+      case 'Setrika Saja':
+        return Icons.iron_outlined;
+      case 'Cuci Bedcover / Selimut / Sprei':
+        return Icons.bed;
+      case 'Cuci Sepatu':
+        return Icons.hiking;
+      default:
+        return Icons.local_laundry_service;
+    }
+  }
 
   @override
   void didChangeDependencies() {
@@ -78,12 +69,10 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
 
     if (_isInit) {
       final args =
-          ModalRoute.of(context)?.settings.arguments
-              as Map<String, dynamic>?;
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
       if (args != null && args['title'] != null) {
-        final index =
-            services.indexWhere((s) => s['title'] == args['title']);
+        final index = services.indexWhere((s) => s['title'] == args['title']);
 
         if (index != -1) {
           selectedServices[index] = 1;
@@ -99,10 +88,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
   }
 
   String _formatRp(int value) {
-    return 'Rp ${value.toString().replaceAllMapped(
-      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
-      (m) => '${m[1]}.',
-    )}';
+    return 'Rp ${value.toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}';
   }
 
   int get totalServiceFee {
@@ -142,7 +128,6 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                       itemBuilder: (context, i) {
                         final s = services[i];
                         final selected = selectedServices.containsKey(i);
-
                         return Padding(
                           padding: const EdgeInsets.only(right: 10),
                           child: FilterChip(
@@ -180,18 +165,17 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
 
                   Expanded(
                     child: selectedServices.isEmpty
-                        ? const Center(
-                            child: Text('Belum ada layanan dipilih'))
+                        ? const Center(child: Text('Belum ada layanan dipilih'))
                         : ListView.builder(
                             itemCount: selectedServices.length,
                             itemBuilder: (context, index) {
-                              final key =
-                                  selectedServices.keys.elementAt(index);
+                              final key = selectedServices.keys.elementAt(
+                                index,
+                              );
                               final service = services[key];
                               final int qty = selectedServices[key]!;
 
-                              final int price =
-                                  _parsePrice(service['price']);
+                              final int price = _parsePrice(service['price']);
 
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 12),
@@ -199,13 +183,13 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
-                                      color: Colors.grey.shade300),
+                                    color: Colors.grey.shade300,
+                                  ),
                                 ),
                                 child: Row(
                                   children: [
                                     ClipRRect(
-                                      borderRadius:
-                                          BorderRadius.circular(10),
+                                      borderRadius: BorderRadius.circular(10),
                                       child: Image.asset(
                                         service['image'],
                                         width: 60,
@@ -228,8 +212,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                                           ),
                                           Text(
                                             '${_formatRp(price)}',
-                                            style:
-                                                AppTextStyles.bodyMuted,
+                                            style: AppTextStyles.bodyMuted,
                                           ),
                                         ],
                                       ),
@@ -270,8 +253,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                             selectedServices.forEach((index, qty) {
                               final service = services[index];
 
-                              final int price =
-                                  _parsePrice(service['price']);
+                              final int price = _parsePrice(service['price']);
                               final int subtotal = price * qty;
 
                               serviceFee += subtotal;

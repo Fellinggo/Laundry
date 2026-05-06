@@ -134,15 +134,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (trailing != null)
-            Text(
-              trailing,
-              style: AppTextStyles.bodyMuted,
-            ),
-          Icon(
-            Icons.chevron_right,
-            color: AppColors.textMuted,
-          ),
+          if (trailing != null) Text(trailing, style: AppTextStyles.bodyMuted),
+          Icon(Icons.chevron_right, color: AppColors.textMuted),
         ],
       ),
       onTap: onTap,
@@ -159,29 +152,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     await prefs.setBool('isLoggedIn', false);
-    
+
     if (!mounted) return;
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/main',
-      (route) => false,
-    );
+    Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
   }
 
   Future<void> _deleteAccount(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     await prefs.clear();
 
     if (!mounted) return;
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/main',
-      (route) => false,
-    );
-    
+    Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Akun berhasil dihapus'),
@@ -211,7 +196,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
             child: Text(
               'Hapus Akun',
-              style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: AppColors.danger,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -225,7 +213,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text('Keluar', style: AppTextStyles.sectionTitle),
-        content: const Text('Apakah kamu yakin ingin keluar? Data kamu akan tetap tersimpan.'),
+        content: const Text(
+          'Apakah kamu yakin ingin keluar? Data kamu akan tetap tersimpan.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -238,7 +228,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
             child: const Text(
               'Keluar',
-              style: TextStyle(color: AppColors.primaryNavy, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: AppColors.primaryNavy,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],

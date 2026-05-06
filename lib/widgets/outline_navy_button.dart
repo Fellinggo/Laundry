@@ -37,13 +37,12 @@ class OutlineNavyButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (leading != null) ...[
-                leading!,
-                const SizedBox(width: 10),
-              ],
+              if (leading != null) ...[leading!, const SizedBox(width: 10)],
               Text(
                 label,
-                style: AppTextStyles.button.copyWith(color: AppColors.primaryNavy),
+                style: AppTextStyles.button.copyWith(
+                  color: AppColors.primaryNavy,
+                ),
               ),
             ],
           ),

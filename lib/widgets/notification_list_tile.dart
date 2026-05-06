@@ -28,7 +28,12 @@ class NotificationListTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700)),
+                Text(
+                  title,
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
                 const SizedBox(height: 4),
                 Text(subtitle, style: AppTextStyles.bodyMuted),
               ],
@@ -75,7 +80,10 @@ class NotificationIconBubble extends StatelessWidget {
             child: Container(
               width: 10,
               height: 10,
-              decoration: const BoxDecoration(color: Colors.amber, shape: BoxShape.circle),
+              decoration: const BoxDecoration(
+                color: Colors.amber,
+                shape: BoxShape.circle,
+              ),
             ),
           ),
       ],

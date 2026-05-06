@@ -3,20 +3,11 @@ import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
 
 class OrderStepProgressBar extends StatelessWidget {
-  const OrderStepProgressBar({
-    super.key,
-    this.activeIndex = 0,
-  });
+  const OrderStepProgressBar({super.key, this.activeIndex = 0});
 
   final int activeIndex;
 
-  static const _labels = [
-    'Dijemput',
-    'Diambil',
-    'Dicuci',
-    'Diantar',
-    'Sampai',
-  ];
+  static const _labels = ['Dijemput', 'Diambil', 'Dicuci', 'Diantar', 'Sampai'];
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +16,7 @@ class OrderStepProgressBar extends StatelessWidget {
         Row(
           children: [
             for (var s = 0; s < _labels.length; s++) ...[
-              _StepDot(
-                active: s == activeIndex,
-                done: s < activeIndex,
-              ),
+              _StepDot(active: s == activeIndex, done: s < activeIndex),
               if (s < _labels.length - 1)
                 Expanded(
                   child: Container(
@@ -47,23 +35,20 @@ class OrderStepProgressBar extends StatelessWidget {
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: List.generate(
-            _labels.length,
-            (s) {
-              final active = s == activeIndex;
-              return Expanded(
-                child: Text(
-                  _labels[s],
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.caption.copyWith(
-                    fontSize: 10,
-                    fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                    color: active ? AppColors.actionBlue : AppColors.textMuted,
-                  ),
+          children: List.generate(_labels.length, (s) {
+            final active = s == activeIndex;
+            return Expanded(
+              child: Text(
+                _labels[s],
+                textAlign: TextAlign.center,
+                style: AppTextStyles.caption.copyWith(
+                  fontSize: 10,
+                  fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                  color: active ? AppColors.actionBlue : AppColors.textMuted,
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          }),
         ),
       ],
     );
@@ -71,10 +56,7 @@ class OrderStepProgressBar extends StatelessWidget {
 }
 
 class _StepDot extends StatelessWidget {
-  const _StepDot({
-    required this.active,
-    required this.done,
-  });
+  const _StepDot({required this.active, required this.done});
 
   final bool active;
   final bool done;
@@ -90,10 +72,7 @@ class _StepDot extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: on ? AppColors.actionBlue : AppColors.borderLight,
-          border: Border.all(
-            color: AppColors.white,
-            width: 2,
-          ),
+          border: Border.all(color: AppColors.white, width: 2),
           boxShadow: active
               ? [
                   BoxShadow(

@@ -88,6 +88,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       ),
     );
   }
+
   List<Widget> _buildAll() {
     return [
       _dateHeader('Hari Ini'),
@@ -123,10 +124,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   List<Widget> _buildOrdersOnly() {
     if (notifications.isEmpty) {
-      return [
-        _dateHeader('Hari Ini'),
-        const Text("Belum ada pesanan"),
-      ];
+      return [_dateHeader('Hari Ini'), const Text("Belum ada pesanan")];
     }
 
     return [
@@ -148,10 +146,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget _dateHeader(String t) {
     return Padding(
       padding: const EdgeInsets.only(top: 8, bottom: 12),
-      child: Text(
-        t,
-        style: AppTextStyles.sectionTitle.copyWith(fontSize: 15),
-      ),
+      child: Text(t, style: AppTextStyles.sectionTitle.copyWith(fontSize: 15)),
     );
   }
 }

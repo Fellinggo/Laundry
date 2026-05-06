@@ -21,10 +21,7 @@ class InfoKvRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 5,
-            child: Text(label, style: AppTextStyles.bodyMuted),
-          ),
+          Expanded(flex: 5, child: Text(label, style: AppTextStyles.bodyMuted)),
           Expanded(
             flex: 6,
             child: Text(
@@ -53,7 +50,12 @@ class PaymentDividerLabel extends StatelessWidget {
         const Expanded(child: Divider(color: AppColors.borderLight)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Text(label, style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary)),
+          child: Text(
+            label,
+            style: AppTextStyles.caption.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
         ),
         const Expanded(child: Divider(color: AppColors.borderLight)),
       ],
