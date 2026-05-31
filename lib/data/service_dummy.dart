@@ -1,4 +1,4 @@
-import '../widgets/eta_badge.dart';
+import '../views/widgets/eta_badge.dart';
 
 class ServiceModel {
   final String title;
@@ -18,7 +18,10 @@ class ServiceModel {
   });
 }
 
-final List<ServiceModel> serviceDummy = [
+final List<
+  ServiceModel
+>
+serviceDummy = [
   ServiceModel(
     title: 'Cuci Regular',
     price: 'Rp 20.000 / Plastik',

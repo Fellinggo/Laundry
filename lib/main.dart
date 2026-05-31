@@ -3,40 +3,41 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
-import 'constants/app_colors.dart';
+import 'package:wushlaundry/constants/app_colors.dart';
 
 // Provider
-import 'provider/adreesprovider.dart';
-import 'provider/authprovider.dart';
-import 'provider/notificationprovider.dart';
-import 'provider/orderprovider.dart';
-import 'provider/serviceprovider.dart';
+import 'package:wushlaundry/providers/address_provider.dart';
+import 'package:wushlaundry/providers/auth_provider.dart';
+import 'package:wushlaundry/providers/notification_provider.dart';
+import 'package:wushlaundry/providers/order_provider.dart';
+import 'package:wushlaundry/providers/service_provider.dart';
 
 // Screen
-import 'screens/about_screen.dart';
-import 'screens/help_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/main_shell_screen.dart';
-import 'screens/my_orders_screen.dart';
-import 'screens/notifications_screen.dart';
-import 'screens/offers_screen.dart';
-import 'screens/onboarding_screen.dart';
-import 'screens/order_detail_screen.dart';
-import 'screens/order_review_screen.dart';
-import 'screens/payment_method_screen.dart';
-import 'screens/pickup_schedule_screen.dart';
-import 'screens/pin_entry_screen.dart';
-import 'screens/privacy_policy_screen.dart';
-import 'screens/register_screen.dart';
-import 'screens/service_detail_screen.dart';
-import 'screens/services_screen.dart';
-import 'screens/settings_screen.dart';
-import 'screens/splash_screen.dart';
-import 'screens/terms_conditions_screen.dart';
-import 'screens/edit_address_screen.dart';
-import 'screens/add_address_screen.dart';
+import 'package:wushlaundry/views/screens/about_screen.dart';
+import 'package:wushlaundry/views/screens/add_address_screen.dart';
+import 'package:wushlaundry/views/screens/edit_address_screen.dart';
+import 'package:wushlaundry/views/screens/help_screen.dart';
+import 'package:wushlaundry/views/screens/login_screen.dart';
+import 'package:wushlaundry/views/screens/main_shell_screen.dart';
+import 'package:wushlaundry/views/screens/my_orders_screen.dart';
+import 'package:wushlaundry/views/screens/notifications_screen.dart';
+import 'package:wushlaundry/views/screens/offers_screen.dart';
+import 'package:wushlaundry/views/screens/onboarding_screen.dart';
+import 'package:wushlaundry/views/screens/order_detail_screen.dart';
+import 'package:wushlaundry/views/screens/order_review_screen.dart';
+import 'package:wushlaundry/views/screens/payment_method_screen.dart';
+import 'package:wushlaundry/views/screens/pickup_schedule_screen.dart';
+import 'package:wushlaundry/views/screens/pin_entry_screen.dart';
+import 'package:wushlaundry/views/screens/privacy_policy_screen.dart';
+import 'package:wushlaundry/views/screens/register_screen.dart';
+import 'package:wushlaundry/views/screens/service_detail_screen.dart';
+import 'package:wushlaundry/views/screens/services_screen.dart';
+import 'package:wushlaundry/views/screens/settings_screen.dart';
+import 'package:wushlaundry/views/screens/splash_screen.dart';
+import 'package:wushlaundry/views/screens/terms_conditions_screen.dart';
 
-void main() async {
+void
+main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final prefs = await SharedPreferences.getInstance();
@@ -45,18 +46,45 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => OrderProvider()),
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => ServiceProvider()),
-        ChangeNotifierProvider(create: (_) => AddressProvider()),
-        ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => OrderProvider(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => AuthProvider(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => ServiceProvider(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => AddressProvider(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => NotificationProvider(),
+        ),
       ],
       child: const WushLaundryApp(),
     ),
   );
 }
 
-class WushLaundryApp extends StatelessWidget {
+class WushLaundryApp
+    extends
+        StatelessWidget {
   const WushLaundryApp({
     super.key,
   });
@@ -80,157 +108,234 @@ class WushLaundryApp extends StatelessWidget {
 
       initialRoute: '/',
 
-      onGenerateRoute: (settings) {
-        switch (settings.name) {
-          case '/':
+      onGenerateRoute:
+          (
+            settings,
+          ) {
+            switch (settings.name) {
+              case '/':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const SplashScreen(),
+                  settings: settings,
+                );
+
+              case '/onboarding':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const OnboardingScreen(),
+                  settings: settings,
+                );
+
+              case '/main':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const MainShellScreen(),
+                  settings: settings,
+                );
+
+              case '/login':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const LoginScreen(),
+                  settings: settings,
+                );
+
+              case '/register':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const RegisterScreen(),
+                  settings: settings,
+                );
+
+              case '/services':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const ServicesScreen(),
+                  settings: settings,
+                );
+
+              case '/edit-address':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const EditAddressScreen(),
+                  settings: settings,
+                );
+
+              case '/add-address':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const AddAddressScreen(),
+                  settings: settings,
+                );
+
+              case '/service-detail':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const ServiceDetailScreen(),
+                  settings: settings,
+                );
+
+              case '/pickup-schedule':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const PickupScheduleScreen(),
+                  settings: settings,
+                );
+
+              case '/order-review':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const OrderReviewScreen(),
+                  settings: settings,
+                );
+
+              case '/payment':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const PaymentMethodScreen(),
+                  settings: settings,
+                );
+
+              case '/pin':
+                final args =
+                    settings.arguments
+                        as Map? ??
+                    {};
+                final wallet =
+                    args['wallet'] ??
+                    'DANA';
+
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => PinEntryScreen(
+                        walletName: wallet,
+                      ),
+                  settings: settings,
+                );
+
+              case '/order-detail':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const OrderDetailScreen(),
+                  settings: settings,
+                );
+
+              case '/notifications':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const NotificationsScreen(),
+                  settings: settings,
+                );
+
+              case '/my-orders':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const MyOrdersScreen(),
+                  settings: settings,
+                );
+
+              case '/offers-full':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const OffersScreen(),
+                  settings: settings,
+                );
+
+              case '/settings':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const SettingsScreen(),
+                  settings: settings,
+                );
+
+              case '/privacy':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const PrivacyPolicyScreen(),
+                  settings: settings,
+                );
+
+              case '/terms':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const TermsConditionsScreen(),
+                  settings: settings,
+                );
+
+              case '/help':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const HelpScreen(),
+                  settings: settings,
+                );
+
+              case '/about':
+                return MaterialPageRoute(
+                  builder:
+                      (
+                        _,
+                      ) => const AboutScreen(),
+                  settings: settings,
+                );
+            }
+
             return MaterialPageRoute(
-              builder: (_) => const SplashScreen(),
+              builder:
+                  (
+                    _,
+                  ) => const Scaffold(
+                    body: Center(
+                      child: Text(
+                        'Route not found',
+                      ),
+                    ),
+                  ),
               settings: settings,
             );
-
-          case '/onboarding':
-            return MaterialPageRoute(
-              builder: (_) => const OnboardingScreen(),
-              settings: settings,
-            );
-
-          case '/main':
-            return MaterialPageRoute(
-              builder: (_) => const MainShellScreen(),
-              settings: settings,
-            );
-
-          case '/login':
-            return MaterialPageRoute(
-              builder: (_) => const LoginScreen(),
-              settings: settings,
-            );
-
-          case '/register':
-            return MaterialPageRoute(
-              builder: (_) => const RegisterScreen(),
-              settings: settings,
-            );
-
-          case '/services':
-            return MaterialPageRoute(
-              builder: (_) => const ServicesScreen(),
-              settings: settings,
-            );
-
-          case '/edit-address':
-            return MaterialPageRoute(
-              builder: (_) => const EditAddressScreen(),
-              settings: settings,
-            );
-
-          case '/add-address':
-            return MaterialPageRoute(
-              builder: (_) => const AddAddressScreen(),
-              settings: settings,
-            );
-
-          case '/service-detail':
-            return MaterialPageRoute(
-              builder: (_) => const ServiceDetailScreen(),
-              settings: settings,
-            );
-
-          case '/pickup-schedule':
-            return MaterialPageRoute(
-              builder: (_) => const PickupScheduleScreen(),
-              settings: settings,
-            );
-
-          case '/order-review':
-            return MaterialPageRoute(
-              builder: (_) => const OrderReviewScreen(),
-              settings: settings,
-            );
-
-          case '/payment':
-            return MaterialPageRoute(
-              builder: (_) => const PaymentMethodScreen(),
-              settings: settings,
-            );
-
-          case '/pin':
-            final args = settings.arguments as Map? ?? {};
-            final wallet = args['wallet'] ?? 'DANA';
-
-            return MaterialPageRoute(
-              builder: (_) => PinEntryScreen(
-                walletName: wallet,
-              ),
-              settings: settings,
-            );
-
-          case '/order-detail':
-            return MaterialPageRoute(
-              builder: (_) => const OrderDetailScreen(),
-              settings: settings,
-            );
-
-          case '/notifications':
-            return MaterialPageRoute(
-              builder: (_) => const NotificationsScreen(),
-              settings: settings,
-            );
-
-          case '/my-orders':
-            return MaterialPageRoute(
-              builder: (_) => const MyOrdersScreen(),
-              settings: settings,
-            );
-
-          case '/offers-full':
-            return MaterialPageRoute(
-              builder: (_) => const OffersScreen(),
-              settings: settings,
-            );
-
-          case '/settings':
-            return MaterialPageRoute(
-              builder: (_) => const SettingsScreen(),
-              settings: settings,
-            );
-
-          case '/privacy':
-            return MaterialPageRoute(
-              builder: (_) => const PrivacyPolicyScreen(),
-              settings: settings,
-            );
-
-          case '/terms':
-            return MaterialPageRoute(
-              builder: (_) => const TermsConditionsScreen(),
-              settings: settings,
-            );
-
-          case '/help':
-            return MaterialPageRoute(
-              builder: (_) => const HelpScreen(),
-              settings: settings,
-            );
-
-          case '/about':
-            return MaterialPageRoute(
-              builder: (_) => const AboutScreen(),
-              settings: settings,
-            );
-        }
-
-        return MaterialPageRoute(
-          builder: (_) => const Scaffold(
-            body: Center(
-              child: Text(
-                'Route not found',
-              ),
-            ),
-          ),
-          settings: settings,
-        );
-      },
+          },
     );
   }
 }
