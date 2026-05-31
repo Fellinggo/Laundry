@@ -6,6 +6,7 @@ import 'package:wushlaundry/constants/app_text_styles.dart';
 import 'package:wushlaundry/data/dataDummy.dart';
 import 'package:wushlaundry/widgets/curved_navy_header.dart';
 import 'package:wushlaundry/widgets/primary_button.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 

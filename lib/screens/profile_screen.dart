@@ -133,12 +133,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       action();
     }
   }
+
   void _deleteAddress(int index) async {
     setState(() {
       addresses.removeAt(index);
     });
     await _saveAddressesToPrefs();
   }
+
   Future<void> _addNewAddress() async {
     final result = await Navigator.pushNamed(context, '/add-address');
 
@@ -149,6 +151,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await _saveAddressesToPrefs();
     }
   }
+
   Future<void> _editAddress(int index) async {
     final result = await Navigator.pushNamed(
       context,

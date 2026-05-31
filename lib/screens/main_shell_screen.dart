@@ -48,10 +48,12 @@ class _MainShellScreenState extends State<MainShellScreen> {
     }
     Navigator.pushNamed(context, '/notifications');
   }
+
   void _goToServicesTab() => setState(() => _index = 2);
   void _goToServiceDetail(Map<String, dynamic> service) {
     Navigator.pushNamed(context, '/service-detail', arguments: service);
   }
+
   void _goToDisc() => setState(() => _index = 3);
 
   @override
