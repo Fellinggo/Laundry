@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 import 'constants/app_colors.dart';
 
+// Provider
+import 'provider/adreesprovider.dart';
+import 'provider/authprovider.dart';
+import 'provider/notificationprovider.dart';
+import 'provider/orderprovider.dart';
+import 'provider/serviceprovider.dart';
+
+// Screen
 import 'screens/about_screen.dart';
 import 'screens/help_screen.dart';
 import 'screens/login_screen.dart';
@@ -27,21 +36,27 @@ import 'screens/terms_conditions_screen.dart';
 import 'screens/edit_address_screen.dart';
 import 'screens/add_address_screen.dart';
 
-void
-main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final prefs = await SharedPreferences.getInstance();
   await prefs.clear();
 
   runApp(
-    const WushLaundryApp(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => ServiceProvider()),
+        ChangeNotifierProvider(create: (_) => AddressProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
+      ],
+      child: const WushLaundryApp(),
+    ),
   );
 }
 
-class WushLaundryApp
-    extends
-        StatelessWidget {
+class WushLaundryApp extends StatelessWidget {
   const WushLaundryApp({
     super.key,
   });
@@ -65,231 +80,157 @@ class WushLaundryApp
 
       initialRoute: '/',
 
-      onGenerateRoute:
-          (
-            settings,
-          ) {
-            switch (settings.name) {
-              case '/':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const SplashScreen(),
-                  settings: settings,
-                );
-
-              case '/onboarding':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const OnboardingScreen(),
-                  settings: settings,
-                );
-
-              case '/main':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const MainShellScreen(),
-                  settings: settings,
-                );
-
-              case '/login':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const LoginScreen(),
-                  settings: settings,
-                );
-
-              case '/register':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const RegisterScreen(),
-                  settings: settings,
-                );
-
-              case '/services':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const ServicesScreen(),
-                  settings: settings,
-                );
-
-              case '/edit-address':
-                return MaterialPageRoute(
-                  builder: (_) => const EditAddressScreen(),
-                  settings: settings,
-                );
-
-              case '/add-address': 
-                return MaterialPageRoute(
-                  builder: (_) => const AddAddressScreen(),
-                  settings: settings,
-                );
-
-
-              case '/service-detail':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const ServiceDetailScreen(),
-                  settings: settings,
-                );
-
-              case '/pickup-schedule':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const PickupScheduleScreen(),
-                  settings: settings,
-                );
-
-              case '/order-review':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const OrderReviewScreen(),
-                  settings: settings,
-                );
-
-              case '/payment':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const PaymentMethodScreen(),
-                  settings: settings,
-                );
-
-              case '/pin':
-                final args =
-                    settings.arguments
-                        as Map? ??
-                    {};
-
-                final wallet =
-                    args['wallet'] ??
-                    'DANA';
-
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => PinEntryScreen(
-                        walletName: wallet,
-                      ),
-                  settings: settings,
-                );
-
-              case '/order-detail':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const OrderDetailScreen(),
-                  settings: settings,
-                );
-
-              case '/notifications':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const NotificationsScreen(),
-                  settings: settings,
-                );
-
-              case '/my-orders':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const MyOrdersScreen(),
-                  settings: settings,
-                );
-
-              case '/offers-full':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const OffersScreen(),
-                  settings: settings,
-                );
-
-              case '/settings':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const SettingsScreen(),
-                  settings: settings,
-                );
-
-              case '/privacy':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const PrivacyPolicyScreen(),
-                  settings: settings,
-                );
-
-              case '/terms':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const TermsConditionsScreen(),
-                  settings: settings,
-                );
-
-              case '/help':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const HelpScreen(),
-                  settings: settings,
-                );
-
-              case '/about':
-                return MaterialPageRoute(
-                  builder:
-                      (
-                        _,
-                      ) => const AboutScreen(),
-                  settings: settings,
-                );
-
-            }
-            
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case '/':
             return MaterialPageRoute(
-              builder:
-                  (
-                    _,
-                  ) => const Scaffold(
-                    body: Center(
-                      child: Text(
-                        'Route not found',
-                      ),
-                    ),
-                  ),
+              builder: (_) => const SplashScreen(),
               settings: settings,
             );
-          },
+
+          case '/onboarding':
+            return MaterialPageRoute(
+              builder: (_) => const OnboardingScreen(),
+              settings: settings,
+            );
+
+          case '/main':
+            return MaterialPageRoute(
+              builder: (_) => const MainShellScreen(),
+              settings: settings,
+            );
+
+          case '/login':
+            return MaterialPageRoute(
+              builder: (_) => const LoginScreen(),
+              settings: settings,
+            );
+
+          case '/register':
+            return MaterialPageRoute(
+              builder: (_) => const RegisterScreen(),
+              settings: settings,
+            );
+
+          case '/services':
+            return MaterialPageRoute(
+              builder: (_) => const ServicesScreen(),
+              settings: settings,
+            );
+
+          case '/edit-address':
+            return MaterialPageRoute(
+              builder: (_) => const EditAddressScreen(),
+              settings: settings,
+            );
+
+          case '/add-address':
+            return MaterialPageRoute(
+              builder: (_) => const AddAddressScreen(),
+              settings: settings,
+            );
+
+          case '/service-detail':
+            return MaterialPageRoute(
+              builder: (_) => const ServiceDetailScreen(),
+              settings: settings,
+            );
+
+          case '/pickup-schedule':
+            return MaterialPageRoute(
+              builder: (_) => const PickupScheduleScreen(),
+              settings: settings,
+            );
+
+          case '/order-review':
+            return MaterialPageRoute(
+              builder: (_) => const OrderReviewScreen(),
+              settings: settings,
+            );
+
+          case '/payment':
+            return MaterialPageRoute(
+              builder: (_) => const PaymentMethodScreen(),
+              settings: settings,
+            );
+
+          case '/pin':
+            final args = settings.arguments as Map? ?? {};
+            final wallet = args['wallet'] ?? 'DANA';
+
+            return MaterialPageRoute(
+              builder: (_) => PinEntryScreen(
+                walletName: wallet,
+              ),
+              settings: settings,
+            );
+
+          case '/order-detail':
+            return MaterialPageRoute(
+              builder: (_) => const OrderDetailScreen(),
+              settings: settings,
+            );
+
+          case '/notifications':
+            return MaterialPageRoute(
+              builder: (_) => const NotificationsScreen(),
+              settings: settings,
+            );
+
+          case '/my-orders':
+            return MaterialPageRoute(
+              builder: (_) => const MyOrdersScreen(),
+              settings: settings,
+            );
+
+          case '/offers-full':
+            return MaterialPageRoute(
+              builder: (_) => const OffersScreen(),
+              settings: settings,
+            );
+
+          case '/settings':
+            return MaterialPageRoute(
+              builder: (_) => const SettingsScreen(),
+              settings: settings,
+            );
+
+          case '/privacy':
+            return MaterialPageRoute(
+              builder: (_) => const PrivacyPolicyScreen(),
+              settings: settings,
+            );
+
+          case '/terms':
+            return MaterialPageRoute(
+              builder: (_) => const TermsConditionsScreen(),
+              settings: settings,
+            );
+
+          case '/help':
+            return MaterialPageRoute(
+              builder: (_) => const HelpScreen(),
+              settings: settings,
+            );
+
+          case '/about':
+            return MaterialPageRoute(
+              builder: (_) => const AboutScreen(),
+              settings: settings,
+            );
+        }
+
+        return MaterialPageRoute(
+          builder: (_) => const Scaffold(
+            body: Center(
+              child: Text(
+                'Route not found',
+              ),
+            ),
+          ),
+          settings: settings,
+        );
+      },
     );
   }
 }

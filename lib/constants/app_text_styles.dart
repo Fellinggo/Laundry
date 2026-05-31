@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 class AppTextStyles {
-  const AppTextStyles._(); 
+  const AppTextStyles._();
 
   static TextStyle _poppins({
     double fontSize = 14,
@@ -48,22 +48,37 @@ class AppTextStyles {
     fontWeight: FontWeight.w700,
     color: AppColors.headerNavy,
   );
-  
-  static final TextStyle body =
-  _poppins(fontSize: 14, color: AppColors.textDark);
 
-  static final TextStyle bodyMuted =
-  _poppins(fontSize: 13, color: AppColors.textSecondary);
+  static final TextStyle body = _poppins(
+    fontSize: 14,
+    color: AppColors.textDark,
+  );
 
-  static final TextStyle caption =
-  _poppins(fontSize: 12, color: AppColors.textMuted);
+  static final TextStyle bodyMuted = _poppins(
+    fontSize: 13,
+    color: AppColors.textSecondary,
+  );
 
-  static final TextStyle button =
-  _poppins(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.white);
+  static final TextStyle caption = _poppins(
+    fontSize: 12,
+    color: AppColors.textMuted,
+  );
 
-  static final TextStyle link =
-  _poppins(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.linkBlue);
+  static final TextStyle button = _poppins(
+    fontSize: 15,
+    fontWeight: FontWeight.w600,
+    color: AppColors.white,
+  );
 
-  static final TextStyle price =
-  _poppins(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textDark);
+  static final TextStyle link = _poppins(
+    fontSize: 13,
+    fontWeight: FontWeight.w600,
+    color: AppColors.linkBlue,
+  );
+
+  static final TextStyle price = _poppins(
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textDark,
+  );
 }
