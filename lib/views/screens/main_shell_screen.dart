@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wushlaundry/constants/app_colors.dart';
-import 'package:wushlaundry/views/screens/home_screen.dart';
-import 'package:wushlaundry/views/screens/my_orders_screen.dart';
-import 'package:wushlaundry/views/screens/offers_screen.dart';
-import 'package:wushlaundry/views/screens/profile_screen.dart';
-import 'package:wushlaundry/views/screens/services_screen.dart';
-import 'package:wushlaundry/views/widgets/app_bottom_nav_bar.dart';
-import 'package:wushlaundry/views/widgets/login_modal_sheet.dart';
+import '../../constants/app_colors.dart';
+import '../screens/home_screen.dart';
+import '../screens/my_orders_screen.dart';
+import '../screens/offers_screen.dart';
+import '../screens/profile_screen.dart';
+import '../screens/services_screen.dart';
+import '../widgets/app_bottom_nav_bar.dart';
+import '../../controllers/main_shell_controller.dart';
 
 class MainShellScreen
     extends
@@ -28,57 +27,42 @@ class _MainShellScreenState
         State<
           MainShellScreen
         > {
-  int _index = 0;
-  bool loggedIn = false;
-  String? userFirstName;
+  late MainShellController _controller;
 
   @override
   void initState() {
     super.initState();
-    loadUser();
+    _controller = MainShellController();
+    _controller.addListener(
+      _onControllerChanged,
+    );
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    loadUser();
+  void dispose() {
+    _controller.removeListener(
+      _onControllerChanged,
+    );
+    _controller.dispose();
+    super.dispose();
   }
 
-  Future<
-    void
-  >
-  loadUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(
-      () {
-        loggedIn =
-            prefs.getBool(
-              'isLoggedIn',
-            ) ??
-            false;
-        userFirstName = prefs.getString(
-          'userName',
-        );
-      },
-    );
+  void _onControllerChanged() {
+    if (mounted) {
+      setState(
+        () {},
+      );
+    }
   }
 
   void _handleNotificationTap() {
-    if (!loggedIn) {
-      showLoginModal(
-        context,
-      );
-      return;
-    }
-    Navigator.pushNamed(
+    _controller.handleNotificationTap(
       context,
-      '/notifications',
     );
   }
 
-  void _goToServicesTab() => setState(
-    () => _index = 2,
-  );
+  void _goToServicesTab() => _controller.goToServicesTab();
+
   void _goToServiceDetail(
     Map<
       String,
@@ -86,28 +70,29 @@ class _MainShellScreenState
     >
     service,
   ) {
-    Navigator.pushNamed(
+    _controller.handleServiceDetail(
       context,
-      '/service-detail',
-      arguments: service,
+      service,
     );
   }
 
-  void _goToDisc() => setState(
-    () => _index = 3,
-  );
+  void _goToDisc() => _controller.goToOffersTab();
 
   @override
   Widget build(
     BuildContext context,
   ) {
+    final isLoggedIn = _controller.isLoggedIn;
+    final userFirstName = _controller.userFirstName;
+    final currentIndex = _controller.currentIndex;
+
     return Scaffold(
       backgroundColor: AppColors.pageBg,
       body: IndexedStack(
-        index: _index,
+        index: currentIndex,
         children: [
           HomeScreen(
-            loggedIn: loggedIn,
+            loggedIn: isLoggedIn,
             userFirstName: userFirstName,
             onOpenNotifications: _handleNotificationTap,
             onOpenServices: _goToServicesTab,
@@ -115,36 +100,34 @@ class _MainShellScreenState
             onOpenDisc: _goToDisc,
           ),
           MyOrdersScreen(
-            loggedIn: loggedIn,
+            loggedIn: isLoggedIn,
           ),
           ServicesScreen(
-            loggedIn: loggedIn,
+            loggedIn: isLoggedIn,
             onOpenNotifications: _handleNotificationTap,
           ),
-
           OffersScreen(
-            loggedIn: loggedIn,
+            loggedIn: isLoggedIn,
             onOpenNotifications: _handleNotificationTap,
             onOpenServices: _goToServicesTab,
           ),
-
           ProfileScreen(
             key: ValueKey(
-              loggedIn,
+              isLoggedIn,
             ),
           ),
         ],
       ),
       bottomNavigationBar: AppBottomNavBar(
-        currentIndex: _index,
+        currentIndex: currentIndex,
         onTap:
             (
-              i,
+              index,
             ) {
-              setState(
-                () => _index = i,
+              _controller.changeTab(
+                index,
               );
-              loadUser();
+              _controller.refreshUser();
             },
       ),
     );

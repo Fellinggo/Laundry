@@ -1,38 +1,24 @@
 import 'package:flutter/material.dart';
-import '../../constants/app_colors.dart';
-import '../../constants/app_spacing.dart';
-import '../../constants/app_text_styles.dart';
+import '../../../constants/app_colors.dart';
+import '../../../constants/app_spacing.dart';
+import '../../../constants/app_text_styles.dart';
 
-class LabeledTextField
+class PhoneInputField
     extends
         StatelessWidget {
-  const LabeledTextField({
-    super.key,
-    required this.label,
-    required this.hint,
-    this.prefixIcon,
-    this.suffix,
-    this.obscure = false,
-    this.maxLines = 1,
-    this.controller,
-    this.keyboardType,
-    this.errorText,
-    this.onChanged, // ← TAMBAHKAN INI
-  });
-
-  final String label;
-  final String hint;
-  final IconData? prefixIcon;
-  final Widget? suffix;
-  final bool obscure;
-  final int maxLines;
-  final TextEditingController? controller;
-  final TextInputType? keyboardType;
+  final TextEditingController controller;
   final String? errorText;
   final Function(
     String,
   )?
   onChanged; // ← TAMBAHKAN INI
+
+  const PhoneInputField({
+    super.key,
+    required this.controller,
+    this.errorText,
+    this.onChanged, // ← TAMBAHKAN INI
+  });
 
   @override
   Widget build(
@@ -42,46 +28,24 @@ class LabeledTextField
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label,
+          'No. HP',
           style: AppTextStyles.sectionTitle.copyWith(
             fontSize: 14,
           ),
         ),
-
         const SizedBox(
           height: 8,
         ),
-
         TextField(
           controller: controller,
-          obscureText: obscure,
-          maxLines: obscure
-              ? 1
-              : maxLines,
-          keyboardType: keyboardType,
+          keyboardType: TextInputType.phone,
           style: AppTextStyles.body,
-          cursorColor: AppColors.primaryNavy,
           onChanged: onChanged, // ← TAMBAHKAN INI
           decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: AppTextStyles.bodyMuted,
+            hintText: '08XX XXXX XXXX',
             filled: true,
             fillColor: AppColors.white,
             errorText: errorText,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 14,
-            ),
-            prefixIcon:
-                prefixIcon !=
-                    null
-                ? Icon(
-                    prefixIcon,
-                    color: AppColors.textSecondary,
-                    size: 22,
-                  )
-                : null,
-            suffixIcon: suffix,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 AppSpacing.inputRadius,
@@ -125,6 +89,9 @@ class LabeledTextField
                 color: Colors.red,
                 width: 1.4,
               ),
+            ),
+            prefixIcon: const Icon(
+              Icons.phone,
             ),
           ),
         ),

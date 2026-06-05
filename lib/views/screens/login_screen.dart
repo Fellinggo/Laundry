@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wushlaundry/constants/app_colors.dart';
-import 'package:wushlaundry/constants/app_spacing.dart';
-import 'package:wushlaundry/constants/app_text_styles.dart';
-import 'package:wushlaundry/data/dataDummy.dart';
-import 'package:wushlaundry/views/widgets/curved_navy_header.dart';
-import 'package:wushlaundry/views/widgets/primary_button.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_spacing.dart';
+import '../../constants/app_text_styles.dart';
+import '../widgets/curved_navy_header.dart';
+import '../widgets/primary_button.dart';
+import '../../controllers/login_controller.dart';
 
 class LoginScreen
     extends
@@ -26,202 +25,56 @@ class _LoginScreenState
         State<
           LoginScreen
         > {
-  bool _obscure = true;
-  bool _staySignedIn = false;
-
+  late LoginController _controller;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
-  String? emailError;
-  String? passwordError;
 
   @override
   void initState() {
     super.initState();
-    _checkAutoLogin();
-  }
-
-  Future<
-    void
-  >
-  _checkAutoLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    final staySignedIn =
-        prefs.getBool(
-          'staySignedIn',
-        ) ??
-        false;
-    final isLoggedIn =
-        prefs.getBool(
-          'isLoggedIn',
-        ) ??
-        false;
-
-    if (staySignedIn &&
-        isLoggedIn) {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (
-          _,
-        ) {
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            '/main',
-            (
-              route,
-            ) => false,
-          );
-        },
-      );
-    }
-  }
-
-  Future<
-    void
-  >
-  _injectDummyData() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    // INJECT LANGSUNG, abaikan pengecekan apapun
-    await prefs.setStringList(
-      'process_orders',
-      DummyOrders.processOrders,
+    _controller = LoginController();
+    _controller.addListener(
+      _onControllerChanged,
     );
-
-    print(
-      '========== INJECT DUMMY ==========',
-    );
-    print(
-      'Dummy injected to process_orders',
-    );
-    print(
-      'Data: ${DummyOrders.processOrders}',
-    );
-
-    // Verifikasi
-    final check = prefs.getStringList(
-      'process_orders',
-    );
-    print(
-      'Verification - process_orders length: ${check?.length}',
-    );
-    print(
-      '==================================',
+    _controller.checkAutoLogin(
+      context,
     );
   }
 
-  Future<
-    void
-  >
-  handleLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    String email = emailController.text.trim();
-    String password = passwordController.text.trim();
-
-    setState(
-      () {
-        emailError = null;
-        passwordError = null;
-      },
+  @override
+  void dispose() {
+    _controller.removeListener(
+      _onControllerChanged,
     );
+    _controller.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
-    bool hasError = false;
-
-    bool isEmailValid =
-        RegExp(
-          r'^[a-zA-Z0-9._%+-]+@('
-          r'gmail\.com|'
-          r'yahoo\.com|'
-          r'yahoo\.co\.id|'
-          r'hotmail\.com|'
-          r'outlook\.com|'
-          r'icloud\.com|'
-          r'[a-zA-Z0-9-.]+\.ac\.id|'
-          r'[a-zA-Z0-9-.]+\.edu'
-          r')$',
-        ).hasMatch(
-          email,
-        );
-
-    if (!isEmailValid) {
-      emailError = "Email tidak valid";
-      hasError = true;
-    }
-
-    bool hasMinLength =
-        password.length >=
-        6;
-    bool hasUppercase = password.contains(
-      RegExp(
-        r'[A-Z]',
-      ),
-    );
-    bool hasLowercase = password.contains(
-      RegExp(
-        r'[a-z]',
-      ),
-    );
-    bool hasNumber = password.contains(
-      RegExp(
-        r'[0-9]',
-      ),
-    );
-
-    if (!(hasMinLength &&
-        hasUppercase &&
-        hasLowercase &&
-        hasNumber)) {
-      passwordError = "Min 6 karakter, huruf besar, kecil, dan angka wajib ada";
-      hasError = true;
-    }
-
-    if (hasError) {
+  void _onControllerChanged() {
+    if (mounted) {
       setState(
         () {},
       );
-      return;
     }
+  }
 
-    String namaUser = email.split(
-      '@',
-    )[0];
-
-    await prefs.setBool(
-      'isLoggedIn',
-      true,
-    );
-    await prefs.setBool(
-      'isSignup',
-      false,
-    );
-    await prefs.setString(
-      'userName',
-      namaUser,
-    );
-    await prefs.setString(
-      'userEmail',
-      email,
-    );
-    await prefs.setBool(
-      'staySignedIn',
-      _staySignedIn,
-    );
-    await prefs.setString(
-      'login_method',
-      'signin',
+  Future<
+    void
+  >
+  _handleLogin() async {
+    final success = await _controller.validateAndLogin(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
     );
 
-    // INJECT DUMMY
-    await _injectDummyData();
-
-    if (!mounted) return;
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/main',
-      (
-        route,
-      ) => false,
-    );
+    if (success &&
+        mounted) {
+      _controller.navigateToMain(
+        context,
+      );
+    }
   }
 
   OutlineInputBorder _border(
@@ -252,7 +105,6 @@ class _LoginScreenState
             heightFraction: 0.40,
             subtitle: 'Masuk dan nikmati layanan laundry',
           ),
-
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(
@@ -289,6 +141,10 @@ class _LoginScreenState
                     TextField(
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
+                      onChanged:
+                          (
+                            _,
+                          ) => _controller.clearErrors(),
                       decoration: InputDecoration(
                         labelText: "Email",
                         hintText: "Masukkan Email",
@@ -296,42 +152,43 @@ class _LoginScreenState
                           Icons.email_outlined,
                         ),
                         border: _border(
-                          emailError !=
+                          _controller.emailError !=
                               null,
                         ),
                         enabledBorder: _border(
-                          emailError !=
+                          _controller.emailError !=
                               null,
                         ),
                         focusedBorder: _border(
-                          emailError !=
+                          _controller.emailError !=
                               null,
                         ),
                       ),
                     ),
-
-                    if (emailError !=
+                    if (_controller.emailError !=
                         null)
                       Padding(
                         padding: const EdgeInsets.only(
                           top: 6,
                         ),
                         child: Text(
-                          emailError!,
+                          _controller.emailError!,
                           style: const TextStyle(
                             color: Colors.red,
                             fontSize: 12,
                           ),
                         ),
                       ),
-
                     const SizedBox(
                       height: AppSpacing.lg,
                     ),
-
                     TextField(
                       controller: passwordController,
-                      obscureText: _obscure,
+                      obscureText: _controller.obscure,
+                      onChanged:
+                          (
+                            _,
+                          ) => _controller.clearErrors(),
                       decoration: InputDecoration(
                         labelText: "Password",
                         hintText: "Masukkan Password",
@@ -339,23 +196,21 @@ class _LoginScreenState
                           Icons.lock_outline_rounded,
                         ),
                         border: _border(
-                          passwordError !=
+                          _controller.passwordError !=
                               null,
                         ),
                         enabledBorder: _border(
-                          passwordError !=
+                          _controller.passwordError !=
                               null,
                         ),
                         focusedBorder: _border(
-                          passwordError !=
+                          _controller.passwordError !=
                               null,
                         ),
                         suffixIcon: IconButton(
-                          onPressed: () => setState(
-                            () => _obscure = !_obscure,
-                          ),
+                          onPressed: () => _controller.toggleObscure(),
                           icon: Icon(
-                            _obscure
+                            _controller.obscure
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined,
                             color: AppColors.textSecondary,
@@ -363,42 +218,37 @@ class _LoginScreenState
                         ),
                       ),
                     ),
-
-                    if (passwordError !=
+                    if (_controller.passwordError !=
                         null)
                       Padding(
                         padding: const EdgeInsets.only(
                           top: 6,
                         ),
                         child: Text(
-                          passwordError!,
+                          _controller.passwordError!,
                           style: const TextStyle(
                             color: Colors.red,
                             fontSize: 12,
                           ),
                         ),
                       ),
-
                     const SizedBox(
                       height: AppSpacing.md,
                     ),
-
                     Row(
                       children: [
                         InkWell(
                           borderRadius: BorderRadius.circular(
                             20,
                           ),
-                          onTap: () => setState(
-                            () => _staySignedIn = !_staySignedIn,
-                          ),
+                          onTap: () => _controller.toggleStaySignedIn(),
                           child: Row(
                             children: [
                               Icon(
-                                _staySignedIn
+                                _controller.staySignedIn
                                     ? Icons.check_circle
                                     : Icons.circle_outlined,
-                                color: _staySignedIn
+                                color: _controller.staySignedIn
                                     ? AppColors.primaryNavy
                                     : AppColors.textSecondary,
                                 size: 22,
@@ -417,17 +267,9 @@ class _LoginScreenState
                         ),
                         const Spacer(),
                         TextButton(
-                          onPressed: () {
-                            ScaffoldMessenger.of(
-                              context,
-                            ).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Fitur lupa password akan segera hadir',
-                                ),
-                              ),
-                            );
-                          },
+                          onPressed: () => _controller.showForgotPasswordMessage(
+                            context,
+                          ),
                           child: Text(
                             'Lupa password',
                             style: AppTextStyles.link,
@@ -435,20 +277,20 @@ class _LoginScreenState
                         ),
                       ],
                     ),
-
                     const SizedBox(
                       height: AppSpacing.xl,
                     ),
-
                     PrimaryButton(
-                      label: 'Masuk',
-                      onPressed: handleLogin,
+                      label: _controller.isLoading
+                          ? 'Memproses...'
+                          : 'Masuk',
+                      onPressed: _controller.isLoading
+                          ? null
+                          : _handleLogin,
                     ),
-
                     const SizedBox(
                       height: AppSpacing.xl,
                     ),
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -457,9 +299,8 @@ class _LoginScreenState
                           style: AppTextStyles.bodyMuted,
                         ),
                         TextButton(
-                          onPressed: () => Navigator.pushReplacementNamed(
+                          onPressed: () => _controller.navigateToRegister(
                             context,
-                            '/register',
                           ),
                           child: Text(
                             'Daftar',

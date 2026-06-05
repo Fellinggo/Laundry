@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wushlaundry/constants/app_colors.dart';
-import 'package:wushlaundry/constants/app_spacing.dart';
-import 'package:wushlaundry/constants/app_text_styles.dart';
-import 'package:wushlaundry/views/widgets/navy_app_bar.dart';
-import 'package:wushlaundry/views/widgets/rounded_white_panel.dart';
+import 'package:wushlaundry/controllers/setting_controller.dart';
+import 'package:wushlaundry/views/widgets/setting_tile_widget.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_spacing.dart';
+import '../../constants/app_text_styles.dart';
+import '../widgets/navy_app_bar.dart';
+import '../widgets/rounded_white_panel.dart';
 
 class SettingsScreen
     extends
@@ -25,39 +26,45 @@ class _SettingsScreenState
         State<
           SettingsScreen
         > {
-  bool isLoggedIn = false;
+  late SettingsController _controller;
 
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus();
+    _controller = SettingsController();
+    _controller.addListener(
+      _onControllerChanged,
+    );
   }
 
-  Future<
-    void
-  >
-  _checkLoginStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(
-      () {
-        isLoggedIn =
-            prefs.getBool(
-              'isLoggedIn',
-            ) ??
-            false;
-      },
+  @override
+  void dispose() {
+    _controller.removeListener(
+      _onControllerChanged,
     );
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onControllerChanged() {
+    if (mounted) {
+      setState(
+        () {},
+      );
+    }
   }
 
   @override
   Widget build(
     BuildContext context,
   ) {
+    final isLoggedIn = _controller.isLoggedIn;
+
     return Scaffold(
       backgroundColor: AppColors.profileNavy,
       appBar: NavyBackAppBar(
         title: 'Pengaturan',
-        onBack: () => Navigator.pop(
+        onBack: () => _controller.goBack(
           context,
         ),
       ),
@@ -77,11 +84,11 @@ class _SettingsScreenState
             const SizedBox(
               height: 8,
             ),
-            _tile(
-              Icons.language,
-              'Bahasa',
-              trailing: 'Indonesia',
-              onTap: () => _languageSheet(
+            SettingsTileWidget(
+              icon: Icons.language,
+              title: 'Bahasa',
+              trailing: _controller.languageOptions[_controller.selectedLanguage].name,
+              onTap: () => _controller.showLanguageSheet(
                 context,
               ),
             ),
@@ -97,39 +104,34 @@ class _SettingsScreenState
             const SizedBox(
               height: 8,
             ),
-            _tile(
-              Icons.privacy_tip_outlined,
-              'Kebijakan Privasi',
-              onTap: () => Navigator.pushNamed(
+            SettingsTileWidget(
+              icon: Icons.privacy_tip_outlined,
+              title: 'Kebijakan Privasi',
+              onTap: () => _controller.navigateToPrivacy(
                 context,
-                '/privacy',
               ),
             ),
-            _tile(
-              Icons.help_outline,
-              'Bantuan',
-              onTap: () => Navigator.pushNamed(
+            SettingsTileWidget(
+              icon: Icons.help_outline,
+              title: 'Bantuan',
+              onTap: () => _controller.navigateToHelp(
                 context,
-                '/help',
               ),
             ),
-            _tile(
-              Icons.article_outlined,
-              'Syarat dan Ketentuan',
-              onTap: () => Navigator.pushNamed(
+            SettingsTileWidget(
+              icon: Icons.article_outlined,
+              title: 'Syarat dan Ketentuan',
+              onTap: () => _controller.navigateToTerms(
                 context,
-                '/terms',
               ),
             ),
-            _tile(
-              Icons.info_outline,
-              'Tentang',
-              onTap: () => Navigator.pushNamed(
+            SettingsTileWidget(
+              icon: Icons.info_outline,
+              title: 'Tentang',
+              onTap: () => _controller.navigateToAbout(
                 context,
-                '/about',
               ),
             ),
-
             if (isLoggedIn) ...[
               const SizedBox(
                 height: AppSpacing.xl,
@@ -144,325 +146,25 @@ class _SettingsScreenState
               const SizedBox(
                 height: 8,
               ),
-              _tile(
-                Icons.person_off_outlined,
-                'Hapus Akun',
+              SettingsTileWidget(
+                icon: Icons.person_off_outlined,
+                title: 'Hapus Akun',
                 danger: true,
-                onTap: () => _confirmDelete(
+                onTap: () => _controller.showDeleteConfirmation(
                   context,
                 ),
               ),
-              _tile(
-                Icons.logout,
-                'Keluar',
+              SettingsTileWidget(
+                icon: Icons.logout,
+                title: 'Keluar',
                 danger: true,
-                onTap: () => _confirmLogout(
+                onTap: () => _controller.showLogoutConfirmation(
                   context,
                 ),
               ),
             ],
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _tile(
-    IconData icon,
-    String title, {
-    String? trailing,
-    bool danger = false,
-    VoidCallback? onTap,
-  }) {
-    final c = danger
-        ? AppColors.danger
-        : AppColors.headerNavy;
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Icon(
-        icon,
-        color: c,
-      ),
-      title: Text(
-        title,
-        style: AppTextStyles.body.copyWith(
-          color: c,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (trailing !=
-              null)
-            Text(
-              trailing,
-              style: AppTextStyles.bodyMuted,
-            ),
-          Icon(
-            Icons.chevron_right,
-            color: AppColors.textMuted,
-          ),
-        ],
-      ),
-      onTap: onTap,
-    );
-  }
-
-  Future<
-    void
-  >
-  _languageSheet(
-    BuildContext context,
-  ) {
-    return showModalBottomSheet<
-      void
-    >(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder:
-          (
-            ctx,
-          ) => const _LanguageSheetBody(),
-    );
-  }
-
-  Future<
-    void
-  >
-  _logout(
-    BuildContext context,
-  ) async {
-    final prefs = await SharedPreferences.getInstance();
-
-    await prefs.setBool(
-      'isLoggedIn',
-      false,
-    );
-
-    if (!mounted) return;
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/main',
-      (
-        route,
-      ) => false,
-    );
-  }
-
-  Future<
-    void
-  >
-  _deleteAccount(
-    BuildContext context,
-  ) async {
-    final prefs = await SharedPreferences.getInstance();
-
-    await prefs.clear();
-
-    if (!mounted) return;
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/main',
-      (
-        route,
-      ) => false,
-    );
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Akun berhasil dihapus',
-        ),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-
-  void _confirmDelete(
-    BuildContext context,
-  ) {
-    showDialog<
-      void
-    >(
-      context: context,
-      builder:
-          (
-            ctx,
-          ) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                16,
-              ),
-            ),
-            title: Text(
-              'Hapus Akun',
-              style: AppTextStyles.sectionTitle,
-            ),
-            content: const Text(
-              'Apakah kamu yakin ingin menghapus akun ini? Semua data akan hilang dan tidak bisa dikembalikan.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(
-                  ctx,
-                ),
-                child: Text(
-                  'Batal',
-                  style: AppTextStyles.bodyMuted,
-                ),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.pop(
-                    ctx,
-                  );
-                  await _deleteAccount(
-                    context,
-                  );
-                },
-                child: Text(
-                  'Hapus Akun',
-                  style: TextStyle(
-                    color: AppColors.danger,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-    );
-  }
-
-  void _confirmLogout(
-    BuildContext context,
-  ) {
-    showDialog<
-      void
-    >(
-      context: context,
-      builder:
-          (
-            ctx,
-          ) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                16,
-              ),
-            ),
-            title: Text(
-              'Keluar',
-              style: AppTextStyles.sectionTitle,
-            ),
-            content: const Text(
-              'Apakah kamu yakin ingin keluar? Data kamu akan tetap tersimpan.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(
-                  ctx,
-                ),
-                child: Text(
-                  'Batal',
-                  style: AppTextStyles.bodyMuted,
-                ),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.pop(
-                    ctx,
-                  );
-                  await _logout(
-                    context,
-                  );
-                },
-                child: const Text(
-                  'Keluar',
-                  style: TextStyle(
-                    color: AppColors.primaryNavy,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-    );
-  }
-}
-
-class _LanguageSheetBody
-    extends
-        StatefulWidget {
-  const _LanguageSheetBody();
-
-  @override
-  State<
-    _LanguageSheetBody
-  >
-  createState() => _LanguageSheetBodyState();
-}
-
-class _LanguageSheetBodyState
-    extends
-        State<
-          _LanguageSheetBody
-        > {
-  int _selected = 0;
-
-  @override
-  Widget build(
-    BuildContext context,
-  ) {
-    return Container(
-      margin: const EdgeInsets.all(
-        AppSpacing.xl,
-      ),
-      padding: const EdgeInsets.all(
-        AppSpacing.lg,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(
-          20,
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            title: const Text(
-              'Indonesia',
-            ),
-            trailing:
-                _selected ==
-                    0
-                ? const Icon(
-                    Icons.check_circle,
-                    color: AppColors.primaryNavy,
-                  )
-                : null,
-            onTap: () => setState(
-              () => _selected = 0,
-            ),
-          ),
-          ListTile(
-            title: Text(
-              'English',
-              style: AppTextStyles.body.copyWith(
-                color: AppColors.textMuted,
-              ),
-            ),
-            subtitle: Text(
-              'Segera hadir',
-              style: AppTextStyles.caption.copyWith(
-                color: AppColors.danger,
-                fontSize: 11,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

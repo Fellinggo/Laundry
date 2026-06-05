@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:wushlaundry/constants/app_colors.dart';
-import 'package:wushlaundry/constants/app_spacing.dart';
-import 'package:wushlaundry/constants/app_text_styles.dart';
-import 'package:wushlaundry/data/service_dummy.dart';
-import 'package:wushlaundry/views/widgets/eta_badge.dart';
-import 'package:wushlaundry/views/widgets/login_modal_sheet.dart';
-import 'package:wushlaundry/views/widgets/navy_app_bar.dart';
+import 'package:wushlaundry/controllers/service_controller.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_spacing.dart';
+import '../widgets/navy_app_bar.dart';
+import '../widgets/service_grid_card.dart';
+import '../widgets/service_wide_card.dart';
+import '../widgets/service_section_header.dart';
 
 class ServicesScreen
     extends
@@ -19,23 +19,15 @@ class ServicesScreen
   final VoidCallback? onOpenNotifications;
   final bool loggedIn;
 
-  void _handleTap(
-    BuildContext context,
-    VoidCallback action,
-  ) {
-    if (!loggedIn) {
-      showLoginModal(
-        context,
-      );
-      return;
-    }
-    action();
-  }
-
   @override
   Widget build(
     BuildContext context,
   ) {
+    final controller = ServicesController(
+      loggedIn: loggedIn,
+      onOpenNotifications: onOpenNotifications,
+    );
+
     return Scaffold(
       backgroundColor: AppColors.headerNavy,
       appBar: NavyCenterTitleAppBar(
@@ -46,9 +38,8 @@ class ServicesScreen
               right: 20,
             ),
             child: GestureDetector(
-              onTap: () => _handleTap(
+              onTap: () => controller.handleNotificationTap(
                 context,
-                () => onOpenNotifications?.call(),
               ),
               child: const Icon(
                 Icons.notifications_none_rounded,
@@ -90,16 +81,12 @@ class ServicesScreen
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Layanan Lainnya',
-                    style: AppTextStyles.sectionTitle.copyWith(
-                      fontSize: 16,
-                    ),
+                  const ServiceSectionHeader(
+                    title: 'Layanan Lainnya',
                   ),
                   const SizedBox(
                     height: 16,
                   ),
-
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
@@ -107,270 +94,53 @@ class ServicesScreen
                     mainAxisSpacing: 16,
                     crossAxisSpacing: 16,
                     childAspectRatio: 0.85,
-                    children: serviceDummy
-                        .where(
-                          (
-                            e,
-                          ) => !e.isWide,
-                        )
-                        .map(
-                          (
-                            service,
-                          ) => _gridCard(
+                    children: controller.gridServices.map(
+                      (
+                        service,
+                      ) {
+                        return ServiceGridCard(
+                          title: service.title,
+                          price: service.price,
+                          eta: service.eta,
+                          etaType: service.etaType,
+                          imagePath: service.imagePath,
+                          onTap: () => controller.handleServiceTap(
                             context,
-                            title: service.title,
-                            price: service.price,
-                            eta: service.eta,
-                            etaType: service.etaType,
-                            imagePath: service.imagePath,
+                            service.title,
                           ),
-                        )
-                        .toList(),
+                        );
+                      },
+                    ).toList(),
                   ),
-
                   const SizedBox(
                     height: 20,
                   ),
-
-                  ...serviceDummy
-                      .where(
-                        (
-                          e,
-                        ) => e.isWide,
-                      )
-                      .map(
-                        (
-                          service,
-                        ) => Padding(
-                          padding: const EdgeInsets.only(
-                            bottom: 20,
-                          ),
-                          child: _wideCard(
+                  ...controller.wideServices.map(
+                    (
+                      service,
+                    ) {
+                      return Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: 20,
+                        ),
+                        child: ServiceWideCard(
+                          title: service.title,
+                          price: service.price,
+                          eta: service.eta,
+                          imagePath: service.imagePath,
+                          onTap: () => controller.handleServiceTap(
                             context,
-                            title: service.title,
-                            price: service.price,
-                            eta: service.eta,
-                            imagePath: service.imagePath,
+                            service.title,
                           ),
                         ),
-                      )
-                      .toList(),
-
+                      );
+                    },
+                  ).toList(),
                   const SizedBox(
                     height: 80,
                   ),
                 ],
               ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _gridCard(
-    BuildContext context, {
-    required String title,
-    required String price,
-    required String eta,
-    required EtaType etaType,
-    required String imagePath,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(
-          255,
-          255,
-          255,
-          255,
-        ),
-        borderRadius: BorderRadius.circular(
-          16,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(
-              0.36,
-            ),
-            blurRadius: 10,
-            offset: const Offset(
-              0,
-              4,
-            ),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(
-          16,
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => _handleTap(
-              context,
-              () => Navigator.pushNamed(
-                context,
-                '/service-detail',
-                arguments: {
-                  'title': title,
-                },
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 5,
-                  child: Stack(
-                    children: [
-                      Image.asset(
-                        imagePath,
-                        width: double.infinity,
-                        height: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: EtaBadge(
-                          label: eta,
-                          type: etaType,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(
-                    12,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        price,
-                        style: AppTextStyles.caption.copyWith(
-                          fontSize: 11,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 2,
-                      ),
-                      Text(
-                        title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTextStyles.sectionTitle.copyWith(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.headerNavy,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _wideCard(
-    BuildContext context, {
-    required String title,
-    required String price,
-    required String eta,
-    required String imagePath,
-  }) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(
-          16,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(
-              0.36,
-            ),
-            blurRadius: 10,
-            offset: const Offset(
-              0,
-              4,
-            ),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(
-          16,
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => _handleTap(
-              context,
-              () => Navigator.pushNamed(
-                context,
-                '/service-detail',
-                arguments: {
-                  'title': title,
-                },
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Stack(
-                  children: [
-                    Image.asset(
-                      imagePath,
-                      height: 120,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                    Positioned(
-                      top: 10,
-                      right: 10,
-                      child: EtaBadge(
-                        label: eta,
-                        type: EtaType.normal,
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(
-                    14,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        price,
-                        style: AppTextStyles.caption.copyWith(
-                          fontSize: 12,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 2,
-                      ),
-                      Text(
-                        title,
-                        style: AppTextStyles.sectionTitle.copyWith(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
             ),
           ),
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wushlaundry/controllers/splash_controller.dart';
 
 class SplashScreen
     extends
@@ -19,21 +20,35 @@ class _SplashScreenState
         State<
           SplashScreen
         > {
+  late SplashController _controller;
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(
-      const Duration(
-        seconds: 2,
-      ),
-      () {
-        if (!mounted) return;
-        Navigator.pushReplacementNamed(
-          context,
-          '/onboarding',
-        );
-      },
+    _controller = SplashController();
+    _controller.addListener(
+      _onControllerChanged,
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(
+      _onControllerChanged,
+    );
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onControllerChanged() {
+    // Ketika timer selesai, controller akan memanggil notifyListeners()
+    // Ini akan memicu navigasi
+    if (mounted &&
+        !_controller.isNavigating) {
+      _controller.navigateToNextScreen(
+        context,
+      );
+    }
   }
 
   @override
@@ -43,14 +58,13 @@ class _SplashScreenState
     final size = MediaQuery.of(
       context,
     ).size;
+    final splashModel = _controller.splashModel;
 
     return Scaffold(
-      backgroundColor: const Color(
-        0xFFF6F7FF,
-      ),
+      backgroundColor: splashModel.backgroundColor,
       body: Center(
         child: Image.asset(
-          'assets/images/logo.png',
+          splashModel.logoAssetPath,
           width:
               size.width *
               0.5,

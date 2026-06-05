@@ -1,17 +1,15 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wushlaundry/constants/app_colors.dart';
-import 'package:wushlaundry/constants/app_spacing.dart';
-import 'package:wushlaundry/constants/app_text_styles.dart';
-import 'package:wushlaundry/data/service_dummy.dart';
-import 'package:wushlaundry/views/widgets/login_modal_sheet.dart';
-import 'package:wushlaundry/views/widgets/offer_image_slider.dart';
-import 'package:wushlaundry/views/widgets/rounded_white_panel.dart';
-import 'package:wushlaundry/views/widgets/section_header_row.dart';
-import 'package:wushlaundry/views/widgets/service_card_compact.dart';
-import 'package:wushlaundry/views/widgets/active_order_card.dart';
+import 'package:wushlaundry/controllers/home_controller.dart';
+import '../widgets/login_modal_sheet.dart';
+import '../widgets/offer_image_slider.dart';
+import '../widgets/rounded_white_panel.dart';
+import '../widgets/section_header_row.dart';
+import '../widgets/service_card_compact.dart';
+import '../widgets/active_order_card.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_spacing.dart';
+import '../../constants/app_text_styles.dart';
+import '../../data/service_dummy.dart';
 
 class HomeScreen
     extends
@@ -51,8 +49,7 @@ class _HomeScreenState
         State<
           HomeScreen
         > {
-  String? userFirstName;
-
+  late HomeController _controller;
   final homeServices = serviceDummy
       .where(
         (
@@ -63,6 +60,32 @@ class _HomeScreenState
         3,
       )
       .toList();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = HomeController();
+    _controller.addListener(
+      _onControllerChanged,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(
+      _onControllerChanged,
+    );
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onControllerChanged() {
+    if (mounted) {
+      setState(
+        () {},
+      );
+    }
+  }
 
   Widget _buildEmptyOrderBox() {
     return Container(
@@ -99,241 +122,6 @@ class _HomeScreenState
     );
   }
 
-  List<
-    Map<
-      String,
-      dynamic
-    >
-  >
-  activeOrders = [];
-
-  @override
-  void initState() {
-    super.initState();
-    loadActiveOrder();
-    _loadUserName();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    loadActiveOrder();
-    _loadUserName();
-  }
-
-  Future<
-    void
-  >
-  _loadUserName() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isLoggedIn =
-        prefs.getBool(
-          'isLoggedIn',
-        ) ??
-        false;
-
-    if (isLoggedIn) {
-      final fullName =
-          prefs.getString(
-            'userName',
-          ) ??
-          'User';
-      setState(
-        () {
-          userFirstName = fullName
-              .split(
-                ' ',
-              )
-              .first;
-        },
-      );
-    } else {
-      setState(
-        () {
-          userFirstName = null;
-        },
-      );
-    }
-  }
-
-  int _parseRupiahToInt(
-    String rupiah,
-  ) {
-    if (rupiah.isEmpty) return 0;
-    String cleaned = rupiah
-        .replaceAll(
-          'Rp ',
-          '',
-        )
-        .replaceAll(
-          '.',
-          '',
-        );
-    return int.tryParse(
-          cleaned,
-        ) ??
-        0;
-  }
-
-  String _formatRupiah(
-    int number,
-  ) {
-    final s = number.toString();
-    final buffer = StringBuffer();
-    int count = 0;
-    for (
-      int i =
-          s.length -
-          1;
-      i >=
-          0;
-      i--
-    ) {
-      buffer.write(
-        s[i],
-      );
-      count++;
-      if (count %
-                  3 ==
-              0 &&
-          i !=
-              0) {
-        buffer.write(
-          '.',
-        );
-      }
-    }
-    return 'Rp ${buffer.toString().split('').reversed.join()}';
-  }
-
-  Future<
-    void
-  >
-  loadActiveOrder() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isLogin =
-        prefs.getBool(
-          'isLoggedIn',
-        ) ??
-        false;
-
-    if (!isLogin) {
-      setState(
-        () => activeOrders = [],
-      );
-      return;
-    }
-
-    final List<
-      String
-    >
-    activeRaw =
-        prefs.getStringList(
-          'active_orders',
-        ) ??
-        [];
-    final List<
-      String
-    >
-    processRaw =
-        prefs.getStringList(
-          'process_orders',
-        ) ??
-        [];
-
-    final List<
-      String
-    >
-    ordersRaw = [
-      ...activeRaw,
-      ...processRaw,
-    ];
-
-    print(
-      '========== HOME SCREEN ==========',
-    );
-    print(
-      'Jumlah pesanan di SharedPreferences: ${ordersRaw.length}',
-    );
-    print(
-      'active_orders: ${activeRaw.length}',
-    );
-    print(
-      'process_orders: ${processRaw.length}',
-    );
-
-    final List<
-      String
-    >
-    validOrders = ordersRaw.where(
-      (
-        orderString,
-      ) {
-        final data = Uri.splitQueryString(
-          orderString,
-        );
-        final String orderId =
-            data['orderId'] ??
-            '';
-        return orderId.isNotEmpty &&
-            orderId !=
-                '000000';
-      },
-    ).toList();
-
-    setState(
-      () {
-        activeOrders = validOrders.map(
-          (
-            e,
-          ) {
-            final data = Uri.splitQueryString(
-              e,
-            );
-            return {
-              'orderId':
-                  data['orderId'] ??
-                  '000000',
-              'service':
-                  data['service'] ??
-                  'Cuci Regular',
-              'qty':
-                  data['qty'] ??
-                  '1',
-              'pickupTime':
-                  data['pickupTime'] ??
-                  '-',
-              'deliveryTime':
-                  data['deliveryTime'] ??
-                  '-',
-              'totalPrice':
-                  data['totalPrice'] ??
-                  'Rp 0',
-              'address':
-                  data['address'] ??
-                  '-',
-              'itemsJson':
-                  data['itemsJson'] ??
-                  '',
-            };
-          },
-        ).toList();
-      },
-    );
-
-    print(
-      'Active orders loaded: ${activeOrders.length}',
-    );
-    for (var order in activeOrders) {
-      print(
-        '   - Order ID: ${order['orderId']}',
-      );
-    }
-    print(
-      '==================================',
-    );
-  }
-
   void _handleServiceTap(
     BuildContext context,
     Map<
@@ -342,7 +130,7 @@ class _HomeScreenState
     >
     service,
   ) {
-    if (!widget.loggedIn) {
+    if (!_controller.isLoggedIn) {
       showLoginModal(
         context,
       );
@@ -356,7 +144,7 @@ class _HomeScreenState
   void _handleNotificationTap(
     BuildContext context,
   ) {
-    if (!widget.loggedIn) {
+    if (!_controller.isLoggedIn) {
       showLoginModal(
         context,
       );
@@ -365,11 +153,14 @@ class _HomeScreenState
     widget.onOpenNotifications?.call();
   }
 
-  void _handleOfferTap(
+  Future<
+    void
+  >
+  _handleOfferTap(
     BuildContext context,
     int index,
   ) async {
-    if (!widget.loggedIn) {
+    if (!_controller.isLoggedIn) {
       showLoginModal(
         context,
       );
@@ -388,25 +179,10 @@ class _HomeScreenState
 
     if (code !=
         null) {
-      await Clipboard.setData(
-        ClipboardData(
-          text: code,
-        ),
+      await _controller.copyPromoCodeToClipboard(
+        context,
+        code,
       );
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Kode $code berhasil disalin',
-            ),
-            duration: const Duration(
-              milliseconds: 800,
-            ),
-          ),
-        );
-      }
     }
 
     await Future.delayed(
@@ -421,7 +197,10 @@ class _HomeScreenState
   Widget build(
     BuildContext context,
   ) {
-    _loadUserName();
+    final isLoggedIn = _controller.isLoggedIn;
+    final userFirstName = _controller.userFirstName;
+    final activeOrders = _controller.activeOrders;
+
     return ColoredBox(
       color: AppColors.headerNavy,
       child: Column(
@@ -447,7 +226,7 @@ class _HomeScreenState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (widget.loggedIn &&
+                      if (isLoggedIn &&
                           userFirstName !=
                               null) ...[
                         Text(
@@ -569,59 +348,20 @@ class _HomeScreenState
                                       index,
                                     ) {
                                       final order = activeOrders[index];
-
-                                      final bool isDummyOrder =
-                                          order['orderId'] ==
-                                          '100001';
-
-                                      final int currentStep = isDummyOrder
-                                          ? 2
-                                          : 0;
-                                      final String badgeLabel = isDummyOrder
-                                          ? 'Dicuci'
-                                          : 'Diproses';
-
-                                      String rawTotal =
-                                          order['totalPrice']?.toString() ??
-                                          'Rp 0';
-                                      int totalNominal = _parseRupiahToInt(
-                                        rawTotal,
-                                      );
-                                      int finalTotal = isDummyOrder
-                                          ? totalNominal +
-                                                5000
-                                          : totalNominal;
-                                      String displayTotal = _formatRupiah(
-                                        finalTotal,
+                                      final displayTotal = _controller.getDisplayTotal(
+                                        order,
                                       );
 
                                       return GestureDetector(
                                         behavior: HitTestBehavior.opaque,
                                         onTap: () {
-                                          final itemsJson = order['itemsJson'];
-
-                                          if (itemsJson !=
-                                                  null &&
-                                              itemsJson.isNotEmpty) {
-                                            try {
-                                              if (itemsJson
-                                                  is String) {
-                                              } else if (itemsJson
-                                                  is List) {}
-                                            } catch (
-                                              e
-                                            ) {
-                                              print(
-                                                'Error parsing itemsJson: $e',
-                                              );
-                                            }
-                                          }
-
+                                          // Hapus blok if yang tidak berguna
+                                          // Langsung navigasi ke detail order
                                           Navigator.pushNamed(
                                             context,
                                             '/order-detail',
                                             arguments: {
-                                              ...order,
+                                              ...order.toMap(),
                                               'fromActiveOrder': true,
                                             },
                                           );
@@ -631,11 +371,11 @@ class _HomeScreenState
                                             right: 12,
                                           ),
                                           child: ActiveOrderCard(
-                                            statusTitle: 'Pesanan ${order['orderId']}',
-                                            subtitle: 'Pickup: ${order['pickupTime']}\nDelivery: ${order['deliveryTime']}',
+                                            statusTitle: 'Pesanan ${order.orderId}',
+                                            subtitle: 'Pickup: ${order.pickupTime}\nDelivery: ${order.deliveryTime}',
                                             totalPrice: displayTotal,
-                                            currentStep: currentStep,
-                                            badgeLabel: badgeLabel,
+                                            currentStep: order.currentStep,
+                                            badgeLabel: order.badgeLabel,
                                           ),
                                         ),
                                       );
