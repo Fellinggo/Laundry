@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:wushlaundry/constants/app_colors.dart';
-import 'package:wushlaundry/constants/app_spacing.dart';
 import 'package:wushlaundry/constants/app_text_styles.dart';
 import 'package:wushlaundry/views/widgets/labeled_text_field.dart';
 import 'package:wushlaundry/views/widgets/primary_button.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_spacing.dart';
+import '../../controllers/add_address_controller.dart';
 
 class AddAddressScreen
     extends
@@ -24,61 +25,44 @@ class _AddAddressScreenState
         State<
           AddAddressScreen
         > {
+  final controller = AddAddressController();
+
   final TextEditingController addressController = TextEditingController();
 
   String? selectedTitle;
   String? addressError;
   String? titleError;
 
-  final List<
-    String
-  >
-  titleOptions = [
-    'Rumah',
-    'Kantor',
-    'Kos',
-    'Apartemen',
-    'Lainnya',
-  ];
-
   bool _validate() {
     setState(
       () {
-        titleError = null;
-        addressError = null;
+        titleError = controller.validateTitle(
+          selectedTitle,
+        );
+
+        addressError = controller.validateAddress(
+          addressController.text,
+        );
       },
     );
 
-    bool isValid = true;
-
-    if (selectedTitle ==
-            null ||
-        selectedTitle!.isEmpty) {
-      titleError = 'Pilih tipe alamat';
-      isValid = false;
-    }
-
-    if (addressController.text.trim().isEmpty) {
-      addressError = 'Alamat tidak boleh kosong';
-      isValid = false;
-    } else if (addressController.text.trim().length <
-        10) {
-      addressError = 'Alamat terlalu pendek (minimal 10 karakter)';
-      isValid = false;
-    }
-
-    return isValid;
+    return titleError ==
+            null &&
+        addressError ==
+            null;
   }
 
   void _saveAddress() {
     if (!_validate()) return;
 
+    final addressData = controller.createAddress(
+      title: selectedTitle!,
+      address: addressController.text,
+    );
+
     Navigator.pop(
       context,
-      {
-        'title': selectedTitle,
-        'address': addressController.text.trim(),
-      },
+      addressData.toMap(),
     );
   }
 
@@ -155,9 +139,9 @@ class _AddAddressScreenState
                         ),
                       ),
                       isExpanded: true,
-                      items: titleOptions.map(
+                      items: controller.titleOptions.map(
                         (
-                          String title,
+                          title,
                         ) {
                           return DropdownMenuItem<
                             String
@@ -184,6 +168,7 @@ class _AddAddressScreenState
                     ),
               ),
             ),
+
             if (titleError !=
                 null)
               Padding(
@@ -203,6 +188,7 @@ class _AddAddressScreenState
             const SizedBox(
               height: 24,
             ),
+
             LabeledTextField(
               label: 'Alamat Lengkap',
               hint: 'Masukkan alamat lengkap',

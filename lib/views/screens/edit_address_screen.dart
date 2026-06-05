@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:wushlaundry/constants/app_colors.dart';
-import 'package:wushlaundry/constants/app_spacing.dart';
-import 'package:wushlaundry/constants/app_text_styles.dart';
+
+import '../../constants/app_colors.dart';
+import '../../constants/app_spacing.dart';
+import '../../constants/app_text_styles.dart';
+import '../../controllers/edit_address_controller.dart';
 
 class EditAddressScreen
     extends
@@ -22,28 +24,54 @@ class _EditAddressScreenState
         State<
           EditAddressScreen
         > {
+  final controller = EditAddressController();
+
   final titleController = TextEditingController();
+
   final addressController = TextEditingController();
+
+  bool _isLoaded = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
+    if (_isLoaded) return;
+
     final args =
         ModalRoute.of(
               context,
-            )!.settings.arguments
+            )?.settings.arguments
             as Map?;
 
-    if (args !=
-        null) {
-      titleController.text =
-          args['title'] ??
-          '';
-      addressController.text =
-          args['address'] ??
-          '';
-    }
+    final addressData = controller.loadAddress(
+      args,
+    );
+
+    titleController.text = addressData.title;
+
+    addressController.text = addressData.address;
+
+    _isLoaded = true;
+  }
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    addressController.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    final addressData = controller.saveAddress(
+      title: titleController.text,
+      address: addressController.text,
+    );
+
+    Navigator.pop(
+      context,
+      addressData.toMap(),
+    );
   }
 
   @override
@@ -52,7 +80,6 @@ class _EditAddressScreenState
   ) {
     return Scaffold(
       backgroundColor: AppColors.profileNavy,
-
       appBar: AppBar(
         backgroundColor: AppColors.profileNavy,
         elevation: 0,
@@ -66,7 +93,6 @@ class _EditAddressScreenState
           ),
         ),
       ),
-
       body: Container(
         margin: const EdgeInsets.only(
           top: 12,
@@ -155,15 +181,7 @@ class _EditAddressScreenState
                       ),
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.pop(
-                      context,
-                      {
-                        'title': titleController.text,
-                        'address': addressController.text,
-                      },
-                    );
-                  },
+                  onPressed: _save,
                   child: const Text(
                     "Simpan",
                     style: TextStyle(

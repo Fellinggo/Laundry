@@ -5,10 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wushlaundry/constants/app_colors.dart';
 import 'package:wushlaundry/constants/app_spacing.dart';
 import 'package:wushlaundry/constants/app_text_styles.dart';
-import 'package:wushlaundry/views/screens/main_shell_screen.dart';
-import 'package:wushlaundry/views/widgets/navy_app_bar.dart';
-import 'package:wushlaundry/views/widgets/rounded_white_panel.dart';
-import 'package:wushlaundry/views/widgets/step_progress_bar.dart';
+import '../widgets/step_progress_bar.dart';
+import '../widgets/navy_app_bar.dart';
+import '../widgets/rounded_white_panel.dart';
+import '../screens/main_shell_screen.dart';
 
 class OrderDetailScreen
     extends

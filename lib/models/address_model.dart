@@ -1,31 +1,20 @@
-class Address {
-  final String id;
-  final String label;
-  final String fullAddress;
-  final String phone;
+class AddressModel {
+  final String title;
+  final String address;
 
-  Address({
-    required this.id,
-    required this.label,
-    required this.fullAddress,
-    required this.phone,
+  const AddressModel({
+    required this.title,
+    required this.address,
   });
 
-  factory Address.fromJson(Map<String, dynamic> json) {
-    return Address(
-      id: json['id'],
-      label: json['label'],
-      fullAddress: json['full_address'],
-      phone: json['phone'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
+  Map<
+    String,
+    dynamic
+  >
+  toMap() {
     return {
-      'id': id,
-      'label': label,
-      'full_address': fullAddress,
-      'phone': phone,
+      'title': title,
+      'address': address,
     };
   }
 }
