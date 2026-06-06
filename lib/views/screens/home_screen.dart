@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wushlaundry/controllers/home_controller.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/login_modal_sheet.dart';
 import '../widgets/offer_image_slider.dart';
 import '../widgets/rounded_white_panel.dart';
@@ -10,6 +11,7 @@ import '../../constants/app_colors.dart';
 import '../../constants/app_spacing.dart';
 import '../../constants/app_text_styles.dart';
 import '../../data/service_dummy.dart';
+import '../../controllers/home_controller.dart';
 
 class HomeScreen
     extends
@@ -41,10 +43,11 @@ class HomeScreen
   State<
     HomeScreen
   >
-  createState() => _HomeScreenState();
+  createState() => HomeScreenState();
 }
 
-class _HomeScreenState
+// EXPORT STATE agar bisa diakses dari MainShellController
+class HomeScreenState
     extends
         State<
           HomeScreen
@@ -85,6 +88,14 @@ class _HomeScreenState
         () {},
       );
     }
+  }
+
+  // TAMBAHKAN METHOD INI untuk refresh data user dari luar
+  Future<
+    void
+  >
+  refreshUserData() async {
+    await _controller.refreshUserData();
   }
 
   Widget _buildEmptyOrderBox() {
@@ -239,14 +250,12 @@ class _HomeScreenState
                           height: 6,
                         ),
                       ],
-
                       const SectionHeaderRow(
                         title: 'Layanan Laundry Kami',
                       ),
                       const SizedBox(
                         height: 12,
                       ),
-
                       Row(
                         children: [
                           Expanded(
@@ -320,7 +329,6 @@ class _HomeScreenState
                           ),
                         ],
                       ),
-
                       const SizedBox(
                         height: AppSpacing.xl,
                       ),
@@ -330,7 +338,6 @@ class _HomeScreenState
                       const SizedBox(
                         height: 12,
                       ),
-
                       SizedBox(
                         height: 180,
                         child: activeOrders.isEmpty
@@ -351,12 +358,9 @@ class _HomeScreenState
                                       final displayTotal = _controller.getDisplayTotal(
                                         order,
                                       );
-
                                       return GestureDetector(
                                         behavior: HitTestBehavior.opaque,
                                         onTap: () {
-                                          // Hapus blok if yang tidak berguna
-                                          // Langsung navigasi ke detail order
                                           Navigator.pushNamed(
                                             context,
                                             '/order-detail',
@@ -382,7 +386,6 @@ class _HomeScreenState
                                     },
                               ),
                       ),
-
                       const SizedBox(
                         height: AppSpacing.xl,
                       ),
@@ -391,7 +394,6 @@ class _HomeScreenState
                         actionLabel: 'Lainnya',
                         onAction: () => widget.onOpenDisc?.call(),
                       ),
-
                       OfferImageAutoSlider(
                         onTap:
                             (
@@ -401,7 +403,6 @@ class _HomeScreenState
                               index,
                             ),
                       ),
-
                       const SizedBox(
                         height: 24,
                       ),

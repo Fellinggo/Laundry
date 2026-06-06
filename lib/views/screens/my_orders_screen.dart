@@ -196,7 +196,6 @@ class _MyOrdersScreenState
             index,
           ) {
             final order = orders[index];
-
             return PesananOrderCard(
               orderId: 'No. Pesanan ${order.orderId}',
               dateLabel: order.dateLabel,

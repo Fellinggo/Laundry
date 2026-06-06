@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wushlaundry/views/widgets/login_modal_sheet.dart';
 import '../models/main_shell_model.dart';
+import '../views/screens/home_screen.dart'; // Import HomeScreenState
 
 class MainShellController
     extends
@@ -11,6 +12,15 @@ class MainShellController
     isLoggedIn: false,
     userFirstName: null,
   );
+
+  // Tambahkan GlobalKey untuk HomeScreen
+  final GlobalKey<
+    HomeScreenState
+  >
+  homeScreenKey =
+      GlobalKey<
+        HomeScreenState
+      >();
 
   MainShellState get state => _state;
   int get currentIndex => _state.selectedIndex;
@@ -49,6 +59,8 @@ class MainShellController
   >
   refreshUser() async {
     await _loadUser();
+    // Refresh HomeScreen setelah user data berubah
+    homeScreenKey.currentState?.refreshUserData();
   }
 
   void changeTab(
@@ -124,9 +136,6 @@ class MainShellController
   }
 
   bool canNavigateToAuthenticatedOnly() {
-    if (!_state.isLoggedIn) {
-      return false;
-    }
-    return true;
+    return _state.isLoggedIn;
   }
 }

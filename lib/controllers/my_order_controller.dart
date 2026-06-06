@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wushlaundry/models/user_order_model.dart';
-import '../../data/dataDummy.dart';
+import 'package:wushlaundry/data/dataDummy.dart';
+import '../models/user_order_model.dart';
 
 class MyOrdersController
     extends
@@ -78,6 +78,7 @@ class MyOrdersController
     final prefs = await SharedPreferences.getInstance();
     bool cleaned = false;
 
+    // Clean active orders
     List<
       String
     >
@@ -122,6 +123,7 @@ class MyOrdersController
       cleaned = true;
     }
 
+    // Clean process orders
     List<
       String
     >
@@ -166,6 +168,7 @@ class MyOrdersController
       cleaned = true;
     }
 
+    // Clean completed orders
     List<
       String
     >

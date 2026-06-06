@@ -92,6 +92,7 @@ class _MainShellScreenState
         index: currentIndex,
         children: [
           HomeScreen(
+            key: _controller.homeScreenKey, // ← TAMBAHKAN KEY INI
             loggedIn: isLoggedIn,
             userFirstName: userFirstName,
             onOpenNotifications: _handleNotificationTap,

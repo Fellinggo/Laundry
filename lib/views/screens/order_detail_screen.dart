@@ -225,6 +225,7 @@ class OrderDetailScreen
               'Titik Penjemputan',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
+                fontSize: 14,
               ),
             ),
           ],
@@ -234,7 +235,9 @@ class OrderDetailScreen
         ),
         Text(
           data.pickupAddress,
-          style: AppTextStyles.body,
+          style: AppTextStyles.body.copyWith(
+            fontSize: 14,
+          ),
         ),
         const SizedBox(
           height: 10,
@@ -276,6 +279,7 @@ class OrderDetailScreen
               'Titik Pengantaran',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
+                fontSize: 14,
               ),
             ),
           ],
@@ -285,7 +289,9 @@ class OrderDetailScreen
         ),
         Text(
           data.deliveryAddress,
-          style: AppTextStyles.bodyMuted,
+          style: AppTextStyles.bodyMuted.copyWith(
+            fontSize: 14,
+          ),
         ),
       ],
     );
@@ -379,19 +385,39 @@ class OrderDetailScreen
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _row(
+        _rowBold(
           'Waktu Pengambilan',
           data.pickupTimeText,
         ),
         const Divider(),
-        _row(
+        _rowBold(
           'Waktu Pengiriman',
           data.deliveryTimeText,
         ),
         const Divider(),
-        _row(
-          'Alamat Pengiriman',
-          data.deliveryAddress,
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 8,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Alamat Pengiriman',
+                style: AppTextStyles.body.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              Text(
+                data.deliveryAddress,
+                style: AppTextStyles.body,
+                softWrap: true,
+              ),
+            ],
+          ),
         ),
         const Divider(),
         const SizedBox(
@@ -463,6 +489,33 @@ class OrderDetailScreen
     );
   }
 
+  Widget _rowBold(
+    String title,
+    String value,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: 8,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: AppTextStyles.body.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            value,
+            style: AppTextStyles.body,
+            textAlign: TextAlign.right,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _row(
     String title,
     String value, {
@@ -473,20 +526,20 @@ class OrderDetailScreen
         vertical: 8,
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            child: Text(
-              title,
-              style: bold
-                  ? AppTextStyles.sectionTitle
-                  : AppTextStyles.body,
-            ),
+          Text(
+            title,
+            style: bold
+                ? AppTextStyles.sectionTitle
+                : AppTextStyles.body,
           ),
           Text(
             value,
             style: bold
                 ? AppTextStyles.sectionTitle
                 : AppTextStyles.body,
+            textAlign: TextAlign.right,
           ),
         ],
       ),

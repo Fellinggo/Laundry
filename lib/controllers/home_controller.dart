@@ -55,6 +55,14 @@ class HomeController
     notifyListeners();
   }
 
+  // Tambahkan method ini untuk refresh data user dari luar
+  Future<
+    void
+  >
+  refreshUserData() async {
+    await loadUserData();
+  }
+
   Future<
     void
   >
@@ -193,8 +201,7 @@ class HomeController
         text: code,
       ),
     );
-    if (true) {
-      // mounted akan dicek di view
+    if (context.mounted) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(

@@ -16,6 +16,7 @@ class OrderDetailBox
     BuildContext context,
   ) {
     return Container(
+      width: double.infinity, // ← TAMBAHKAN INI
       padding: const EdgeInsets.all(
         16,
       ),

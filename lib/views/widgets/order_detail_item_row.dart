@@ -57,7 +57,7 @@ class OrderDetailItemRow
         children: [
           if (item.image !=
                   null &&
-              item.image!.isNotEmpty)
+              item.image!.isNotEmpty) ...[
             ClipRRect(
               borderRadius: BorderRadius.circular(
                 8,
@@ -85,12 +85,10 @@ class OrderDetailItemRow
                     },
               ),
             ),
-          if (item.image !=
-                  null &&
-              item.image!.isNotEmpty)
             const SizedBox(
               width: 12,
             ),
+          ],
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
