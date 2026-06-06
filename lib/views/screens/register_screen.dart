@@ -28,12 +28,78 @@ class _RegisterScreenState
         > {
   late RegisterController _controller;
 
+  // Buat TextEditingController di sini, bukan di build
+  late final TextEditingController _nameController;
+  late final TextEditingController _emailController;
+  late final TextEditingController _phoneController;
+  late final TextEditingController _passwordController;
+  late final TextEditingController _confirmPasswordController;
+
   @override
   void initState() {
     super.initState();
     _controller = RegisterController();
     _controller.addListener(
       _onControllerChanged,
+    );
+
+    // Inisialisasi controllers
+    _nameController = TextEditingController();
+    _emailController = TextEditingController();
+    _phoneController = TextEditingController();
+    _passwordController = TextEditingController();
+    _confirmPasswordController = TextEditingController();
+
+    // Setup listeners untuk sync dengan controller
+    _nameController.addListener(
+      () {
+        if (_nameController.text !=
+            _controller.data.name) {
+          _controller.updateName(
+            _nameController.text,
+          );
+        }
+      },
+    );
+    _emailController.addListener(
+      () {
+        if (_emailController.text !=
+            _controller.data.email) {
+          _controller.updateEmail(
+            _emailController.text,
+          );
+        }
+      },
+    );
+    _phoneController.addListener(
+      () {
+        if (_phoneController.text !=
+            _controller.data.phone) {
+          _controller.updatePhone(
+            _phoneController.text,
+          );
+        }
+      },
+    );
+    _passwordController.addListener(
+      () {
+        if (_passwordController.text !=
+            _controller.data.password) {
+          _controller.updatePassword(
+            _passwordController.text,
+          );
+        }
+      },
+    );
+    _confirmPasswordController.addListener(
+      () {
+        if (_confirmPasswordController.text !=
+            _controller.data.confirmPassword) {
+          _controller.updateConfirmPassword(
+            _confirmPasswordController.text,
+          );
+        }
+      },
     );
   }
 
@@ -43,11 +109,40 @@ class _RegisterScreenState
       _onControllerChanged,
     );
     _controller.dispose();
+
+    // Dispose semua controllers
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+
     super.dispose();
   }
 
   void _onControllerChanged() {
     if (mounted) {
+      // Update text controllers jika data berubah dari luar
+      if (_nameController.text !=
+          _controller.data.name) {
+        _nameController.text = _controller.data.name;
+      }
+      if (_emailController.text !=
+          _controller.data.email) {
+        _emailController.text = _controller.data.email;
+      }
+      if (_phoneController.text !=
+          _controller.data.phone) {
+        _phoneController.text = _controller.data.phone;
+      }
+      if (_passwordController.text !=
+          _controller.data.password) {
+        _passwordController.text = _controller.data.password;
+      }
+      if (_confirmPasswordController.text !=
+          _controller.data.confirmPassword) {
+        _confirmPasswordController.text = _controller.data.confirmPassword;
+      }
       setState(
         () {},
       );
@@ -100,15 +195,13 @@ class _RegisterScreenState
                         label: 'Nama Lengkap',
                         hint: 'Masukkan Nama Lengkap',
                         prefixIcon: Icons.person_outline_rounded,
-                        controller: TextEditingController(
-                          text: _controller.data.name,
-                        ),
+                        controller: _nameController, // Gunakan controller yang sudah dibuat
                         onChanged:
                             (
                               value,
                             ) => _controller.updateName(
                               value,
-                            ), // ← Sekarang tidak merah
+                            ),
                       ),
                       const SizedBox(
                         height: 10,
@@ -117,31 +210,27 @@ class _RegisterScreenState
                         label: 'Email',
                         hint: 'Masukkan Email',
                         prefixIcon: Icons.email_outlined,
-                        controller: TextEditingController(
-                          text: _controller.data.email,
-                        ),
+                        controller: _emailController, // Gunakan controller yang sudah dibuat
                         errorText: _controller.emailError,
                         onChanged:
                             (
                               value,
                             ) => _controller.updateEmail(
                               value,
-                            ), // ← Sekarang tidak merah
+                            ),
                       ),
                       const SizedBox(
                         height: 10,
                       ),
                       PhoneInputField(
-                        controller: TextEditingController(
-                          text: _controller.data.phone,
-                        ),
+                        controller: _phoneController, // Gunakan controller yang sudah dibuat
                         errorText: _controller.phoneError,
                         onChanged:
                             (
                               value,
                             ) => _controller.updatePhone(
                               value,
-                            ), // ← PhoneInputField harus punya onChanged juga
+                            ),
                       ),
                       const SizedBox(
                         height: 10,
@@ -150,9 +239,7 @@ class _RegisterScreenState
                         label: 'Password',
                         hint: 'Masukkan Password',
                         prefixIcon: Icons.lock_outline_rounded,
-                        controller: TextEditingController(
-                          text: _controller.data.password,
-                        ),
+                        controller: _passwordController, // Gunakan controller yang sudah dibuat
                         obscure: _controller.obscurePassword,
                         errorText: _controller.passwordError,
                         onChanged:
@@ -160,7 +247,7 @@ class _RegisterScreenState
                               value,
                             ) => _controller.updatePassword(
                               value,
-                            ), // ← Sekarang tidak merah
+                            ),
                         suffix: IconButton(
                           onPressed: _controller.togglePasswordVisibility,
                           icon: Icon(
@@ -177,9 +264,7 @@ class _RegisterScreenState
                         label: 'Konfirmasi Password',
                         hint: 'Masukkan Konfirmasi Password',
                         prefixIcon: Icons.lock_outline_rounded,
-                        controller: TextEditingController(
-                          text: _controller.data.confirmPassword,
-                        ),
+                        controller: _confirmPasswordController, // Gunakan controller yang sudah dibuat
                         obscure: _controller.obscureConfirmPassword,
                         errorText: _controller.confirmPasswordError,
                         onChanged:
@@ -187,7 +272,7 @@ class _RegisterScreenState
                               value,
                             ) => _controller.updateConfirmPassword(
                               value,
-                            ), // ← Sekarang tidak merah
+                            ),
                         suffix: IconButton(
                           onPressed: _controller.toggleConfirmPasswordVisibility,
                           icon: Icon(

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:wushlaundry/constants/app_colors.dart';
-import 'package:wushlaundry/constants/app_spacing.dart';
-import 'package:wushlaundry/constants/app_text_styles.dart';
-import 'package:wushlaundry/views/widgets/login_modal_sheet.dart';
-import 'package:wushlaundry/views/widgets/navy_app_bar.dart';
+import 'package:wushlaundry/controllers/offer_controller.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_spacing.dart';
+import '../../constants/app_text_styles.dart';
+import '../widgets/navy_app_bar.dart';
+import '../widgets/promo_card_widget.dart';
+import '../../models/offer_model.dart';
 
 class OffersScreen
     extends
@@ -20,22 +21,16 @@ class OffersScreen
   final bool loggedIn;
   final VoidCallback? onOpenServices;
 
-  void _handleTap(
-    BuildContext context,
-  ) {
-    if (!loggedIn) {
-      showLoginModal(
-        context,
-      );
-      return;
-    }
-    onOpenNotifications?.call();
-  }
-
   @override
   Widget build(
     BuildContext context,
   ) {
+    final controller = OffersController(
+      loggedIn: loggedIn,
+      onOpenNotifications: onOpenNotifications,
+      onOpenServices: onOpenServices,
+    );
+
     return Scaffold(
       backgroundColor: AppColors.headerNavy,
       body: Column(
@@ -48,7 +43,7 @@ class OffersScreen
                   right: 20,
                 ),
                 child: GestureDetector(
-                  onTap: () => _handleTap(
+                  onTap: () => controller.handleNotificationTap(
                     context,
                   ),
                   child: const Icon(
@@ -84,110 +79,58 @@ class OffersScreen
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Tawaran Pengguna Baru',
-                      style: AppTextStyles.sectionTitle,
-                    ),
-                    const SizedBox(
-                      height: AppSpacing.md,
-                    ),
+                    // New User Offers Section
+                    if (controller.getNewUserOffers().isNotEmpty) ...[
+                      Text(
+                        controller.getNewUserOffers().first.category.displayTitle,
+                        style: AppTextStyles.sectionTitle,
+                      ),
+                      const SizedBox(
+                        height: AppSpacing.md,
+                      ),
+                      ...controller.getNewUserOffers().map(
+                        (
+                          offer,
+                        ) => PromoCardWidget(
+                          imagePath: offer.imagePath,
+                          onTap: () => controller.handlePromoCardTap(
+                            context,
+                            offer,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: AppSpacing.xl,
+                      ),
+                    ],
 
-                    _promoCard(
-                      context: context,
-                      imagePath: 'assets/images/promos.png',
-                      promoCode: 'SSSd789',
-                    ),
-
-                    const SizedBox(
-                      height: AppSpacing.xl,
-                    ),
-
-                    Text(
-                      'Penawaran Khusus',
-                      style: AppTextStyles.sectionTitle,
-                    ),
-                    const SizedBox(
-                      height: AppSpacing.md,
-                    ),
-
-                    _promoCard(
-                      context: context,
-                      imagePath: 'assets/images/pays.png',
-                      promoCode: 'PAYDAYWUSH',
-                    ),
-
-                    _promoCard(
-                      context: context,
-                      imagePath: 'assets/images/bedcovers.png',
-                      promoCode: 'BERSIHSPREI',
-                    ),
+                    // Special Offers Section
+                    if (controller.getSpecialOffers().isNotEmpty) ...[
+                      Text(
+                        controller.getSpecialOffers().first.category.displayTitle,
+                        style: AppTextStyles.sectionTitle,
+                      ),
+                      const SizedBox(
+                        height: AppSpacing.md,
+                      ),
+                      ...controller.getSpecialOffers().map(
+                        (
+                          offer,
+                        ) => PromoCardWidget(
+                          imagePath: offer.imagePath,
+                          onTap: () => controller.handlePromoCardTap(
+                            context,
+                            offer,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _promoCard({
-    required BuildContext context,
-    required String imagePath,
-    String? promoCode,
-  }) {
-    return GestureDetector(
-      onTap: () async {
-        if (!loggedIn) {
-          showLoginModal(
-            context,
-          );
-          return;
-        }
-
-        if (promoCode !=
-            null) {
-          await Clipboard.setData(
-            ClipboardData(
-              text: promoCode,
-            ),
-          );
-
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Kode $promoCode berhasil disalin',
-              ),
-              duration: const Duration(
-                milliseconds: 800,
-              ),
-            ),
-          );
-        }
-
-        await Future.delayed(
-          const Duration(
-            milliseconds: 500,
-          ),
-        );
-
-        onOpenServices?.call();
-      },
-      child: Container(
-        margin: const EdgeInsets.only(
-          bottom: 12,
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(
-            20,
-          ),
-          child: Image.asset(
-            imagePath,
-            fit: BoxFit.contain,
-          ),
-        ),
       ),
     );
   }

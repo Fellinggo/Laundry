@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../constants/app_colors.dart';
-import '../../constants/app_spacing.dart';
-import '../../constants/app_text_styles.dart';
+import '../../../constants/app_colors.dart';
+import '../../../constants/app_spacing.dart';
+import '../../../constants/app_text_styles.dart';
 
 class PaymentMethodTile
     extends
         StatelessWidget {
+  final String title;
+  final bool connected;
+  final Widget? leading;
+  final VoidCallback? onTap;
+
   const PaymentMethodTile({
     super.key,
     required this.title,
@@ -13,11 +18,6 @@ class PaymentMethodTile
     this.leading,
     this.onTap,
   });
-
-  final String title;
-  final bool connected;
-  final Widget? leading;
-  final VoidCallback? onTap;
 
   @override
   Widget build(
@@ -31,9 +31,6 @@ class PaymentMethodTile
           AppSpacing.cardRadius,
         ),
         child: Container(
-          margin: const EdgeInsets.only(
-            bottom: AppSpacing.md,
-          ),
           padding: const EdgeInsets.symmetric(
             horizontal: 14,
             vertical: 14,
@@ -56,7 +53,6 @@ class PaymentMethodTile
                   width: 12,
                 ),
               ],
-
               Expanded(
                 child: Text(
                   title,
@@ -65,7 +61,6 @@ class PaymentMethodTile
                   ),
                 ),
               ),
-
               if (connected)
                 Row(
                   children: [
@@ -87,49 +82,6 @@ class PaymentMethodTile
                   ],
                 ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class WalletLogoBox
-    extends
-        StatelessWidget {
-  const WalletLogoBox({
-    super.key,
-    required this.label,
-    required this.color,
-  });
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(
-    BuildContext context,
-  ) {
-    return Container(
-      width: 38,
-      height: 38,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: color.withOpacity(
-          0.15,
-        ),
-        border: Border.all(
-          color: color,
-        ),
-      ),
-
-      child: FittedBox(
-        child: Text(
-          label,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: color,
           ),
         ),
       ),

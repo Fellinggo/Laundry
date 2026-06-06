@@ -10,10 +10,10 @@ import '../widgets/navy_app_bar.dart';
 import '../widgets/rounded_white_panel.dart';
 import '../widgets/policy_bullet_widget.dart';
 
-class PrivacyPolicyScreenWithProvider
+class PrivacyPolicyScreen
     extends
         StatelessWidget {
-  const PrivacyPolicyScreenWithProvider({
+  const PrivacyPolicyScreen({
     super.key,
   });
 
