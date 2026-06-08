@@ -6,7 +6,7 @@ import '../models/offer_model.dart';
 class OffersController
     extends
         ChangeNotifier {
-  final bool loggedIn;
+  bool _loggedIn;
   final VoidCallback? onOpenNotifications;
   final VoidCallback? onOpenServices;
 
@@ -21,14 +21,25 @@ class OffersController
   >
   get offers => _offers;
   bool get isLoading => _isLoading;
-  bool get isLoggedIn => loggedIn;
+  bool get isLoggedIn => _loggedIn;
 
   OffersController({
-    required this.loggedIn,
+    required bool loggedIn,
     this.onOpenNotifications,
     this.onOpenServices,
-  }) {
+  }) : _loggedIn = loggedIn {
     loadOffers();
+  }
+
+  /// Memperbarui status login secara dinamis dari parameter widget di luar
+  void updateLoginStatus(
+    bool loggedIn,
+  ) {
+    if (_loggedIn !=
+        loggedIn) {
+      _loggedIn = loggedIn;
+      notifyListeners();
+    }
   }
 
   void loadOffers() {
@@ -69,7 +80,7 @@ class OffersController
   void handleNotificationTap(
     BuildContext context,
   ) {
-    if (!loggedIn) {
+    if (!_loggedIn) {
       showLoginModal(
         context,
       );
@@ -85,7 +96,7 @@ class OffersController
     BuildContext context,
     OfferModel offer,
   ) async {
-    if (!loggedIn) {
+    if (!_loggedIn) {
       showLoginModal(
         context,
       );

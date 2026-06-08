@@ -1,55 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wushlaundry/controllers/splash_controller.dart';
 
 class SplashScreen
     extends
-        StatefulWidget {
+        StatelessWidget {
   const SplashScreen({
     super.key,
   });
 
   @override
-  State<
-    SplashScreen
-  >
-  createState() => _SplashScreenState();
+  Widget build(
+    BuildContext context,
+  ) {
+    return ChangeNotifierProvider<
+      SplashController
+    >(
+      create:
+          (
+            _,
+          ) => SplashController(),
+      child: const _SplashContent(),
+    );
+  }
 }
 
-class _SplashScreenState
+class _SplashContent
     extends
-        State<
-          SplashScreen
-        > {
-  late SplashController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = SplashController();
-    _controller.addListener(
-      _onControllerChanged,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.removeListener(
-      _onControllerChanged,
-    );
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _onControllerChanged() {
-    // Ketika timer selesai, controller akan memanggil notifyListeners()
-    // Ini akan memicu navigasi
-    if (mounted &&
-        !_controller.isNavigating) {
-      _controller.navigateToNextScreen(
-        context,
-      );
-    }
-  }
+        StatelessWidget {
+  const _SplashContent();
 
   @override
   Widget build(
@@ -58,7 +37,57 @@ class _SplashScreenState
     final size = MediaQuery.of(
       context,
     ).size;
-    final splashModel = _controller.splashModel;
+
+    // Mengambil data model splash secara atomik
+    final splashModel =
+        context.select<
+          SplashController,
+          dynamic
+        >(
+          (
+            c,
+          ) => c.splashModel,
+        );
+
+    // Mendengarkan status perubahan timer
+    final timerFinished =
+        context.select<
+          SplashController,
+          bool
+        >(
+          (
+            c,
+          ) => c.timerFinished,
+        );
+    final isNavigating =
+        context.select<
+          SplashController,
+          bool
+        >(
+          (
+            c,
+          ) => c.isNavigating,
+        );
+
+    // Memicu navigasi aman setelah frame UI selesai digambar sepenuhnya
+    if (timerFinished &&
+        !isNavigating) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (
+          _,
+        ) {
+          if (context.mounted) {
+            context
+                .read<
+                  SplashController
+                >()
+                .navigateToNextScreen(
+                  context,
+                );
+          }
+        },
+      );
+    }
 
     return Scaffold(
       backgroundColor: splashModel.backgroundColor,

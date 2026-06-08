@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wushlaundry/controllers/payment_method_controller.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_spacing.dart';
@@ -17,62 +18,84 @@ class PaymentMethodScreen
   Widget build(
     BuildContext context,
   ) {
-    final controller = PaymentController();
-    final orderData = controller.getOrderData(
-      context,
-    );
-    final methods = controller.getPaymentMethods();
-
-    return Scaffold(
-      backgroundColor: AppColors.pageBg,
-      appBar: AppBar(
-        backgroundColor: AppColors.white,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: AppColors.headerNavy,
-          ),
-          onPressed: () => controller.goBack(
-            context,
-          ),
-        ),
-        title: Text(
-          'Pilih Metode Pembayaran',
-          style: AppTextStyles.screenTitleNavy,
-        ),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(
-          AppSpacing.xl,
-        ),
-        children: methods.map(
+    return ChangeNotifierProvider<
+      PaymentController
+    >(
+      create:
           (
-            method,
-          ) {
-            return Column(
-              children: [
-                PaymentMethodTile(
-                  title: method.name,
-                  connected: method.isConnected,
-                  leading: WalletLogoBox(
-                    label: method.logoLabel,
-                    color: method.color,
+            _,
+          ) => PaymentController(),
+      child: Builder(
+        builder:
+            (
+              context,
+            ) {
+              // Menggunakan context dari Builder untuk mengakses Provider yang baru dibuat
+              final controller = context
+                  .read<
+                    PaymentController
+                  >();
+              final orderData = controller.getOrderData(
+                context,
+              );
+              final methods = controller.getPaymentMethods();
+
+              return Scaffold(
+                backgroundColor: AppColors.pageBg,
+                appBar: AppBar(
+                  backgroundColor: AppColors.white,
+                  elevation: 0,
+                  centerTitle: true,
+                  leading: IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: AppColors.headerNavy,
+                    ),
+                    onPressed: () => controller.goBack(
+                      context,
+                    ),
                   ),
-                  onTap: () => controller.onMethodTap(
-                    context,
-                    method,
-                    orderData,
+                  title: Text(
+                    'Pilih Metode Pembayaran',
+                    style: AppTextStyles.screenTitleNavy,
                   ),
                 ),
-                const SizedBox(
-                  height: 12,
+                body: ListView.separated(
+                  padding: const EdgeInsets.all(
+                    AppSpacing.xl,
+                  ),
+                  itemCount: methods.length,
+                  separatorBuilder:
+                      (
+                        context,
+                        index,
+                      ) => const SizedBox(
+                        height: 12,
+                      ),
+                  itemBuilder:
+                      (
+                        context,
+                        index,
+                      ) {
+                        final method = methods[index];
+
+                        return PaymentMethodTile(
+                          title: method.name,
+                          connected: method.isConnected,
+                          leading: WalletLogoBox(
+                            label: method.logoLabel,
+                            color: method.color,
+                          ),
+                          onTap: () => controller.onMethodTap(
+                            context,
+                            method,
+                            orderData,
+                          ),
+                        );
+                      },
                 ),
-              ],
-            );
-          },
-        ).toList(),
+              );
+            },
       ),
     );
   }

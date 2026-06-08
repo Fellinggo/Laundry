@@ -65,8 +65,6 @@ class PrivacyPolicyController
   void onLearnMorePressed(
     BuildContext context,
   ) {
-    // Implementasi navigasi ke halaman detail cookie
-    // Contoh: Navigator.pushNamed(context, '/cookie-policy');
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(

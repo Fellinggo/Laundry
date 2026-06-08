@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wushlaundry/views/widgets/onboarding_navigation_button.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_spacing.dart';
@@ -8,58 +9,23 @@ import '../../controllers/onboarding_controller.dart';
 
 class OnboardingScreen
     extends
-        StatefulWidget {
+        StatelessWidget {
   const OnboardingScreen({
     super.key,
   });
 
   @override
-  State<
-    OnboardingScreen
-  >
-  createState() => _OnboardingScreenState();
-}
-
-class _OnboardingScreenState
-    extends
-        State<
-          OnboardingScreen
-        > {
-  late OnboardingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = OnboardingController();
-    _controller.addListener(
-      _onControllerChanged,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.removeListener(
-      _onControllerChanged,
-    );
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _onControllerChanged() {
-    if (mounted) {
-      setState(
-        () {},
-      );
-    }
-  }
-
-  @override
   Widget build(
     BuildContext context,
   ) {
-    final pages = _controller.pages;
-    final currentIndex = _controller.currentIndex;
-    final currentPage = _controller.currentPage;
+    // Memantau state OnboardingController secara reaktif
+    final controller = context
+        .watch<
+          OnboardingController
+        >();
+    final pages = controller.pages;
+    final currentIndex = controller.currentIndex;
+    final currentPage = controller.currentPage;
 
     return Scaffold(
       backgroundColor: AppColors.onboardingBg,
@@ -68,12 +34,12 @@ class _OnboardingScreenState
           children: [
             Expanded(
               child: PageView.builder(
-                controller: _controller.pageController,
+                controller: controller.pageController,
                 itemCount: pages.length,
                 onPageChanged:
                     (
                       index,
-                    ) => _controller.onPageChanged(
+                    ) => controller.onPageChanged(
                       index,
                     ),
                 itemBuilder:
@@ -110,12 +76,12 @@ class _OnboardingScreenState
               ),
               child: OnboardingNavigationButtons(
                 isFinalPage: currentPage.isFinalPage,
-                isLastPage: _controller.isLastPage,
-                onSkip: () => _controller.skipToLastPage(),
-                onNext: () => _controller.nextPage(
+                isLastPage: controller.isLastPage,
+                onSkip: () => controller.skipToLastPage(),
+                onNext: () => controller.nextPage(
                   context,
                 ),
-                onStart: () => _controller.goToMain(
+                onStart: () => controller.goToMain(
                   context,
                 ),
               ),

@@ -1,6 +1,9 @@
+import 'package:flutter/material.dart';
 import '../models/address_model.dart';
 
-class AddAddressController {
+class AddAddressController
+    extends
+        ChangeNotifier {
   final List<
     String
   >
@@ -12,41 +15,70 @@ class AddAddressController {
     'Lainnya',
   ];
 
-  String? validateTitle(
-    String? title,
+  String? _selectedTitle;
+  String? _titleError;
+  String? _addressError;
+
+  // Getters untuk UI
+  String? get selectedTitle => _selectedTitle;
+  String? get titleError => _titleError;
+  String? get addressError => _addressError;
+
+  /// Update pilihan tipe alamat dan hapus error-nya jika ada
+  void selectTitle(
+    String? value,
   ) {
-    if (title ==
+    _selectedTitle = value;
+    _titleError = null;
+    notifyListeners();
+  }
+
+  /// Validasi internal state
+  bool validate(
+    String addressText,
+  ) {
+    final addressValue = addressText.trim();
+
+    // 1. Validasi Tipe Alamat
+    if (_selectedTitle ==
             null ||
-        title.isEmpty) {
-      return 'Pilih tipe alamat';
-    }
-    return null;
-  }
-
-  String? validateAddress(
-    String address,
-  ) {
-    final value = address.trim();
-
-    if (value.isEmpty) {
-      return 'Alamat tidak boleh kosong';
+        _selectedTitle!.isEmpty) {
+      _titleError = 'Pilih tipe alamat';
+    } else {
+      _titleError = null;
     }
 
-    if (value.length <
+    // 2. Validasi Konten Alamat
+    if (addressValue.isEmpty) {
+      _addressError = 'Alamat tidak boleh kosong';
+    } else if (addressValue.length <
         10) {
-      return 'Alamat terlalu pendek (minimal 10 karakter)';
+      _addressError = 'Alamat terlalu pendek (minimal 10 karakter)';
+    } else {
+      _addressError = null;
     }
 
-    return null;
+    notifyListeners();
+    return _titleError ==
+            null &&
+        _addressError ==
+            null;
   }
 
-  AddressModel createAddress({
-    required String title,
-    required String address,
-  }) {
+  /// Membuat model data alamat setelah validasi sukses
+  AddressModel createAddress(
+    String addressText,
+  ) {
     return AddressModel(
-      title: title,
-      address: address.trim(),
+      title: _selectedTitle!,
+      address: addressText.trim(),
     );
+  }
+
+  /// Reset state ketika screen ditutup atau dihancurkan
+  void resetState() {
+    _selectedTitle = null;
+    _titleError = null;
+    _addressError = null;
   }
 }

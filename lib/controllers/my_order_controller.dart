@@ -6,7 +6,7 @@ import '../models/user_order_model.dart';
 class MyOrdersController
     extends
         ChangeNotifier {
-  final bool loggedIn;
+  bool _loggedIn;
 
   int _currentTab = 0;
   List<
@@ -37,12 +37,23 @@ class MyOrdersController
   >
   get completedOrders => _completedOrders;
   bool get isLoading => _isLoading;
-  bool get isLoggedIn => loggedIn;
+  bool get isLoggedIn => _loggedIn;
 
   MyOrdersController({
-    required this.loggedIn,
-  }) {
+    required bool loggedIn,
+  }) : _loggedIn = loggedIn {
     loadOrders();
+  }
+
+  /// Memperbarui status login dari luar (misal jika ada perubahan state di MainShell)
+  void updateLoginStatus(
+    bool loggedIn,
+  ) {
+    if (_loggedIn !=
+        loggedIn) {
+      _loggedIn = loggedIn;
+      loadOrders();
+    }
   }
 
   void changeTab(
@@ -114,7 +125,6 @@ class MyOrdersController
           totalPrice,
         );
 
-        // Jika orderId valid dan ada isinya, pertahankan (jangan dihapus otomatis)
         if (orderId.isNotEmpty &&
             orderId !=
                 '100001')
@@ -268,7 +278,7 @@ class MyOrdersController
     notifyListeners();
 
     final prefs = await SharedPreferences.getInstance();
-    final isLoggedIn = loggedIn;
+    final isLoggedIn = _loggedIn;
 
     debugPrint(
       '========== MY ORDERS SCREEN ==========',

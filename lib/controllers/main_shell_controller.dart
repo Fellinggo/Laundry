@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wushlaundry/views/widgets/login_modal_sheet.dart';
-import '../models/main_shell_model.dart';
+import '../models/main_shell_model.dart'; // Tetap mengimpor model milikmu
 import '../views/screens/home_screen.dart';
 
 class MainShellController
@@ -74,9 +74,8 @@ class MainShellController
         selectedIndex: index,
       );
 
-      // SETIAP KALI PINDAH TAB, kita update nilai pemicu agar widget dengan key ini di-rebuild ulang datanya
+      // Setiap kali pindah tab, perbarui nilai pemicu timestamp
       _tabUpdateTrigger = DateTime.now().millisecondsSinceEpoch;
-
       notifyListeners();
     }
   }

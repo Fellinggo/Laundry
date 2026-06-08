@@ -164,11 +164,21 @@ class SettingsController
       builder:
           (
             ctx,
-          ) => LanguageSheetWidget(
-            selectedIndex: _settings.selectedLanguageIndex,
-            languageOptions: _settings.languageOptions,
-            onLanguageSelected: changeLanguage,
-          ),
+          ) {
+            // Menggunakan context dari Screen utama agar perubahan bahasa langsung merender ulang UI
+            return LanguageSheetWidget(
+              selectedIndex: _settings.selectedLanguageIndex,
+              languageOptions: _settings.languageOptions,
+              onLanguageSelected:
+                  (
+                    index,
+                  ) {
+                    changeLanguage(
+                      index,
+                    );
+                  },
+            );
+          },
     );
   }
 

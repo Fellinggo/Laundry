@@ -28,8 +28,8 @@ class HomeController
   String? get userFirstName => _user?.firstName;
 
   HomeController() {
-    loadUserData();
-    loadActiveOrders();
+    // Memuat data awal saat pertama kali didaftarkan/dibuat
+    refreshData();
   }
 
   Future<
@@ -55,7 +55,6 @@ class HomeController
     notifyListeners();
   }
 
-  // Tambahkan method ini untuk refresh data user dari luar
   Future<
     void
   >
@@ -108,19 +107,6 @@ class HomeController
       ...processRaw,
     ];
 
-    print(
-      '========== HOME SCREEN ==========',
-    );
-    print(
-      'Jumlah pesanan di SharedPreferences: ${ordersRaw.length}',
-    );
-    print(
-      'active_orders: ${activeRaw.length}',
-    );
-    print(
-      'process_orders: ${processRaw.length}',
-    );
-
     final List<
       String
     >
@@ -152,18 +138,6 @@ class HomeController
         );
       },
     ).toList();
-
-    print(
-      'Active orders loaded: ${_activeOrders.length}',
-    );
-    for (var order in _activeOrders) {
-      print(
-        '   - Order ID: ${order.orderId}',
-      );
-    }
-    print(
-      '==================================',
-    );
 
     _isLoading = false;
     notifyListeners();

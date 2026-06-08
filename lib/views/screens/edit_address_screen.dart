@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_spacing.dart';
@@ -24,12 +25,8 @@ class _EditAddressScreenState
         State<
           EditAddressScreen
         > {
-  final controller = EditAddressController();
-
   final titleController = TextEditingController();
-
   final addressController = TextEditingController();
-
   bool _isLoaded = false;
 
   @override
@@ -38,19 +35,25 @@ class _EditAddressScreenState
 
     if (_isLoaded) return;
 
+    // Mengambil argument dari Navigator
     final args =
         ModalRoute.of(
               context,
             )?.settings.arguments
             as Map?;
 
-    final addressData = controller.loadAddress(
+    // Memanggil fungsi load pada Provider
+    final editProvider = context
+        .read<
+          EditAddressController
+        >();
+    editProvider.loadAddress(
       args,
     );
 
-    titleController.text = addressData.title;
-
-    addressController.text = addressData.address;
+    // Sinkronisasi data dari Provider ke TextFields
+    titleController.text = editProvider.title;
+    addressController.text = editProvider.address;
 
     _isLoaded = true;
   }
@@ -63,7 +66,12 @@ class _EditAddressScreenState
   }
 
   void _save() {
-    final addressData = controller.saveAddress(
+    final editProvider = context
+        .read<
+          EditAddressController
+        >();
+
+    final addressData = editProvider.saveAddress(
       title: titleController.text,
       address: addressController.text,
     );
@@ -116,11 +124,9 @@ class _EditAddressScreenState
                 "Judul Alamat",
                 style: AppTextStyles.sectionTitle,
               ),
-
               const SizedBox(
                 height: 8,
               ),
-
               TextField(
                 controller: titleController,
                 decoration: InputDecoration(
@@ -135,20 +141,16 @@ class _EditAddressScreenState
                   ),
                 ),
               ),
-
               const SizedBox(
                 height: AppSpacing.lg,
               ),
-
               Text(
                 "Alamat Lengkap",
                 style: AppTextStyles.sectionTitle,
               ),
-
               const SizedBox(
                 height: 8,
               ),
-
               TextField(
                 controller: addressController,
                 maxLines: 4,
@@ -164,9 +166,7 @@ class _EditAddressScreenState
                   ),
                 ),
               ),
-
               const Spacer(),
-
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

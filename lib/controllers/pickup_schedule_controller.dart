@@ -6,7 +6,7 @@ class PickupScheduleController
     extends
         ChangeNotifier {
   PickupScheduleData _data = PickupScheduleData();
-  TextEditingController customAddressController = TextEditingController();
+  final TextEditingController customAddressController = TextEditingController();
 
   PickupScheduleData get data => _data;
   bool get isLoadingAddresses => _data.isLoadingAddresses;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_spacing.dart';
 import '../widgets/curved_navy_header.dart';
@@ -9,156 +10,73 @@ import '../../controllers/register_controller.dart';
 
 class RegisterScreen
     extends
-        StatefulWidget {
+        StatelessWidget {
   const RegisterScreen({
     super.key,
   });
 
   @override
-  State<
-    RegisterScreen
-  >
-  createState() => _RegisterScreenState();
+  Widget build(
+    BuildContext context,
+  ) {
+    return ChangeNotifierProvider<
+      RegisterController
+    >(
+      create:
+          (
+            _,
+          ) => RegisterController(),
+      child: const _RegisterContent(),
+    );
+  }
 }
 
-class _RegisterScreenState
+class _RegisterContent
+    extends
+        StatefulWidget {
+  const _RegisterContent();
+
+  @override
+  State<
+    _RegisterContent
+  >
+  createState() => _RegisterContentState();
+}
+
+class _RegisterContentState
     extends
         State<
-          RegisterScreen
+          _RegisterContent
         > {
-  late RegisterController _controller;
-
-  // Buat TextEditingController di sini, bukan di build
-  late final TextEditingController _nameController;
-  late final TextEditingController _emailController;
+  // Hanya membuat satu controller khusus untuk PhoneInputField menjamin tidak error merah lagi
   late final TextEditingController _phoneController;
-  late final TextEditingController _passwordController;
-  late final TextEditingController _confirmPasswordController;
 
   @override
   void initState() {
     super.initState();
-    _controller = RegisterController();
-    _controller.addListener(
-      _onControllerChanged,
-    );
-
-    // Inisialisasi controllers
-    _nameController = TextEditingController();
-    _emailController = TextEditingController();
     _phoneController = TextEditingController();
-    _passwordController = TextEditingController();
-    _confirmPasswordController = TextEditingController();
-
-    // Setup listeners untuk sync dengan controller
-    _nameController.addListener(
-      () {
-        if (_nameController.text !=
-            _controller.data.name) {
-          _controller.updateName(
-            _nameController.text,
-          );
-        }
-      },
-    );
-    _emailController.addListener(
-      () {
-        if (_emailController.text !=
-            _controller.data.email) {
-          _controller.updateEmail(
-            _emailController.text,
-          );
-        }
-      },
-    );
-    _phoneController.addListener(
-      () {
-        if (_phoneController.text !=
-            _controller.data.phone) {
-          _controller.updatePhone(
-            _phoneController.text,
-          );
-        }
-      },
-    );
-    _passwordController.addListener(
-      () {
-        if (_passwordController.text !=
-            _controller.data.password) {
-          _controller.updatePassword(
-            _passwordController.text,
-          );
-        }
-      },
-    );
-    _confirmPasswordController.addListener(
-      () {
-        if (_confirmPasswordController.text !=
-            _controller.data.confirmPassword) {
-          _controller.updateConfirmPassword(
-            _confirmPasswordController.text,
-          );
-        }
-      },
-    );
   }
 
   @override
   void dispose() {
-    _controller.removeListener(
-      _onControllerChanged,
-    );
-    _controller.dispose();
-
-    // Dispose semua controllers
-    _nameController.dispose();
-    _emailController.dispose();
     _phoneController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-
     super.dispose();
-  }
-
-  void _onControllerChanged() {
-    if (mounted) {
-      // Update text controllers jika data berubah dari luar
-      if (_nameController.text !=
-          _controller.data.name) {
-        _nameController.text = _controller.data.name;
-      }
-      if (_emailController.text !=
-          _controller.data.email) {
-        _emailController.text = _controller.data.email;
-      }
-      if (_phoneController.text !=
-          _controller.data.phone) {
-        _phoneController.text = _controller.data.phone;
-      }
-      if (_passwordController.text !=
-          _controller.data.password) {
-        _passwordController.text = _controller.data.password;
-      }
-      if (_confirmPasswordController.text !=
-          _controller.data.confirmPassword) {
-        _confirmPasswordController.text = _controller.data.confirmPassword;
-      }
-      setState(
-        () {},
-      );
-    }
   }
 
   Future<
     void
   >
   _handleRegister() async {
-    final success = await _controller.register(
+    final controller = context
+        .read<
+          RegisterController
+        >();
+    final success = await controller.register(
       context,
     );
     if (success &&
         mounted) {
-      _controller.navigateToMain(
+      controller.navigateToMain(
         context,
       );
     }
@@ -168,6 +86,77 @@ class _RegisterScreenState
   Widget build(
     BuildContext context,
   ) {
+    final controller = context
+        .read<
+          RegisterController
+        >();
+
+    // Menyeleksi variabel internal state secara atomik (mencegah rebuild tak perlu)
+    final isLoading =
+        context.select<
+          RegisterController,
+          bool
+        >(
+          (
+            c,
+          ) => c.isLoading,
+        );
+    final obscurePassword =
+        context.select<
+          RegisterController,
+          bool
+        >(
+          (
+            c,
+          ) => c.obscurePassword,
+        );
+    final obscureConfirmPassword =
+        context.select<
+          RegisterController,
+          bool
+        >(
+          (
+            c,
+          ) => c.obscureConfirmPassword,
+        );
+
+    final emailError =
+        context.select<
+          RegisterController,
+          String?
+        >(
+          (
+            c,
+          ) => c.emailError,
+        );
+    final phoneError =
+        context.select<
+          RegisterController,
+          String?
+        >(
+          (
+            c,
+          ) => c.phoneError,
+        );
+    final passwordError =
+        context.select<
+          RegisterController,
+          String?
+        >(
+          (
+            c,
+          ) => c.passwordError,
+        );
+    final confirmPasswordError =
+        context.select<
+          RegisterController,
+          String?
+        >(
+          (
+            c,
+          ) => c.confirmPasswordError,
+        );
+
     return Scaffold(
       backgroundColor: AppColors.pageBg,
       body: Column(
@@ -195,11 +184,10 @@ class _RegisterScreenState
                         label: 'Nama Lengkap',
                         hint: 'Masukkan Nama Lengkap',
                         prefixIcon: Icons.person_outline_rounded,
-                        controller: _nameController, // Gunakan controller yang sudah dibuat
                         onChanged:
                             (
                               value,
-                            ) => _controller.updateName(
+                            ) => controller.updateName(
                               value,
                             ),
                       ),
@@ -210,12 +198,11 @@ class _RegisterScreenState
                         label: 'Email',
                         hint: 'Masukkan Email',
                         prefixIcon: Icons.email_outlined,
-                        controller: _emailController, // Gunakan controller yang sudah dibuat
-                        errorText: _controller.emailError,
+                        errorText: emailError,
                         onChanged:
                             (
                               value,
-                            ) => _controller.updateEmail(
+                            ) => controller.updateEmail(
                               value,
                             ),
                       ),
@@ -223,12 +210,12 @@ class _RegisterScreenState
                         height: 10,
                       ),
                       PhoneInputField(
-                        controller: _phoneController, // Gunakan controller yang sudah dibuat
-                        errorText: _controller.phoneError,
+                        controller: _phoneController, // Diisi kembali agar widget kustom tidak merah
+                        errorText: phoneError,
                         onChanged:
                             (
                               value,
-                            ) => _controller.updatePhone(
+                            ) => controller.updatePhone(
                               value,
                             ),
                       ),
@@ -239,19 +226,18 @@ class _RegisterScreenState
                         label: 'Password',
                         hint: 'Masukkan Password',
                         prefixIcon: Icons.lock_outline_rounded,
-                        controller: _passwordController, // Gunakan controller yang sudah dibuat
-                        obscure: _controller.obscurePassword,
-                        errorText: _controller.passwordError,
+                        obscure: obscurePassword,
+                        errorText: passwordError,
                         onChanged:
                             (
                               value,
-                            ) => _controller.updatePassword(
+                            ) => controller.updatePassword(
                               value,
                             ),
                         suffix: IconButton(
-                          onPressed: _controller.togglePasswordVisibility,
+                          onPressed: controller.togglePasswordVisibility,
                           icon: Icon(
-                            _controller.obscurePassword
+                            obscurePassword
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined,
                           ),
@@ -264,19 +250,18 @@ class _RegisterScreenState
                         label: 'Konfirmasi Password',
                         hint: 'Masukkan Konfirmasi Password',
                         prefixIcon: Icons.lock_outline_rounded,
-                        controller: _confirmPasswordController, // Gunakan controller yang sudah dibuat
-                        obscure: _controller.obscureConfirmPassword,
-                        errorText: _controller.confirmPasswordError,
+                        obscure: obscureConfirmPassword,
+                        errorText: confirmPasswordError,
                         onChanged:
                             (
                               value,
-                            ) => _controller.updateConfirmPassword(
+                            ) => controller.updateConfirmPassword(
                               value,
                             ),
                         suffix: IconButton(
-                          onPressed: _controller.toggleConfirmPasswordVisibility,
+                          onPressed: controller.toggleConfirmPasswordVisibility,
                           icon: Icon(
-                            _controller.obscureConfirmPassword
+                            obscureConfirmPassword
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined,
                           ),
@@ -286,10 +271,10 @@ class _RegisterScreenState
                         height: 18,
                       ),
                       PrimaryButton(
-                        label: _controller.isLoading
+                        label: isLoading
                             ? 'Memproses...'
                             : 'Daftar',
-                        onPressed: _controller.isLoading
+                        onPressed: isLoading
                             ? null
                             : _handleRegister,
                       ),

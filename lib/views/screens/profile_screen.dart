@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_spacing.dart';
 import '../../constants/app_text_styles.dart';
@@ -10,73 +11,87 @@ import '../../controllers/profile_controller.dart';
 
 class ProfileScreen
     extends
-        StatefulWidget {
+        StatelessWidget {
+  final bool embedded;
+
   const ProfileScreen({
     super.key,
     this.embedded = false,
   });
 
-  final bool embedded;
-
   @override
-  State<
-    ProfileScreen
-  >
-  createState() => _ProfileScreenState();
+  Widget build(
+    BuildContext context,
+  ) {
+    // Menginisialisasi controller menggunakan ChangeNotifierProvider jika belum di-provide di root atasnya
+    return ChangeNotifierProvider<
+      ProfileController
+    >(
+      create:
+          (
+            _,
+          ) => ProfileController(),
+      child: const _ProfileContent(),
+    );
+  }
 }
 
-class _ProfileScreenState
+class _ProfileContent
     extends
-        State<
-          ProfileScreen
-        > {
-  late ProfileController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = ProfileController();
-    _controller.addListener(
-      _onControllerChanged,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.removeListener(
-      _onControllerChanged,
-    );
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _onControllerChanged() {
-    if (mounted) {
-      setState(
-        () {},
-      );
-    }
-  }
+        StatelessWidget {
+  const _ProfileContent();
 
   @override
   Widget build(
     BuildContext context,
   ) {
-    final profile = _controller.profile;
-    final isLoggedIn = _controller.isLoggedIn;
-    final addresses = _controller.addresses;
+    final controller = context
+        .read<
+          ProfileController
+        >();
+
+    // Menyeleksi data secara reaktif agar komponen rebuild hanya jika field spesifik ini berubah
+    final profile =
+        context.select<
+          ProfileController,
+          dynamic
+        >(
+          (
+            c,
+          ) => c.profile,
+        );
+    final isLoggedIn =
+        context.select<
+          ProfileController,
+          bool
+        >(
+          (
+            c,
+          ) => c.isLoggedIn,
+        );
+    final addresses =
+        context.select<
+          ProfileController,
+          List<
+            dynamic
+          >
+        >(
+          (
+            c,
+          ) => c.addresses,
+        );
 
     final top = ProfileHeaderWidget(
       name: profile.name,
       email: profile.email,
       isLoggedIn: isLoggedIn,
-      onEditName: () => _controller.handleProtectedAction(
+      onEditName: () => controller.handleProtectedAction(
         context,
-        () => _controller.editName(
+        () => controller.editName(
           context,
         ),
       ),
-      onSettingsTap: () => _controller.navigateToSettings(
+      onSettingsTap: () => controller.navigateToSettings(
         context,
       ),
     );
@@ -99,9 +114,9 @@ class _ProfileScreenState
                 ),
               ),
               IconButton(
-                onPressed: () => _controller.handleProtectedAction(
+                onPressed: () => controller.handleProtectedAction(
                   context,
-                  () => _controller.addNewAddress(
+                  () => controller.addNewAddress(
                     context,
                   ),
                 ),
@@ -129,16 +144,16 @@ class _ProfileScreenState
                       index: i,
                       title: address.title,
                       address: address.address,
-                      onEdit: () => _controller.handleProtectedAction(
+                      onEdit: () => controller.handleProtectedAction(
                         context,
-                        () => _controller.editAddress(
+                        () => controller.editAddress(
                           context,
                           i,
                         ),
                       ),
-                      onDelete: () => _controller.handleProtectedAction(
+                      onDelete: () => controller.handleProtectedAction(
                         context,
-                        () => _controller.deleteAddress(
+                        () => controller.deleteAddress(
                           i,
                         ),
                       ),
@@ -153,12 +168,12 @@ class _ProfileScreenState
           else
             AddressEmptyWidget(
               isLoggedIn: isLoggedIn,
-              onLoginTap: () => _controller.navigateToLogin(
+              onLoginTap: () => controller.navigateToLogin(
                 context,
               ),
-              onAddAddressTap: () => _controller.handleProtectedAction(
+              onAddAddressTap: () => controller.handleProtectedAction(
                 context,
-                () => _controller.addNewAddress(
+                () => controller.addNewAddress(
                   context,
                 ),
               ),
@@ -167,21 +182,19 @@ class _ProfileScreenState
       ),
     );
 
-    final bodyContent = Column(
-      children: [
-        top,
-        const SizedBox(
-          height: 24,
-        ),
-        Expanded(
-          child: sheet,
-        ),
-      ],
-    );
-
     return Scaffold(
       backgroundColor: AppColors.profileNavy,
-      body: bodyContent,
+      body: Column(
+        children: [
+          top,
+          const SizedBox(
+            height: 24,
+          ),
+          Expanded(
+            child: sheet,
+          ),
+        ],
+      ),
     );
   }
 }

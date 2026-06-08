@@ -20,7 +20,9 @@ class TermsConditionsScreen
   Widget build(
     BuildContext context,
   ) {
-    return ChangeNotifierProvider(
+    return ChangeNotifierProvider<
+      TermsController
+    >(
       create:
           (
             _,
@@ -39,13 +41,10 @@ class _TermsConditionsContent
   Widget build(
     BuildContext context,
   ) {
-    final controller =
-        Provider.of<
+    final controller = context
+        .read<
           TermsController
-        >(
-          context,
-        );
-    final termsModel = controller.termsModel;
+        >();
 
     return Scaffold(
       backgroundColor: AppColors.profileNavy,
@@ -55,19 +54,58 @@ class _TermsConditionsContent
           context,
         ),
       ),
-      body: _buildBody(
-        controller,
-        termsModel,
-      ),
+      body: const _TermsConditionsBody(),
     );
   }
+}
 
-  Widget _buildBody(
-    TermsController controller,
-    TermsModel termsModel,
+class _TermsConditionsBody
+    extends
+        StatelessWidget {
+  const _TermsConditionsBody();
+
+  @override
+  Widget build(
+    BuildContext context,
   ) {
-    // Tampilkan loading indicator jika sedang loading
-    if (controller.isLoading) {
+    final controller = context
+        .read<
+          TermsController
+        >();
+
+    // Pemilihan state atomik: Hanya mendengarkan variabel spesifik yang dibutuhkan
+    final isLoading =
+        context.select<
+          TermsController,
+          bool
+        >(
+          (
+            c,
+          ) => c.isLoading,
+        );
+    final errorMessage =
+        context.select<
+          TermsController,
+          String?
+        >(
+          (
+            c,
+          ) => c.errorMessage,
+        );
+    final sections =
+        context.select<
+          TermsController,
+          List<
+            TermsSection
+          >
+        >(
+          (
+            c,
+          ) => c.termsModel.sections,
+        );
+
+    // 1. State Menampilkan Loading Indicator
+    if (isLoading) {
       return const Center(
         child: CircularProgressIndicator(
           color: AppColors.profileNavy,
@@ -75,15 +113,15 @@ class _TermsConditionsContent
       );
     }
 
-    // Tampilkan pesan error jika ada
-    if (controller.errorMessage !=
+    // 2. State Menampilkan Pesan Error
+    if (errorMessage !=
         null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Terjadi kesalahan: ${controller.errorMessage}',
+              'Terjadi kesalahan: $errorMessage',
               style: AppTextStyles.bodyMuted,
               textAlign: TextAlign.center,
             ),
@@ -104,7 +142,7 @@ class _TermsConditionsContent
       );
     }
 
-    // Tampilkan konten utama
+    // 3. State Menampilkan Konten Utama (Data Sukses Dimuat)
     return SizedBox.expand(
       child: RoundedWhitePanel(
         topRadius: 28,
@@ -114,12 +152,12 @@ class _TermsConditionsContent
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: termsModel.sections.map(
+            children: sections.map(
               (
                 section,
               ) {
-                return _buildSection(
-                  section,
+                return _TermsSectionItem(
+                  section: section,
                 );
               },
             ).toList(),
@@ -128,9 +166,20 @@ class _TermsConditionsContent
       ),
     );
   }
+}
 
-  Widget _buildSection(
-    TermsSection section,
+class _TermsSectionItem
+    extends
+        StatelessWidget {
+  final TermsSection section;
+
+  const _TermsSectionItem({
+    required this.section,
+  });
+
+  @override
+  Widget build(
+    BuildContext context,
   ) {
     final int sectionIndex =
         section.title ==
@@ -181,7 +230,7 @@ class _TermsConditionsContent
               isLastItem: isLastItem,
             );
           },
-        ).toList(),
+        ),
         if (!isLastSection)
           const SizedBox(
             height: AppSpacing.lg,

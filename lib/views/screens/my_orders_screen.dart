@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wushlaundry/controllers/my_order_controller.dart';
 import 'package:wushlaundry/models/user_order_model.dart';
 import 'package:wushlaundry/views/widgets/empty_order_widget.dart';
@@ -11,7 +12,7 @@ import '../widgets/rounded_white_panel.dart';
 
 class MyOrdersScreen
     extends
-        StatefulWidget {
+        StatelessWidget {
   const MyOrdersScreen({
     super.key,
     this.loggedIn = false,
@@ -20,64 +21,26 @@ class MyOrdersScreen
   final bool loggedIn;
 
   @override
-  State<
-    MyOrdersScreen
-  >
-  createState() => _MyOrdersScreenState();
-}
-
-class _MyOrdersScreenState
-    extends
-        State<
-          MyOrdersScreen
-        > {
-  late MyOrdersController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = MyOrdersController(
-      loggedIn: widget.loggedIn,
-    );
-    _controller.addListener(
-      _onControllerChanged,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.removeListener(
-      _onControllerChanged,
-    );
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didUpdateWidget(
-    MyOrdersScreen oldWidget,
-  ) {
-    super.didUpdateWidget(
-      oldWidget,
-    );
-    if (oldWidget.loggedIn !=
-        widget.loggedIn) {
-      _controller.refreshOrders();
-    }
-  }
-
-  void _onControllerChanged() {
-    if (mounted) {
-      setState(
-        () {},
-      );
-    }
-  }
-
-  @override
   Widget build(
     BuildContext context,
   ) {
+    // Memantau controller secara reaktif via provider
+    final controller = context
+        .watch<
+          MyOrdersController
+        >();
+
+    // Menjaga sinkronisasi data apabila parameter "loggedIn" dari MainShell berubah
+    WidgetsBinding.instance.addPostFrameCallback(
+      (
+        _,
+      ) {
+        controller.updateLoginStatus(
+          loggedIn,
+        );
+      },
+    );
+
     return Scaffold(
       body: ColoredBox(
         color: AppColors.ordersNavy,
@@ -108,11 +71,11 @@ class _MyOrdersScreenState
                     child: Column(
                       children: [
                         OrderStatusSegmentedBar(
-                          selectedIndex: _controller.currentTab,
+                          selectedIndex: controller.currentTab,
                           onChanged:
                               (
                                 index,
-                              ) => _controller.changeTab(
+                              ) => controller.changeTab(
                                 index,
                               ),
                         ),
@@ -120,7 +83,9 @@ class _MyOrdersScreenState
                           height: AppSpacing.lg,
                         ),
                         Expanded(
-                          child: _buildContent(),
+                          child: _buildContent(
+                            controller,
+                          ),
                         ),
                       ],
                     ),
@@ -134,54 +99,60 @@ class _MyOrdersScreenState
     );
   }
 
-  Widget _buildContent() {
-    if (_controller.isLoading) {
+  Widget _buildContent(
+    MyOrdersController controller,
+  ) {
+    if (controller.isLoading) {
       return const Center(
         child: CircularProgressIndicator(),
       );
     }
 
-    final currentTab = _controller.currentTab;
+    final currentTab = controller.currentTab;
 
     if (currentTab ==
         0) {
-      if (_controller.activeOrders.isEmpty) {
+      if (controller.activeOrders.isEmpty) {
         return const EmptyOrdersWidget(
           message: 'Belum ada pesanan aktif',
           subtitle: 'Pesanan kamu akan tampil di sini setelah melakukan order.',
         );
       }
       return _buildOrderList(
-        _controller.activeOrders,
+        controller,
+        controller.activeOrders,
         'active',
       );
     } else if (currentTab ==
         1) {
-      if (_controller.processOrders.isEmpty) {
+      if (controller.processOrders.isEmpty) {
         return const EmptyOrdersWidget(
           message: 'Belum ada pesanan dalam proses',
           subtitle: 'Pesanan yang sedang dijemput atau diproses akan tampil di sini.',
         );
       }
       return _buildOrderList(
-        _controller.processOrders,
+        controller,
+        controller.processOrders,
         'process',
       );
     } else {
-      if (_controller.completedOrders.isEmpty) {
+      if (controller.completedOrders.isEmpty) {
         return const EmptyOrdersWidget(
           message: 'Belum ada riwayat pesanan',
           subtitle: 'Pesanan yang sudah selesai akan tampil di sini.',
         );
       }
       return _buildOrderList(
-        _controller.completedOrders,
+        controller,
+        controller.completedOrders,
         'completed',
       );
     }
   }
 
   Widget _buildOrderList(
+    MyOrdersController controller,
     List<
       UserOrder
     >
@@ -200,10 +171,10 @@ class _MyOrdersScreenState
               orderId: 'No. Pesanan ${order.orderId}',
               dateLabel: order.dateLabel,
               serviceTitle: order.serviceTitle,
-              totalLabel: _controller.formatRupiah(
+              totalLabel: controller.formatRupiah(
                 order.grandTotal,
               ),
-              onTap: () => _controller.navigateToOrderDetail(
+              onTap: () => controller.navigateToOrderDetail(
                 context,
                 order,
                 status,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_text_styles.dart';
@@ -21,6 +22,7 @@ class OrderDetailScreen
   Widget build(
     BuildContext context,
   ) {
+    // Mengekstrak argument data pesanan yang dikirim via Navigator
     final args =
         ModalRoute.of(
               context,
@@ -33,103 +35,125 @@ class OrderDetailScreen
     final orderData = OrderDetailData.fromArguments(
       args,
     );
-    final controller = OrderDetailController(
-      data: orderData,
-    );
 
-    return Scaffold(
-      backgroundColor: AppColors.headerNavy,
-      appBar: NavyBackAppBar(
-        title: 'Detail Pesanan',
-        onBack: () => controller.onBackPressed(
-          context,
-        ),
-      ),
-      body: Column(
-        children: [
-          const SizedBox(
-            height: 8,
+    // Menyediakan controller menggunakan ChangeNotifierProvider agar siklus datanya reaktif
+    return ChangeNotifierProvider<
+      OrderDetailController
+    >(
+      create:
+          (
+            _,
+          ) => OrderDetailController(
+            data: orderData,
           ),
-          Expanded(
-            child: RoundedWhitePanel(
-              topRadius: 40,
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.xl,
-                AppSpacing.xl,
-                AppSpacing.xl,
-                8,
-              ),
-              child:
-                  NotificationListener<
-                    OverscrollIndicatorNotification
-                  >(
-                    onNotification:
-                        (
-                          overscroll,
-                        ) {
-                          overscroll.disallowIndicator();
-                          return true;
-                        },
-                    child: SingleChildScrollView(
-                      physics: const ClampingScrollPhysics(),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          OrderDetailBox(
-                            child: _buildStatusHeader(
-                              orderData,
-                              controller,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
+      child:
+          Consumer<
+            OrderDetailController
+          >(
+            builder:
+                (
+                  context,
+                  controller,
+                  child,
+                ) {
+                  final data = controller.orderData;
 
-                          if (orderData.orderItems.isNotEmpty)
-                            OrderDetailBox(
-                              child: _buildOrderItems(
-                                orderData,
-                                controller,
-                              ),
-                            ),
-                          if (orderData.orderItems.isEmpty)
-                            OrderDetailBox(
-                              child: _buildSimpleOrderItems(
-                                orderData,
-                                controller,
-                              ),
-                            ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-
-                          OrderDetailBox(
-                            child: _buildPaymentDetails(
-                              orderData,
-                              controller,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-
-                          if (!orderData.isFromActiveOrder &&
-                              !orderData.isFromProcessOrder)
-                            _buildConfirmButton(
-                              context,
-                              controller,
-                            ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                        ],
+                  return Scaffold(
+                    backgroundColor: AppColors.headerNavy,
+                    appBar: NavyBackAppBar(
+                      title: 'Detail Pesanan',
+                      onBack: () => controller.onBackPressed(
+                        context,
                       ),
                     ),
-                  ),
-            ),
+                    body: Column(
+                      children: [
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        Expanded(
+                          child: RoundedWhitePanel(
+                            topRadius: 40,
+                            padding: const EdgeInsets.fromLTRB(
+                              AppSpacing.xl,
+                              AppSpacing.xl,
+                              AppSpacing.xl,
+                              8,
+                            ),
+                            child:
+                                NotificationListener<
+                                  OverscrollIndicatorNotification
+                                >(
+                                  onNotification:
+                                      (
+                                        overscroll,
+                                      ) {
+                                        overscroll.disallowIndicator();
+                                        return true;
+                                      },
+                                  child: SingleChildScrollView(
+                                    physics: const ClampingScrollPhysics(),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        OrderDetailBox(
+                                          child: _buildStatusHeader(
+                                            data,
+                                            controller,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 20,
+                                        ),
+
+                                        if (data.orderItems.isNotEmpty)
+                                          OrderDetailBox(
+                                            child: _buildOrderItems(
+                                              data,
+                                              controller,
+                                            ),
+                                          ),
+                                        if (data.orderItems.isEmpty)
+                                          OrderDetailBox(
+                                            child: _buildSimpleOrderItems(
+                                              data,
+                                              controller,
+                                            ),
+                                          ),
+                                        const SizedBox(
+                                          height: 20,
+                                        ),
+
+                                        OrderDetailBox(
+                                          child: _buildPaymentDetails(
+                                            data,
+                                            controller,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 20,
+                                        ),
+
+                                        if (!data.isFromActiveOrder &&
+                                            !data.isFromProcessOrder)
+                                          _buildConfirmButton(
+                                            context,
+                                            controller,
+                                          ),
+                                        const SizedBox(
+                                          height: 20,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
           ),
-        ],
-      ),
     );
   }
 

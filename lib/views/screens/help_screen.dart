@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // <-- Pastikan import provider ditambahkan
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_spacing.dart';
@@ -18,8 +19,12 @@ class HelpScreen
   Widget build(
     BuildContext context,
   ) {
-    final controller = HelpController();
-    final helpData = controller.getHelpData();
+    // Mengambil data secara efisien menggunakan context.read karena datanya statis
+    final helpController = context
+        .read<
+          HelpController
+        >();
+    final helpData = helpController.helpData;
 
     return Scaffold(
       backgroundColor: AppColors.profileNavy,

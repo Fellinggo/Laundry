@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:wushlaundry/models/payment_method_model.dart';
 
-class PaymentController {
+class PaymentController
+    extends
+        ChangeNotifier {
   List<
     PaymentMethodData
   >

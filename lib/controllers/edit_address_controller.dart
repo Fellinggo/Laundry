@@ -1,26 +1,42 @@
+import 'package:flutter/material.dart';
 import '../models/address_model.dart';
 
-class EditAddressController {
-  AddressModel loadAddress(
+class EditAddressController
+    extends
+        ChangeNotifier {
+  String _title = '';
+  String _address = '';
+
+  // Getters untuk diakses oleh UI
+  String get title => _title;
+  String get address => _address;
+
+  /// Memuat data awal dari argument halaman (Route Arguments)
+  void loadAddress(
     Map? args,
   ) {
-    return AddressModel(
-      title:
-          args?['title'] ??
-          '',
-      address:
-          args?['address'] ??
-          '',
-    );
+    if (args !=
+        null) {
+      _title =
+          args['title'] ??
+          '';
+      _address =
+          args['address'] ??
+          '';
+    }
   }
 
+  /// Membuat model data alamat yang baru setelah diubah oleh pengguna
   AddressModel saveAddress({
     required String title,
     required String address,
   }) {
+    _title = title.trim();
+    _address = address.trim();
+
     return AddressModel(
-      title: title.trim(),
-      address: address.trim(),
+      title: _title,
+      address: _address,
     );
   }
 }

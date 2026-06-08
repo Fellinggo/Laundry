@@ -8,9 +8,11 @@ class SplashController
   SplashModel _splashModel = SplashModel.defaultSplash();
   Timer? _splashTimer;
   bool _isNavigating = false;
+  bool _timerFinished = false;
 
   SplashModel get splashModel => _splashModel;
   bool get isNavigating => _isNavigating;
+  bool get timerFinished => _timerFinished;
 
   SplashController() {
     _startSplashTimer();
@@ -23,8 +25,7 @@ class SplashController
       ),
       () {
         if (!_isNavigating) {
-          // Timer akan dieksekusi melalui navigator di view
-          // Controller hanya memberi tahu bahwa waktunya sudah habis
+          _timerFinished = true;
           notifyListeners();
         }
       },
@@ -37,19 +38,14 @@ class SplashController
     if (_isNavigating) return;
 
     _isNavigating = true;
-    notifyListeners();
-
-    // Batalkan timer jika masih berjalan
     _splashTimer?.cancel();
 
-    // Navigasi ke halaman berikutnya
     Navigator.pushReplacementNamed(
       context,
       _splashModel.redirectRoute,
     );
   }
 
-  // Untuk mengupdate model jika diperlukan (misal dari API/config)
   void updateSplashModel(
     SplashModel newModel,
   ) {

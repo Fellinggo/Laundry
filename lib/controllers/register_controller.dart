@@ -22,7 +22,7 @@ class RegisterController
   bool get obscureConfirmPassword => _obscureConfirmPassword;
   bool get isLoading => _isLoading;
 
-  // Error messages
+  // Membaca pesan error dari model pendaftaran
   String? get emailError => _data.emailErrorMessage;
   String? get phoneError => _data.phoneErrorMessage;
   String? get passwordError => _data.passwordErrorMessage;
@@ -121,7 +121,7 @@ class RegisterController
         'signup',
       );
 
-      // Clear old address data
+      // Membersihkan data penyimpanan alamat lama
       await prefs.remove(
         'userAddresses',
       );

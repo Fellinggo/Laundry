@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wushlaundry/controllers/notification_controller.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_spacing.dart';
@@ -10,62 +11,28 @@ import '../../models/notification_model.dart';
 
 class NotificationsScreen
     extends
-        StatefulWidget {
+        StatelessWidget {
   const NotificationsScreen({
     super.key,
   });
 
   @override
-  State<
-    NotificationsScreen
-  >
-  createState() => _NotificationsScreenState();
-}
-
-class _NotificationsScreenState
-    extends
-        State<
-          NotificationsScreen
-        > {
-  late NotificationsController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = NotificationsController();
-    _controller.addListener(
-      _onControllerChanged,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.removeListener(
-      _onControllerChanged,
-    );
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _onControllerChanged() {
-    if (mounted) {
-      setState(
-        () {},
-      );
-    }
-  }
-
-  @override
   Widget build(
     BuildContext context,
   ) {
+    // Membaca state NotificationsController secara reaktif
+    final controller = context
+        .watch<
+          NotificationsController
+        >();
+
     return Scaffold(
       backgroundColor: AppColors.pageBgCool,
       appBar: AppBar(
         backgroundColor: AppColors.pageBgCool,
         elevation: 0,
         leading: IconButton(
-          onPressed: () => _controller.goBack(
+          onPressed: () => controller.goBack(
             context,
           ),
           icon: const Icon(
@@ -82,7 +49,7 @@ class _NotificationsScreenState
         ),
         centerTitle: true,
         actions: [
-          if (_controller.notifications.isNotEmpty)
+          if (controller.notifications.isNotEmpty)
             IconButton(
               icon: const Icon(
                 Icons.delete_outline,
@@ -90,6 +57,7 @@ class _NotificationsScreenState
               ),
               onPressed: () => _confirmClearAll(
                 context,
+                controller,
               ),
             ),
         ],
@@ -107,10 +75,10 @@ class _NotificationsScreenState
                   icon: Icons.list_alt_rounded,
                   label: 'Semua',
                   selected:
-                      _controller.currentFilter ==
+                      controller.currentFilter ==
                       NotificationFilter.all,
                   activeColor: AppColors.accentBlue,
-                  onTap: () => _controller.changeFilter(
+                  onTap: () => controller.changeFilter(
                     NotificationFilter.all,
                   ),
                 ),
@@ -118,10 +86,10 @@ class _NotificationsScreenState
                   icon: Icons.assignment_outlined,
                   label: 'Pesanan',
                   selected:
-                      _controller.currentFilter ==
+                      controller.currentFilter ==
                       NotificationFilter.orders,
                   activeColor: AppColors.skyTab,
-                  onTap: () => _controller.changeFilter(
+                  onTap: () => controller.changeFilter(
                     NotificationFilter.orders,
                   ),
                 ),
@@ -129,7 +97,7 @@ class _NotificationsScreenState
             ),
           ),
           Expanded(
-            child: _controller.isLoading
+            child: controller.isLoading
                 ? const Center(
                     child: CircularProgressIndicator(),
                   )
@@ -137,7 +105,9 @@ class _NotificationsScreenState
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.xl,
                     ),
-                    children: _buildContent(),
+                    children: _buildContent(
+                      controller,
+                    ),
                   ),
           ),
         ],
@@ -148,10 +118,12 @@ class _NotificationsScreenState
   List<
     Widget
   >
-  _buildContent() {
-    final filteredNotifications = _controller.getFilteredNotifications();
+  _buildContent(
+    NotificationsController controller,
+  ) {
+    final filteredNotifications = controller.getFilteredNotifications();
     final isOrdersOnly =
-        _controller.currentFilter ==
+        controller.currentFilter ==
         NotificationFilter.orders;
 
     if (isOrdersOnly &&
@@ -224,9 +196,6 @@ class _NotificationsScreenState
           ),
         );
       }
-    } else if (!isOrdersOnly) {
-      // No order notifications for "Semua" filter
-      // Just show empty state
     }
 
     return widgets;
@@ -234,6 +203,7 @@ class _NotificationsScreenState
 
   void _confirmClearAll(
     BuildContext context,
+    NotificationsController controller,
   ) {
     showDialog(
       context: context,
@@ -266,7 +236,7 @@ class _NotificationsScreenState
                   Navigator.pop(
                     ctx,
                   );
-                  _controller.clearAllNotifications();
+                  controller.clearAllNotifications();
                 },
                 child: const Text(
                   'Hapus',

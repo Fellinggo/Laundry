@@ -16,7 +16,6 @@ class TermsController
     loadTermsData();
   }
 
-  // Untuk loading data (bisa dari API/local storage nanti)
   Future<
     void
   >
@@ -26,13 +25,12 @@ class TermsController
     notifyListeners();
 
     try {
-      // Simulasi loading dari local storage atau API
-      // Untuk sekarang menggunakan data default
+      // Simulasi loading data (Lokal/API)
       await Future.delayed(
         const Duration(
           milliseconds: 100,
         ),
-      ); // Simulasi loading
+      );
       _termsModel = TermsModel.defaultTerms();
       _isLoading = false;
       notifyListeners();
@@ -45,7 +43,6 @@ class TermsController
     }
   }
 
-  // Untuk refresh data jika diperlukan
   Future<
     void
   >
@@ -53,7 +50,6 @@ class TermsController
     await loadTermsData();
   }
 
-  // Untuk navigasi kembali
   void goBack(
     BuildContext context,
   ) {

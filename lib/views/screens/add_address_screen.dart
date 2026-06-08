@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wushlaundry/constants/app_text_styles.dart';
 import 'package:wushlaundry/views/widgets/labeled_text_field.dart';
 import 'package:wushlaundry/views/widgets/primary_button.dart';
@@ -25,39 +26,42 @@ class _AddAddressScreenState
         State<
           AddAddressScreen
         > {
-  final controller = AddAddressController();
-
   final TextEditingController addressController = TextEditingController();
 
-  String? selectedTitle;
-  String? addressError;
-  String? titleError;
-
-  bool _validate() {
-    setState(
-      () {
-        titleError = controller.validateTitle(
-          selectedTitle,
-        );
-
-        addressError = controller.validateAddress(
-          addressController.text,
-        );
+  @override
+  void dispose() {
+    addressController.dispose();
+    // Opsional: bersihkan state provider saat keluar halaman jika tidak memakai blok scope provider lokal
+    WidgetsBinding.instance.addPostFrameCallback(
+      (
+        _,
+      ) {
+        if (mounted) {
+          context
+              .read<
+                AddAddressController
+              >()
+              .resetState();
+        }
       },
     );
-
-    return titleError ==
-            null &&
-        addressError ==
-            null;
+    super.dispose();
   }
 
   void _saveAddress() {
-    if (!_validate()) return;
+    final provider = context
+        .read<
+          AddAddressController
+        >();
 
-    final addressData = controller.createAddress(
-      title: selectedTitle!,
-      address: addressController.text,
+    // Pemicu validasi di controller
+    if (!provider.validate(
+      addressController.text,
+    ))
+      return;
+
+    final addressData = provider.createAddress(
+      addressController.text,
     );
 
     Navigator.pop(
@@ -67,15 +71,15 @@ class _AddAddressScreenState
   }
 
   @override
-  void dispose() {
-    addressController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(
     BuildContext context,
   ) {
+    // Mendengarkan perubahan state dari AddAddressController
+    final addrProvider = context
+        .watch<
+          AddAddressController
+        >();
+
     return Scaffold(
       backgroundColor: AppColors.pageBg,
       appBar: AppBar(
@@ -120,7 +124,7 @@ class _AddAddressScreenState
                 ),
                 border: Border.all(
                   color:
-                      titleError !=
+                      addrProvider.titleError !=
                           null
                       ? Colors.red
                       : AppColors.borderLight,
@@ -131,7 +135,7 @@ class _AddAddressScreenState
                     DropdownButton<
                       String
                     >(
-                      value: selectedTitle,
+                      value: addrProvider.selectedTitle,
                       hint: Text(
                         'Pilih Tipe Alamat',
                         style: AppTextStyles.body.copyWith(
@@ -139,7 +143,7 @@ class _AddAddressScreenState
                         ),
                       ),
                       isExpanded: true,
-                      items: controller.titleOptions.map(
+                      items: addrProvider.titleOptions.map(
                         (
                           title,
                         ) {
@@ -158,18 +162,15 @@ class _AddAddressScreenState
                           (
                             String? newValue,
                           ) {
-                            setState(
-                              () {
-                                selectedTitle = newValue;
-                                titleError = null;
-                              },
+                            addrProvider.selectTitle(
+                              newValue,
                             );
                           },
                     ),
               ),
             ),
 
-            if (titleError !=
+            if (addrProvider.titleError !=
                 null)
               Padding(
                 padding: const EdgeInsets.only(
@@ -177,7 +178,7 @@ class _AddAddressScreenState
                   left: 12,
                 ),
                 child: Text(
-                  titleError!,
+                  addrProvider.titleError!,
                   style: const TextStyle(
                     color: Colors.red,
                     fontSize: 12,
@@ -195,7 +196,7 @@ class _AddAddressScreenState
               prefixIcon: Icons.location_on_outlined,
               controller: addressController,
               maxLines: 3,
-              errorText: addressError,
+              errorText: addrProvider.addressError,
             ),
 
             const SizedBox(

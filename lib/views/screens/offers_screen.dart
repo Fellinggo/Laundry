@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wushlaundry/controllers/offer_controller.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_spacing.dart';
@@ -25,11 +26,25 @@ class OffersScreen
   Widget build(
     BuildContext context,
   ) {
-    final controller = OffersController(
-      loggedIn: loggedIn,
-      onOpenNotifications: onOpenNotifications,
-      onOpenServices: onOpenServices,
+    // Mengakses OffersController secara reaktif melalui Provider
+    final controller = context
+        .watch<
+          OffersController
+        >();
+
+    // Menjaga sinkronisasi state login jika terjadi pembaruan dari MainShell
+    WidgetsBinding.instance.addPostFrameCallback(
+      (
+        _,
+      ) {
+        controller.updateLoginStatus(
+          loggedIn,
+        );
+      },
     );
+
+    final newUserOffers = controller.getNewUserOffers();
+    final specialOffers = controller.getSpecialOffers();
 
     return Scaffold(
       backgroundColor: AppColors.headerNavy,
@@ -80,15 +95,15 @@ class OffersScreen
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // New User Offers Section
-                    if (controller.getNewUserOffers().isNotEmpty) ...[
+                    if (newUserOffers.isNotEmpty) ...[
                       Text(
-                        controller.getNewUserOffers().first.category.displayTitle,
+                        newUserOffers.first.category.displayTitle,
                         style: AppTextStyles.sectionTitle,
                       ),
                       const SizedBox(
                         height: AppSpacing.md,
                       ),
-                      ...controller.getNewUserOffers().map(
+                      ...newUserOffers.map(
                         (
                           offer,
                         ) => PromoCardWidget(
@@ -105,15 +120,15 @@ class OffersScreen
                     ],
 
                     // Special Offers Section
-                    if (controller.getSpecialOffers().isNotEmpty) ...[
+                    if (specialOffers.isNotEmpty) ...[
                       Text(
-                        controller.getSpecialOffers().first.category.displayTitle,
+                        specialOffers.first.category.displayTitle,
                         style: AppTextStyles.sectionTitle,
                       ),
                       const SizedBox(
                         height: AppSpacing.md,
                       ),
-                      ...controller.getSpecialOffers().map(
+                      ...specialOffers.map(
                         (
                           offer,
                         ) => PromoCardWidget(

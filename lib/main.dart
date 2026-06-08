@@ -7,8 +7,27 @@ import 'package:wushlaundry/constants/app_colors.dart';
 
 // Controllers / Providers
 import 'package:wushlaundry/controllers/about_controller.dart';
+import 'package:wushlaundry/controllers/add_address_controller.dart';
+import 'package:wushlaundry/controllers/edit_address_controller.dart';
+import 'package:wushlaundry/controllers/help_controller.dart';
+import 'package:wushlaundry/controllers/home_controller.dart';
+import 'package:wushlaundry/controllers/login_controller.dart';
 import 'package:wushlaundry/controllers/main_shell_controller.dart';
 import 'package:wushlaundry/controllers/my_order_controller.dart';
+import 'package:wushlaundry/controllers/notification_controller.dart';
+import 'package:wushlaundry/controllers/offer_controller.dart';
+import 'package:wushlaundry/controllers/onboarding_controller.dart';
+import 'package:wushlaundry/controllers/payment_method_controller.dart';
+import 'package:wushlaundry/controllers/pickup_schedule_controller.dart';
+import 'package:wushlaundry/controllers/pin_entry_controller.dart';
+import 'package:wushlaundry/controllers/privacy_controller.dart';
+import 'package:wushlaundry/controllers/profile_controller.dart';
+import 'package:wushlaundry/controllers/register_controller.dart';
+import 'package:wushlaundry/controllers/service_controller.dart';
+import 'package:wushlaundry/controllers/service_detail_controller.dart';
+import 'package:wushlaundry/controllers/setting_controller.dart';
+import 'package:wushlaundry/controllers/splash_controller.dart';
+import 'package:wushlaundry/controllers/terms_controller.dart';
 
 // Screens
 import 'package:wushlaundry/views/screens/about_screen.dart';
@@ -39,27 +58,132 @@ main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final prefs = await SharedPreferences.getInstance();
-  // Mengambil status login untuk disuntikkan ke MyOrdersController saat startup
   final bool isLoggedIn =
       prefs.getBool(
         'isLoggedIn',
       ) ??
       false;
 
-  // Hapus semua data SharedPreferences untuk testing (opsional)
-  // await prefs.clear();
-
   runApp(
     MultiProvider(
       providers: [
-        // 1. Mendaftarkan MainShellController sebagai Provider
+        // Provider tanpa parameter
         ChangeNotifierProvider(
           create:
               (
                 _,
               ) => MainShellController(),
         ),
-        // 2. Mendaftarkan MyOrdersController dengan argument login awal
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => AboutController(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => AddAddressController(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => EditAddressController(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => HelpController(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => HomeController(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => LoginController(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => NotificationsController(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => OnboardingController(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => PaymentController(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => PickupScheduleController(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => PinEntryController(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => PrivacyPolicyController(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => ProfileController(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => RegisterController(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => ServiceDetailController(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => SettingsController(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => SplashController(),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => TermsController(),
+        ),
+
+        // Provider dengan parameter - gunakan nilai dari SharedPreferences
         ChangeNotifierProvider(
           create:
               (
@@ -68,12 +192,21 @@ main() async {
                 loggedIn: isLoggedIn,
               ),
         ),
-        // 3. Mendaftarkan AboutController yang baru saja kita buat
         ChangeNotifierProvider(
           create:
               (
                 _,
-              ) => AboutController(),
+              ) => OffersController(
+                loggedIn: isLoggedIn,
+              ),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => ServicesController(
+                loggedIn: isLoggedIn,
+              ),
         ),
       ],
       child: const WushLaundryApp(),
@@ -124,7 +257,6 @@ class WushLaundryApp
               ) => const SplashScreen(),
           settings: settings,
         );
-
       case '/onboarding':
         return MaterialPageRoute(
           builder:
@@ -133,7 +265,6 @@ class WushLaundryApp
               ) => const OnboardingScreen(),
           settings: settings,
         );
-
       case '/main':
         return MaterialPageRoute(
           builder:
@@ -142,7 +273,6 @@ class WushLaundryApp
               ) => const MainShellScreen(),
           settings: settings,
         );
-
       case '/login':
         return MaterialPageRoute(
           builder:
@@ -151,7 +281,6 @@ class WushLaundryApp
               ) => const LoginScreen(),
           settings: settings,
         );
-
       case '/register':
         return MaterialPageRoute(
           builder:
@@ -160,7 +289,6 @@ class WushLaundryApp
               ) => const RegisterScreen(),
           settings: settings,
         );
-
       case '/services':
         return MaterialPageRoute(
           builder:
@@ -169,7 +297,6 @@ class WushLaundryApp
               ) => const ServicesScreen(),
           settings: settings,
         );
-
       case '/edit-address':
         return MaterialPageRoute(
           builder:
@@ -178,7 +305,6 @@ class WushLaundryApp
               ) => const EditAddressScreen(),
           settings: settings,
         );
-
       case '/add-address':
         return MaterialPageRoute(
           builder:
@@ -187,7 +313,6 @@ class WushLaundryApp
               ) => const AddAddressScreen(),
           settings: settings,
         );
-
       case '/service-detail':
         return MaterialPageRoute(
           builder:
@@ -196,7 +321,6 @@ class WushLaundryApp
               ) => const ServiceDetailScreen(),
           settings: settings,
         );
-
       case '/pickup-schedule':
         return MaterialPageRoute(
           builder:
@@ -205,7 +329,6 @@ class WushLaundryApp
               ) => const PickupScheduleScreen(),
           settings: settings,
         );
-
       case '/order-review':
         return MaterialPageRoute(
           builder:
@@ -214,7 +337,6 @@ class WushLaundryApp
               ) => const OrderReviewScreen(),
           settings: settings,
         );
-
       case '/payment':
         return MaterialPageRoute(
           builder:
@@ -223,7 +345,6 @@ class WushLaundryApp
               ) => const PaymentMethodScreen(),
           settings: settings,
         );
-
       case '/pin':
         final args =
             settings.arguments
@@ -244,7 +365,6 @@ class WushLaundryApp
               ),
           settings: settings,
         );
-
       case '/order-detail':
         return MaterialPageRoute(
           builder:
@@ -253,7 +373,6 @@ class WushLaundryApp
               ) => const OrderDetailScreen(),
           settings: settings,
         );
-
       case '/notifications':
         return MaterialPageRoute(
           builder:
@@ -262,7 +381,6 @@ class WushLaundryApp
               ) => const NotificationsScreen(),
           settings: settings,
         );
-
       case '/my-orders':
         return MaterialPageRoute(
           builder:
@@ -271,7 +389,6 @@ class WushLaundryApp
               ) => const MyOrdersScreen(),
           settings: settings,
         );
-
       case '/offers-full':
         return MaterialPageRoute(
           builder:
@@ -280,7 +397,6 @@ class WushLaundryApp
               ) => const OffersScreen(),
           settings: settings,
         );
-
       case '/settings':
         return MaterialPageRoute(
           builder:
@@ -289,7 +405,6 @@ class WushLaundryApp
               ) => const SettingsScreen(),
           settings: settings,
         );
-
       case '/privacy':
         return MaterialPageRoute(
           builder:
@@ -298,7 +413,6 @@ class WushLaundryApp
               ) => const PrivacyPolicyScreen(),
           settings: settings,
         );
-
       case '/terms':
         return MaterialPageRoute(
           builder:
@@ -307,7 +421,6 @@ class WushLaundryApp
               ) => const TermsConditionsScreen(),
           settings: settings,
         );
-
       case '/help':
         return MaterialPageRoute(
           builder:
@@ -316,7 +429,6 @@ class WushLaundryApp
               ) => const HelpScreen(),
           settings: settings,
         );
-
       case '/about':
         return MaterialPageRoute(
           builder:
@@ -325,7 +437,6 @@ class WushLaundryApp
               ) => const AboutScreen(),
           settings: settings,
         );
-
       default:
         return MaterialPageRoute(
           builder:

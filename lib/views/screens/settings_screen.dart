@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wushlaundry/controllers/setting_controller.dart';
 import 'package:wushlaundry/views/widgets/setting_tile_widget.dart';
 import '../../constants/app_colors.dart';
@@ -9,62 +10,66 @@ import '../widgets/rounded_white_panel.dart';
 
 class SettingsScreen
     extends
-        StatefulWidget {
+        StatelessWidget {
   const SettingsScreen({
     super.key,
   });
 
   @override
-  State<
-    SettingsScreen
-  >
-  createState() => _SettingsScreenState();
+  Widget build(
+    BuildContext context,
+  ) {
+    return ChangeNotifierProvider<
+      SettingsController
+    >(
+      create:
+          (
+            _,
+          ) => SettingsController(),
+      child: const _SettingsContent(),
+    );
+  }
 }
 
-class _SettingsScreenState
+class _SettingsContent
     extends
-        State<
-          SettingsScreen
-        > {
-  late SettingsController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = SettingsController();
-    _controller.addListener(
-      _onControllerChanged,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.removeListener(
-      _onControllerChanged,
-    );
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _onControllerChanged() {
-    if (mounted) {
-      setState(
-        () {},
-      );
-    }
-  }
+        StatelessWidget {
+  const _SettingsContent();
 
   @override
   Widget build(
     BuildContext context,
   ) {
-    final isLoggedIn = _controller.isLoggedIn;
+    final controller = context
+        .read<
+          SettingsController
+        >();
+
+    // Menyeleksi variabel secara atomik menggunakan context.select untuk efisiensi render tingkat tinggi
+    final isLoggedIn =
+        context.select<
+          SettingsController,
+          bool
+        >(
+          (
+            c,
+          ) => c.isLoggedIn,
+        );
+    final currentLanguageName =
+        context.select<
+          SettingsController,
+          String
+        >(
+          (
+            c,
+          ) => c.languageOptions[c.selectedLanguage].name,
+        );
 
     return Scaffold(
       backgroundColor: AppColors.profileNavy,
       appBar: NavyBackAppBar(
         title: 'Pengaturan',
-        onBack: () => _controller.goBack(
+        onBack: () => controller.goBack(
           context,
         ),
       ),
@@ -87,8 +92,8 @@ class _SettingsScreenState
             SettingsTileWidget(
               icon: Icons.language,
               title: 'Bahasa',
-              trailing: _controller.languageOptions[_controller.selectedLanguage].name,
-              onTap: () => _controller.showLanguageSheet(
+              trailing: currentLanguageName,
+              onTap: () => controller.showLanguageSheet(
                 context,
               ),
             ),
@@ -107,28 +112,28 @@ class _SettingsScreenState
             SettingsTileWidget(
               icon: Icons.privacy_tip_outlined,
               title: 'Kebijakan Privasi',
-              onTap: () => _controller.navigateToPrivacy(
+              onTap: () => controller.navigateToPrivacy(
                 context,
               ),
             ),
             SettingsTileWidget(
               icon: Icons.help_outline,
               title: 'Bantuan',
-              onTap: () => _controller.navigateToHelp(
+              onTap: () => controller.navigateToHelp(
                 context,
               ),
             ),
             SettingsTileWidget(
               icon: Icons.article_outlined,
               title: 'Syarat dan Ketentuan',
-              onTap: () => _controller.navigateToTerms(
+              onTap: () => controller.navigateToTerms(
                 context,
               ),
             ),
             SettingsTileWidget(
               icon: Icons.info_outline,
               title: 'Tentang',
-              onTap: () => _controller.navigateToAbout(
+              onTap: () => controller.navigateToAbout(
                 context,
               ),
             ),
@@ -150,7 +155,7 @@ class _SettingsScreenState
                 icon: Icons.person_off_outlined,
                 title: 'Hapus Akun',
                 danger: true,
-                onTap: () => _controller.showDeleteConfirmation(
+                onTap: () => controller.showDeleteConfirmation(
                   context,
                 ),
               ),
@@ -158,7 +163,7 @@ class _SettingsScreenState
                 icon: Icons.logout,
                 title: 'Keluar',
                 danger: true,
-                onTap: () => _controller.showLogoutConfirmation(
+                onTap: () => controller.showLogoutConfirmation(
                   context,
                 ),
               ),

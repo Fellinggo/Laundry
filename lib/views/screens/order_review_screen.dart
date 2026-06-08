@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_text_styles.dart';
@@ -10,176 +11,145 @@ import '../../../models/order_review_model.dart';
 
 class OrderReviewScreen
     extends
-        StatefulWidget {
+        StatelessWidget {
   const OrderReviewScreen({
     super.key,
   });
 
   @override
-  State<
-    OrderReviewScreen
-  >
-  createState() => _OrderReviewScreenState();
-}
-
-class _OrderReviewScreenState
-    extends
-        State<
-          OrderReviewScreen
-        > {
-  late OrderReviewController _controller;
-  bool _isInit = true;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    if (_isInit) {
-      final args =
-          ModalRoute.of(
-                context,
-              )?.settings.arguments
-              as Map<
-                String,
-                dynamic
-              >? ??
-          {};
-      final data = OrderReviewData.fromArguments(
-        args,
-      );
-
-      _controller = OrderReviewController(
-        data: data,
-      );
-      _controller.addListener(
-        _onControllerChanged,
-      );
-      _isInit = false;
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.removeListener(
-      _onControllerChanged,
-    );
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _onControllerChanged() {
-    if (mounted) {
-      setState(
-        () {},
-      );
-    }
-  }
-
-  @override
   Widget build(
     BuildContext context,
   ) {
-    if (_isInit) {
-      return const Scaffold(
-        backgroundColor: AppColors.headerNavy,
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
+    // Mengekstrak arguments dari rute navigasi
+    final args =
+        ModalRoute.of(
+              context,
+            )?.settings.arguments
+            as Map<
+              String,
+              dynamic
+            >? ??
+        {};
+    final reviewData = OrderReviewData.fromArguments(
+      args,
+    );
 
-    final data = _controller.orderData;
-
-    return Scaffold(
-      backgroundColor: AppColors.headerNavy,
-      appBar: NavyBackAppBar(
-        title: 'Tinjau Pesanan',
-        onBack: () => _controller.goBack(
-          context,
-        ),
-      ),
-      body: Column(
-        children: [
-          const SizedBox(
-            height: 8,
+    return ChangeNotifierProvider<
+      OrderReviewController
+    >(
+      create:
+          (
+            _,
+          ) => OrderReviewController(
+            data: reviewData,
           ),
-          Expanded(
-            child: RoundedWhitePanel(
-              topRadius: AppSpacing.sheetTopRadius,
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.xl,
-                AppSpacing.xl,
-                AppSpacing.xl,
-                0,
-              ),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: ScrollConfiguration(
-                      behavior: const _NoOverscrollBehavior(),
-                      child: SingleChildScrollView(
-                        physics: const ClampingScrollPhysics(),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Ringkasan Pesanan',
-                              style: AppTextStyles.sectionTitle.copyWith(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 12,
-                            ),
+      child:
+          Consumer<
+            OrderReviewController
+          >(
+            builder:
+                (
+                  context,
+                  controller,
+                  child,
+                ) {
+                  final data = controller.orderData;
 
-                            // Ringkasan Layanan
-                            OrderReviewServiceSummary(
-                              data: data,
-                              formatRupiah: _controller.formatRupiah,
-                            ),
-                            const SizedBox(
-                              height: 24,
-                            ),
-
-                            // Detail Pengiriman (rapi)
-                            _buildDeliveryDetail(
-                              data,
-                            ),
-                            const SizedBox(
-                              height: 24,
-                            ),
-
-                            // Detail Pembayaran
-                            _buildPaymentDetail(
-                              data,
-                            ),
-                            const SizedBox(
-                              height: 24,
-                            ),
-                          ],
-                        ),
+                  return Scaffold(
+                    backgroundColor: AppColors.headerNavy,
+                    appBar: NavyBackAppBar(
+                      title: 'Tinjau Pesanan',
+                      onBack: () => controller.goBack(
+                        context,
                       ),
                     ),
-                  ),
-                  _buildBottomButton(),
-                ],
-              ),
-            ),
+                    body: Column(
+                      children: [
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        Expanded(
+                          child: RoundedWhitePanel(
+                            topRadius: AppSpacing.sheetTopRadius,
+                            padding: const EdgeInsets.fromLTRB(
+                              AppSpacing.xl,
+                              AppSpacing.xl,
+                              AppSpacing.xl,
+                              0,
+                            ),
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: ScrollConfiguration(
+                                    behavior: const _NoOverscrollBehavior(),
+                                    child: SingleChildScrollView(
+                                      physics: const ClampingScrollPhysics(),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Ringkasan Pesanan',
+                                            style: AppTextStyles.sectionTitle.copyWith(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 12,
+                                          ),
+
+                                          // Ringkasan Layanan
+                                          OrderReviewServiceSummary(
+                                            data: data,
+                                            formatRupiah: controller.formatRupiah,
+                                          ),
+                                          const SizedBox(
+                                            height: 24,
+                                          ),
+
+                                          // Detail Pengiriman
+                                          _buildDeliveryDetail(
+                                            context,
+                                            data,
+                                            controller,
+                                          ),
+                                          const SizedBox(
+                                            height: 24,
+                                          ),
+
+                                          // Detail Pembayaran
+                                          _buildPaymentDetail(
+                                            data,
+                                            controller,
+                                          ),
+                                          const SizedBox(
+                                            height: 24,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                _buildBottomButton(
+                                  context,
+                                  controller,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
           ),
-        ],
-      ),
     );
   }
 
-  // Widget Detail Pengiriman yang RAPI
   Widget _buildDeliveryDetail(
+    BuildContext context,
     OrderReviewData data,
+    OrderReviewController controller,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,7 +165,7 @@ class _OrderReviewScreenState
               ),
             ),
             _buildEditButton(
-              () => _controller.editDelivery(
+              () => controller.editDelivery(
                 context,
               ),
             ),
@@ -218,7 +188,6 @@ class _OrderReviewScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Waktu Pengambilan (kiri-kanan)
               _buildInfoRow(
                 'Waktu Pengambilan',
                 data.pickupTime,
@@ -226,8 +195,6 @@ class _OrderReviewScreenState
               const SizedBox(
                 height: 12,
               ),
-
-              // Waktu Pengiriman (kiri-kanan)
               _buildInfoRow(
                 'Waktu Pengiriman',
                 data.deliveryTime,
@@ -235,8 +202,6 @@ class _OrderReviewScreenState
               const SizedBox(
                 height: 12,
               ),
-
-              // Alamat Pengiriman (full width ke bawah)
               const Divider(),
               const SizedBox(
                 height: 8,
@@ -262,9 +227,9 @@ class _OrderReviewScreenState
     );
   }
 
-  // Widget Detail Pembayaran yang RAPI
   Widget _buildPaymentDetail(
     OrderReviewData data,
+    OrderReviewController controller,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,34 +257,28 @@ class _OrderReviewScreenState
           ),
           child: Column(
             children: [
-              // Total Pesanan (kiri-kanan)
               _buildInfoRow(
                 'Total Pesanan',
-                _controller.formatRupiah(
+                controller.formatRupiah(
                   data.serviceFee,
                 ),
               ),
               const SizedBox(
                 height: 12,
               ),
-
-              // Biaya Pengiriman (kiri-kanan)
               _buildInfoRow(
                 'Biaya Pengiriman',
-                _controller.formatRupiah(
+                controller.formatRupiah(
                   data.deliveryFee,
                 ),
               ),
               const SizedBox(
                 height: 12,
               ),
-
               const Divider(),
               const SizedBox(
                 height: 8,
               ),
-
-              // Total Pembayaran (kiri-kanan, bold)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -330,7 +289,7 @@ class _OrderReviewScreenState
                     ),
                   ),
                   Text(
-                    _controller.formatRupiah(
+                    controller.formatRupiah(
                       data.totalPayment,
                     ),
                     style: AppTextStyles.body.copyWith(
@@ -348,7 +307,6 @@ class _OrderReviewScreenState
     );
   }
 
-  // Helper row untuk format kiri-kanan
   Widget _buildInfoRow(
     String label,
     String value,
@@ -397,7 +355,10 @@ class _OrderReviewScreenState
     );
   }
 
-  Widget _buildBottomButton() {
+  Widget _buildBottomButton(
+    BuildContext context,
+    OrderReviewController controller,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(
         vertical: AppSpacing.md,
@@ -430,12 +391,12 @@ class _OrderReviewScreenState
               ),
             ),
           ),
-          onPressed: _controller.isProcessing
+          onPressed: controller.isProcessing
               ? null
-              : () => _controller.processPayment(
+              : () => controller.processPayment(
                   context,
                 ),
-          child: _controller.isProcessing
+          child: controller.isProcessing
               ? const SizedBox(
                   height: 20,
                   width: 20,

@@ -35,11 +35,9 @@ class LoginController
   }
 
   Future<
-    void
+    bool
   >
-  checkAutoLogin(
-    BuildContext context,
-  ) async {
+  isAutoLoginAvailable() async {
     final prefs = await SharedPreferences.getInstance();
     final staySignedIn =
         prefs.getBool(
@@ -51,19 +49,8 @@ class LoginController
           'isLoggedIn',
         ) ??
         false;
-
-    if (staySignedIn &&
-        isLoggedIn) {
-      if (context.mounted) {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/main',
-          (
-            route,
-          ) => false,
-        );
-      }
-    }
+    return staySignedIn &&
+        isLoggedIn;
   }
 
   Future<
@@ -71,7 +58,6 @@ class LoginController
   >
   _injectDummyData() async {
     final prefs = await SharedPreferences.getInstance();
-
     await prefs.setStringList(
       'process_orders',
       DummyOrders.processOrders,
@@ -86,7 +72,6 @@ class LoginController
     print(
       'Data: ${DummyOrders.processOrders}',
     );
-
     final check = prefs.getStringList(
       'process_orders',
     );
@@ -106,7 +91,6 @@ class LoginController
     required String password,
   }) async {
     clearErrors();
-
     bool hasError = false;
 
     // Validasi email
@@ -119,7 +103,6 @@ class LoginController
         password: password,
         staySignedIn: _staySignedIn,
       );
-
       if (!credentials.isEmailValid) {
         _emailError = "Email tidak valid";
         hasError = true;
@@ -136,7 +119,6 @@ class LoginController
         password: password,
         staySignedIn: _staySignedIn,
       );
-
       if (!credentials.isPasswordValid) {
         _passwordError = "Min 6 karakter, huruf besar, kecil, dan angka wajib ada";
         hasError = true;
@@ -207,27 +189,6 @@ class LoginController
           'Fitur lupa password akan segera hadir',
         ),
       ),
-    );
-  }
-
-  void navigateToRegister(
-    BuildContext context,
-  ) {
-    Navigator.pushReplacementNamed(
-      context,
-      '/register',
-    );
-  }
-
-  void navigateToMain(
-    BuildContext context,
-  ) {
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/main',
-      (
-        route,
-      ) => false,
     );
   }
 }

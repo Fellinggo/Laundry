@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wushlaundry/controllers/sesrvice_detail_controller.dart';
+import 'package:provider/provider.dart';
+import 'package:wushlaundry/controllers/service_detail_controller.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_spacing.dart';
 import '../../constants/app_text_styles.dart';
@@ -13,38 +14,16 @@ import '../widgets/empty_selected_service.dart';
 
 class ServiceDetailScreen
     extends
-        StatefulWidget {
+        StatelessWidget {
   const ServiceDetailScreen({
     super.key,
   });
 
   @override
-  State<
-    ServiceDetailScreen
-  >
-  createState() => _ServiceDetailScreenState();
-}
-
-class _ServiceDetailScreenState
-    extends
-        State<
-          ServiceDetailScreen
-        > {
-  late ServiceDetailController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = ServiceDetailController();
-    _controller.addListener(
-      _onControllerChanged,
-    );
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
+  Widget build(
+    BuildContext context,
+  ) {
+    // Mengambil argument navigasi secara aman di luar cycle UI build
     final args =
         ModalRoute.of(
               context,
@@ -53,40 +32,82 @@ class _ServiceDetailScreenState
               String,
               dynamic
             >?;
-    _controller.initializeWithArgument(
-      args,
+
+    return ChangeNotifierProvider<
+      ServiceDetailController
+    >(
+      create:
+          (
+            _,
+          ) => ServiceDetailController()
+            ..initializeWithArgument(
+              args,
+            ),
+      child: const _ServiceDetailContent(),
     );
   }
+}
 
-  @override
-  void dispose() {
-    _controller.removeListener(
-      _onControllerChanged,
-    );
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _onControllerChanged() {
-    if (mounted) {
-      setState(
-        () {},
-      );
-    }
-  }
+class _ServiceDetailContent
+    extends
+        StatelessWidget {
+  const _ServiceDetailContent();
 
   @override
   Widget build(
     BuildContext context,
   ) {
-    final model = _controller.model;
-    final total = _controller.totalServiceFee;
+    final controller = context
+        .read<
+          ServiceDetailController
+        >();
+
+    // Pemilihan state reaktif menggunakan context.select (efisien & anti-rebuild massal)
+    final total =
+        context.select<
+          ServiceDetailController,
+          int
+        >(
+          (
+            c,
+          ) => c.totalServiceFee,
+        );
+    final hasSelectedServices =
+        context.select<
+          ServiceDetailController,
+          bool
+        >(
+          (
+            c,
+          ) => c.hasSelectedServices,
+        );
+    final servicesLength =
+        context.select<
+          ServiceDetailController,
+          int
+        >(
+          (
+            c,
+          ) => c.model.services.length,
+        );
+    final selectedServicesMap =
+        context.select<
+          ServiceDetailController,
+          Map<
+            int,
+            int
+          >
+        >(
+          (
+            c,
+          ) => c.model.selectedServices,
+        );
 
     return Scaffold(
       backgroundColor: AppColors.headerNavy,
       appBar: NavyBackAppBar(
         title: 'Ringkasan Layanan',
-        onBack: () => _controller.goBack(
+        onBack: () => controller.goBack(
           context,
         ),
       ),
@@ -104,20 +125,30 @@ class _ServiceDetailScreenState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Horizontal Filter Chip List
                   SizedBox(
                     height: 44,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: model.services.length,
+                      itemCount: servicesLength,
                       itemBuilder:
                           (
                             context,
                             i,
                           ) {
-                            final service = model.services[i];
-                            final isSelected = model.selectedServices.containsKey(
-                              i,
-                            );
+                            // Memisahkan penyeleksian status chip agar tidak merender ulang chip lain
+                            final isSelected =
+                                context.select<
+                                  ServiceDetailController,
+                                  bool
+                                >(
+                                  (
+                                    c,
+                                  ) => c.model.selectedServices.containsKey(
+                                    i,
+                                  ),
+                                );
+                            final service = controller.model.services[i];
 
                             return ServiceFilterChip(
                               isSelected: isSelected,
@@ -126,7 +157,7 @@ class _ServiceDetailScreenState
                               onSelected:
                                   (
                                     val,
-                                  ) => _controller.toggleServiceSelection(
+                                  ) => controller.toggleServiceSelection(
                                     i,
                                     val,
                                   ),
@@ -144,21 +175,23 @@ class _ServiceDetailScreenState
                   const SizedBox(
                     height: 12,
                   ),
+
+                  // Selected Items List / Empty State
                   Expanded(
-                    child: !_controller.hasSelectedServices
+                    child: !hasSelectedServices
                         ? const EmptySelectedService()
                         : ListView.builder(
-                            itemCount: model.selectedServices.length,
+                            itemCount: selectedServicesMap.length,
                             itemBuilder:
                                 (
                                   context,
                                   index,
                                 ) {
-                                  final key = model.selectedServices.keys.elementAt(
+                                  final key = selectedServicesMap.keys.elementAt(
                                     index,
                                   );
-                                  final service = model.services[key];
-                                  final qty = model.selectedServices[key]!;
+                                  final service = controller.model.services[key];
+                                  final qty = selectedServicesMap[key]!;
 
                                   return SelectedServiceItem(
                                     title: service.title,
@@ -170,7 +203,7 @@ class _ServiceDetailScreenState
                                     onQuantityChanged:
                                         (
                                           newQty,
-                                        ) => _controller.updateQuantity(
+                                        ) => controller.updateQuantity(
                                           key,
                                           newQty,
                                         ),
@@ -180,7 +213,7 @@ class _ServiceDetailScreenState
                   ),
                   InfoKvRow(
                     label: 'Total',
-                    value: _controller.formatPrice(
+                    value: controller.formatPrice(
                       total,
                     ),
                     valueBold: true,
@@ -190,8 +223,8 @@ class _ServiceDetailScreenState
                   ),
                   PrimaryButton(
                     label: 'Jadwalkan Penjemputan',
-                    onPressed: _controller.hasSelectedServices
-                        ? () => _controller.navigateToPickupSchedule(
+                    onPressed: hasSelectedServices
+                        ? () => controller.navigateToPickupSchedule(
                             context,
                           )
                         : null,
@@ -203,5 +236,27 @@ class _ServiceDetailScreenState
         ],
       ),
     );
+  }
+}
+
+class _NoOverscrollBehavior
+    extends
+        ScrollBehavior {
+  const _NoOverscrollBehavior();
+
+  @override
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    return child;
+  }
+
+  @override
+  ScrollPhysics getScrollPhysics(
+    BuildContext context,
+  ) {
+    return const ClampingScrollPhysics();
   }
 }

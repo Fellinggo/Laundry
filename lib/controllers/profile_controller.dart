@@ -53,7 +53,6 @@ class ProfileController
           ) ??
           '-';
 
-      // Update keys dengan email yang benar
       final addressKey = 'userAddresses_$email';
       final titlesKey = 'userAddressTitles_$email';
 
@@ -78,16 +77,14 @@ class ProfileController
           savedAddresses.length,
           (
             i,
-          ) {
-            return AddressModel(
-              title:
-                  i <
-                      savedTitles.length
-                  ? savedTitles[i]
-                  : 'Alamat',
-              address: savedAddresses[i],
-            );
-          },
+          ) => AddressModel(
+            title:
+                i <
+                    savedTitles.length
+                ? savedTitles[i]
+                : 'Alamat',
+            address: savedAddresses[i],
+          ),
         );
       } else {
         final isSignup =
@@ -99,7 +96,6 @@ class ProfileController
         if (isSignup) {
           addresses = [];
         } else {
-          // Menggunakan AddressModelDummy yang sudah Anda buat
           addresses = List.from(
             AddressModelDummy.defaultAddresses,
           );

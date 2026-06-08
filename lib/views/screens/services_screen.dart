@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wushlaundry/controllers/service_controller.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_spacing.dart';
@@ -23,10 +24,65 @@ class ServicesScreen
   Widget build(
     BuildContext context,
   ) {
-    final controller = ServicesController(
-      loggedIn: loggedIn,
-      onOpenNotifications: onOpenNotifications,
+    // Menggunakan ProxyProvider untuk menyinkronkan parameter luar ke dalam Controller secara dinamis
+    return ChangeNotifierProxyProvider0<
+      ServicesController
+    >(
+      create:
+          (
+            _,
+          ) => ServicesController(
+            loggedIn: loggedIn,
+            onOpenNotifications: onOpenNotifications,
+          ),
+      update:
+          (
+            _,
+            controller,
+          ) {
+            return controller!..updateDependencies(
+              loggedIn: loggedIn,
+              onOpenNotifications: onOpenNotifications,
+            );
+          },
+      child: const _ServicesContent(),
     );
+  }
+}
+
+class _ServicesContent
+    extends
+        StatelessWidget {
+  const _ServicesContent();
+
+  @override
+  Widget build(
+    BuildContext context,
+  ) {
+    final controller = context
+        .read<
+          ServicesController
+        >();
+
+    // Mengambil data list secara atomik (Hanya merender ulang jika isi list berubah)
+    final gridServices =
+        context.select<
+          ServicesController,
+          List
+        >(
+          (
+            c,
+          ) => c.gridServices,
+        );
+    final wideServices =
+        context.select<
+          ServicesController,
+          List
+        >(
+          (
+            c,
+          ) => c.wideServices,
+        );
 
     return Scaffold(
       backgroundColor: AppColors.headerNavy,
@@ -87,6 +143,8 @@ class ServicesScreen
                   const SizedBox(
                     height: 16,
                   ),
+
+                  // Grid Services Section
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
@@ -94,7 +152,7 @@ class ServicesScreen
                     mainAxisSpacing: 16,
                     crossAxisSpacing: 16,
                     childAspectRatio: 0.85,
-                    children: controller.gridServices.map(
+                    children: gridServices.map(
                       (
                         service,
                       ) {
@@ -115,7 +173,9 @@ class ServicesScreen
                   const SizedBox(
                     height: 20,
                   ),
-                  ...controller.wideServices.map(
+
+                  // Wide Services Section
+                  ...wideServices.map(
                     (
                       service,
                     ) {
@@ -135,7 +195,7 @@ class ServicesScreen
                         ),
                       );
                     },
-                  ).toList(),
+                  ),
                   const SizedBox(
                     height: 80,
                   ),

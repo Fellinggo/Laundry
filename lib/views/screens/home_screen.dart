@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart'; // <-- Pastikan ini diimport
 import '../widgets/login_modal_sheet.dart';
 import '../widgets/offer_image_slider.dart';
 import '../widgets/rounded_white_panel.dart';
@@ -46,13 +45,11 @@ class HomeScreen
   createState() => HomeScreenState();
 }
 
-// EXPORT STATE agar bisa diakses dari MainShellController
 class HomeScreenState
     extends
         State<
           HomeScreen
         > {
-  late HomeController _controller;
   final homeServices = serviceDummy
       .where(
         (
@@ -64,38 +61,18 @@ class HomeScreenState
       )
       .toList();
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = HomeController();
-    _controller.addListener(
-      _onControllerChanged,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.removeListener(
-      _onControllerChanged,
-    );
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _onControllerChanged() {
-    if (mounted) {
-      setState(
-        () {},
-      );
-    }
-  }
-
-  // TAMBAHKAN METHOD INI untuk refresh data user dari luar
+  // Method pembantu jika MainShellController butuh pemicu refresh data user
   Future<
     void
   >
   refreshUserData() async {
-    await _controller.refreshUserData();
+    if (mounted) {
+      await context
+          .read<
+            HomeController
+          >()
+          .refreshUserData();
+    }
   }
 
   Widget _buildEmptyOrderBox() {
@@ -108,7 +85,6 @@ class HomeScreenState
         ),
         border: Border.all(
           color: AppColors.borderLight,
-          style: BorderStyle.solid,
         ),
       ),
       child: Column(
@@ -135,13 +111,14 @@ class HomeScreenState
 
   void _handleServiceTap(
     BuildContext context,
+    HomeController homeProvider,
     Map<
       String,
       dynamic
     >
     service,
   ) {
-    if (!_controller.isLoggedIn) {
+    if (!homeProvider.isLoggedIn) {
       showLoginModal(
         context,
       );
@@ -154,8 +131,9 @@ class HomeScreenState
 
   void _handleNotificationTap(
     BuildContext context,
+    HomeController homeProvider,
   ) {
-    if (!_controller.isLoggedIn) {
+    if (!homeProvider.isLoggedIn) {
       showLoginModal(
         context,
       );
@@ -169,9 +147,10 @@ class HomeScreenState
   >
   _handleOfferTap(
     BuildContext context,
+    HomeController homeProvider,
     int index,
   ) async {
-    if (!_controller.isLoggedIn) {
+    if (!homeProvider.isLoggedIn) {
       showLoginModal(
         context,
       );
@@ -190,7 +169,7 @@ class HomeScreenState
 
     if (code !=
         null) {
-      await _controller.copyPromoCodeToClipboard(
+      await homeProvider.copyPromoCodeToClipboard(
         context,
         code,
       );
@@ -208,9 +187,11 @@ class HomeScreenState
   Widget build(
     BuildContext context,
   ) {
-    final isLoggedIn = _controller.isLoggedIn;
-    final userFirstName = _controller.userFirstName;
-    final activeOrders = _controller.activeOrders;
+    // Mendengarkan perubahan state secara reaktif via context.watch
+    final homeProvider = context
+        .watch<
+          HomeController
+        >();
 
     return ColoredBox(
       color: AppColors.headerNavy,
@@ -219,6 +200,7 @@ class HomeScreenState
           HomeNavyHeaderBlock(
             onNotification: () => _handleNotificationTap(
               context,
+              homeProvider,
             ),
           ),
           Expanded(
@@ -232,181 +214,192 @@ class HomeScreenState
               ),
               child: ScrollConfiguration(
                 behavior: const _NoOverscrollBehavior(),
-                child: SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (isLoggedIn &&
-                          userFirstName !=
-                              null) ...[
-                        Text(
-                          'Hi ${userFirstName} 👋',
-                          style: AppTextStyles.screenTitleNavy.copyWith(
-                            fontSize: 18,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 6,
-                        ),
-                      ],
-                      const SectionHeaderRow(
-                        title: 'Layanan Laundry Kami',
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: ServiceCardCompact(
-                                    title: homeServices[0].title,
-                                    priceLabel: homeServices[0].price,
-                                    etaLabel: homeServices[0].eta,
-                                    etaType: homeServices[0].etaType,
-                                    onTap: () => _handleServiceTap(
-                                      context,
-                                      {
-                                        'title': homeServices[0].title,
-                                        'price': homeServices[0].price,
-                                        'eta': homeServices[0].eta,
-                                        'type': homeServices[0].etaType,
-                                      },
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 12,
-                                ),
-                                Expanded(
-                                  child: ServiceCardCompact(
-                                    title: homeServices[1].title,
-                                    priceLabel: homeServices[1].price,
-                                    etaLabel: homeServices[1].eta,
-                                    etaType: homeServices[1].etaType,
-                                    onTap: () => _handleServiceTap(
-                                      context,
-                                      {
-                                        'title': homeServices[1].title,
-                                        'price': homeServices[1].price,
-                                        'eta': homeServices[1].eta,
-                                        'type': homeServices[1].etaType,
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
+                child: RefreshIndicator(
+                  // Fitur tarik ke bawah untuk refresh data otomatis
+                  onRefresh: () => homeProvider.refreshData(),
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (homeProvider.isLoggedIn &&
+                            homeProvider.userFirstName !=
+                                null) ...[
+                          Text(
+                            'Hi ${homeProvider.userFirstName} 👋',
+                            style: AppTextStyles.screenTitleNavy.copyWith(
+                              fontSize: 18,
                             ),
                           ),
                           const SizedBox(
-                            width: 10,
-                          ),
-                          GestureDetector(
-                            onTap: () => widget.onOpenServices?.call(),
-                            child: Container(
-                              height: 100,
-                              width: 50,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(
-                                  14,
-                                ),
-                                border: Border.all(
-                                  color: Colors.grey.shade300,
-                                ),
-                              ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  size: 18,
-                                  color: AppColors.headerNavy,
-                                ),
-                              ),
-                            ),
+                            height: 6,
                           ),
                         ],
-                      ),
-                      const SizedBox(
-                        height: AppSpacing.xl,
-                      ),
-                      const SectionHeaderRow(
-                        title: 'Pesanan Aktif',
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
-                      SizedBox(
-                        height: 180,
-                        child: activeOrders.isEmpty
-                            ? _buildEmptyOrderBox()
-                            : PageView.builder(
-                                controller: PageController(
-                                  viewportFraction: 0.9,
-                                  initialPage: 0,
-                                ),
-                                itemCount: activeOrders.length,
-                                padEnds: false,
-                                itemBuilder:
-                                    (
-                                      context,
-                                      index,
-                                    ) {
-                                      final order = activeOrders[index];
-                                      final displayTotal = _controller.getDisplayTotal(
-                                        order,
-                                      );
-                                      return GestureDetector(
-                                        behavior: HitTestBehavior.opaque,
-                                        onTap: () {
-                                          Navigator.pushNamed(
-                                            context,
-                                            '/order-detail',
-                                            arguments: {
-                                              ...order.toMap(),
-                                              'fromActiveOrder': true,
-                                            },
-                                          );
+                        const SectionHeaderRow(
+                          title: 'Layanan Laundry Kami',
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: ServiceCardCompact(
+                                      title: homeServices[0].title,
+                                      priceLabel: homeServices[0].price,
+                                      etaLabel: homeServices[0].eta,
+                                      etaType: homeServices[0].etaType,
+                                      onTap: () => _handleServiceTap(
+                                        context,
+                                        homeProvider,
+                                        {
+                                          'title': homeServices[0].title,
+                                          'price': homeServices[0].price,
+                                          'eta': homeServices[0].eta,
+                                          'type': homeServices[0].etaType,
                                         },
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            right: 12,
-                                          ),
-                                          child: ActiveOrderCard(
-                                            statusTitle: 'Pesanan ${order.orderId}',
-                                            subtitle: 'Pickup: ${order.pickupTime}\nDelivery: ${order.deliveryTime}',
-                                            totalPrice: displayTotal,
-                                            currentStep: order.currentStep,
-                                            badgeLabel: order.badgeLabel,
-                                          ),
-                                        ),
-                                      );
-                                    },
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 12,
+                                  ),
+                                  Expanded(
+                                    child: ServiceCardCompact(
+                                      title: homeServices[1].title,
+                                      priceLabel: homeServices[1].price,
+                                      etaLabel: homeServices[1].eta,
+                                      etaType: homeServices[1].etaType,
+                                      onTap: () => _handleServiceTap(
+                                        context,
+                                        homeProvider,
+                                        {
+                                          'title': homeServices[1].title,
+                                          'price': homeServices[1].price,
+                                          'eta': homeServices[1].eta,
+                                          'type': homeServices[1].etaType,
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                      ),
-                      const SizedBox(
-                        height: AppSpacing.xl,
-                      ),
-                      SectionHeaderRow(
-                        title: 'Penawaran Khusus',
-                        actionLabel: 'Lainnya',
-                        onAction: () => widget.onOpenDisc?.call(),
-                      ),
-                      OfferImageAutoSlider(
-                        onTap:
-                            (
-                              index,
-                            ) => _handleOfferTap(
-                              context,
-                              index,
                             ),
-                      ),
-                      const SizedBox(
-                        height: 24,
-                      ),
-                    ],
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            GestureDetector(
+                              onTap: () => widget.onOpenServices?.call(),
+                              child: Container(
+                                height: 100,
+                                width: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade100,
+                                  borderRadius: BorderRadius.circular(
+                                    14,
+                                  ),
+                                  border: Border.all(
+                                    color: Colors.grey.shade300,
+                                  ),
+                                ),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 18,
+                                    color: AppColors.headerNavy,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: AppSpacing.xl,
+                        ),
+                        const SectionHeaderRow(
+                          title: 'Pesanan Aktif',
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        SizedBox(
+                          height: 180,
+                          child: homeProvider.isLoading
+                              ? const Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                              : homeProvider.activeOrders.isEmpty
+                              ? _buildEmptyOrderBox()
+                              : PageView.builder(
+                                  controller: PageController(
+                                    viewportFraction: 0.9,
+                                    initialPage: 0,
+                                  ),
+                                  itemCount: homeProvider.activeOrders.length,
+                                  padEnds: false,
+                                  itemBuilder:
+                                      (
+                                        context,
+                                        index,
+                                      ) {
+                                        final order = homeProvider.activeOrders[index];
+                                        final displayTotal = homeProvider.getDisplayTotal(
+                                          order,
+                                        );
+                                        return GestureDetector(
+                                          behavior: HitTestBehavior.opaque,
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                              context,
+                                              '/order-detail',
+                                              arguments: {
+                                                ...order.toMap(),
+                                                'fromActiveOrder': true,
+                                              },
+                                            );
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                              right: 12,
+                                            ),
+                                            child: ActiveOrderCard(
+                                              statusTitle: 'Pesanan ${order.orderId}',
+                                              subtitle: 'Pickup: ${order.pickupTime}\nDelivery: ${order.deliveryTime}',
+                                              totalPrice: displayTotal,
+                                              currentStep: order.currentStep,
+                                              badgeLabel: order.badgeLabel,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                ),
+                        ),
+                        const SizedBox(
+                          height: AppSpacing.xl,
+                        ),
+                        SectionHeaderRow(
+                          title: 'Penawaran Khusus',
+                          actionLabel: 'Lainnya',
+                          onAction: () => widget.onOpenDisc?.call(),
+                        ),
+                        OfferImageAutoSlider(
+                          onTap:
+                              (
+                                index,
+                              ) => _handleOfferTap(
+                                context,
+                                homeProvider,
+                                index,
+                              ),
+                        ),
+                        const SizedBox(
+                          height: 24,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

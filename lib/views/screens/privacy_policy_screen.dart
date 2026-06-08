@@ -1,4 +1,3 @@
-// views/privacy_policy_screen_provider.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wushlaundry/controllers/privacy_controller.dart';
@@ -21,7 +20,9 @@ class PrivacyPolicyScreen
   Widget build(
     BuildContext context,
   ) {
-    return ChangeNotifierProvider(
+    return ChangeNotifierProvider<
+      PrivacyPolicyController
+    >(
       create:
           (
             _,
@@ -40,15 +41,11 @@ class _PrivacyPolicyContent
   Widget build(
     BuildContext context,
   ) {
-    final controller =
-        Provider.of<
+    // Membaca method goBack dari controller tanpa me-listen perubahan state
+    final controller = context
+        .read<
           PrivacyPolicyController
-        >(
-          context,
-        );
-    final policyModel = controller.policyModel;
-    final isLoading = controller.isLoading;
-    final errorMessage = controller.errorMessage;
+        >();
 
     return Scaffold(
       backgroundColor: AppColors.profileNavy,
@@ -60,21 +57,46 @@ class _PrivacyPolicyContent
       ),
       body: _buildBody(
         context,
-        controller,
-        policyModel,
-        isLoading,
-        errorMessage,
       ),
     );
   }
 
   Widget _buildBody(
     BuildContext context,
-    PrivacyPolicyController controller,
-    PrivacyPolicyModel policyModel,
-    bool isLoading,
-    String? errorMessage,
   ) {
+    // Menggunakan context.select untuk memantau perubahan state secara spesifik (efisiensi rerender)
+    final isLoading =
+        context.select<
+          PrivacyPolicyController,
+          bool
+        >(
+          (
+            c,
+          ) => c.isLoading,
+        );
+    final errorMessage =
+        context.select<
+          PrivacyPolicyController,
+          String?
+        >(
+          (
+            c,
+          ) => c.errorMessage,
+        );
+    final policyModel =
+        context.select<
+          PrivacyPolicyController,
+          PrivacyPolicyModel
+        >(
+          (
+            c,
+          ) => c.policyModel,
+        );
+    final controller = context
+        .read<
+          PrivacyPolicyController
+        >();
+
     if (isLoading) {
       return const Center(
         child: CircularProgressIndicator(
