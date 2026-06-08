@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // <-- Pastikan import ini ada
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_spacing.dart';
@@ -18,8 +19,12 @@ class AboutScreen
   Widget build(
     BuildContext context,
   ) {
-    final controller = AboutController();
-    final aboutData = controller.getAboutData();
+    // Mengambil data dari Provider
+    final aboutController = context
+        .read<
+          AboutController
+        >();
+    final aboutData = aboutController.aboutData;
 
     return Scaffold(
       backgroundColor: AppColors.profileNavy,

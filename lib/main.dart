@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:wushlaundry/constants/app_colors.dart';
+
+// Controllers / Providers
+import 'package:wushlaundry/controllers/about_controller.dart';
+import 'package:wushlaundry/controllers/main_shell_controller.dart';
+import 'package:wushlaundry/controllers/my_order_controller.dart';
 
 // Screens
 import 'package:wushlaundry/views/screens/about_screen.dart';
@@ -33,11 +39,45 @@ main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final prefs = await SharedPreferences.getInstance();
+  // Mengambil status login untuk disuntikkan ke MyOrdersController saat startup
+  final bool isLoggedIn =
+      prefs.getBool(
+        'isLoggedIn',
+      ) ??
+      false;
+
   // Hapus semua data SharedPreferences untuk testing (opsional)
   // await prefs.clear();
 
   runApp(
-    const WushLaundryApp(),
+    MultiProvider(
+      providers: [
+        // 1. Mendaftarkan MainShellController sebagai Provider
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => MainShellController(),
+        ),
+        // 2. Mendaftarkan MyOrdersController dengan argument login awal
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => MyOrdersController(
+                loggedIn: isLoggedIn,
+              ),
+        ),
+        // 3. Mendaftarkan AboutController yang baru saja kita buat
+        ChangeNotifierProvider(
+          create:
+              (
+                _,
+              ) => AboutController(),
+        ),
+      ],
+      child: const WushLaundryApp(),
+    ),
   );
 }
 

@@ -52,25 +52,32 @@ class MyOrdersController
     notifyListeners();
   }
 
+  /// Memperbaiki parsing Rupiah agar aman dari spasi dan titik ribuan
   int _parseRupiahToInt(
     String rupiah,
   ) {
     if (rupiah.isEmpty) return 0;
     String cleaned = rupiah
         .replaceAll(
-          'Rp ',
+          'Rp',
           '',
         )
         .replaceAll(
           '.',
           '',
-        );
+        )
+        .replaceAll(
+          ' ',
+          '',
+        )
+        .trim();
     return int.tryParse(
           cleaned,
         ) ??
         0;
   }
 
+  /// Memperbaiki logika pembersihan data agar tidak menghapus orderan baru secara tidak sengaja
   Future<
     void
   >
@@ -106,9 +113,16 @@ class MyOrdersController
         int nominal = _parseRupiahToInt(
           totalPrice,
         );
+
+        // Jika orderId valid dan ada isinya, pertahankan (jangan dihapus otomatis)
+        if (orderId.isNotEmpty &&
+            orderId !=
+                '100001')
+          return true;
         if (orderId ==
             '100001')
           return true;
+
         return nominal >
             5000;
       },
@@ -151,9 +165,15 @@ class MyOrdersController
         int nominal = _parseRupiahToInt(
           totalPrice,
         );
+
+        if (orderId.isNotEmpty &&
+            orderId !=
+                DummyOrders.dummyOrderId)
+          return true;
         if (orderId ==
             DummyOrders.dummyOrderId)
           return true;
+
         return nominal >
             5000;
       },
@@ -184,14 +204,21 @@ class MyOrdersController
       (
         order,
       ) {
+        final data = Uri.splitQueryString(
+          order,
+        );
+        final orderId =
+            data['orderId'] ??
+            '';
         final totalPrice =
-            Uri.splitQueryString(
-              order,
-            )['totalPrice'] ??
+            data['totalPrice'] ??
             'Rp 0';
         int nominal = _parseRupiahToInt(
           totalPrice,
         );
+
+        if (orderId.isNotEmpty) return true;
+
         return nominal >
             5000;
       },

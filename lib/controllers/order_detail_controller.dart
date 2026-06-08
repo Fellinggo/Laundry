@@ -71,6 +71,11 @@ class OrderDetailController
       list,
     );
 
+    // Memastikan format harga bersih tanpa spasi tambahan sebelum masuk Uri query
+    final totalHargaFormatted = formatRupiah(
+      data.grandTotal,
+    ).trim();
+
     final orderString = Uri(
       queryParameters: {
         'orderId': data.orderId,
@@ -78,9 +83,7 @@ class OrderDetailController
         'qty': data.totalQty.toString(),
         'pickupTime': data.pickupTimeText,
         'deliveryTime': data.deliveryTimeText,
-        'totalPrice': formatRupiah(
-          data.grandTotal,
-        ),
+        'totalPrice': totalHargaFormatted,
         'address': data.pickupAddress,
         'itemsJson': data.itemsJson,
         'deliveryFee': data.deliveryFee.toString(),
@@ -101,10 +104,10 @@ class OrderDetailController
     );
 
     debugPrint(
-      'Pesanan baru disimpan: ${data.orderId} dengan total: ${data.grandTotal}',
+      'Pesanan baru disimpan: ${data.orderId} dengan total: $totalHargaFormatted',
     );
     debugPrint(
-      'Total pesanan aktif: ${existingOrders.length}',
+      'Total pesanan aktif saat ini: ${existingOrders.length}',
     );
 
     _isSaving = false;

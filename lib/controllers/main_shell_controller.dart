@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wushlaundry/views/widgets/login_modal_sheet.dart';
 import '../models/main_shell_model.dart';
-import '../views/screens/home_screen.dart'; // Import HomeScreenState
+import '../views/screens/home_screen.dart';
 
 class MainShellController
     extends
@@ -13,7 +13,6 @@ class MainShellController
     userFirstName: null,
   );
 
-  // Tambahkan GlobalKey untuk HomeScreen
   final GlobalKey<
     HomeScreenState
   >
@@ -22,10 +21,14 @@ class MainShellController
         HomeScreenState
       >();
 
+  // Trigger unik untuk memaksa refresh widget bertipe IndexedStack via key
+  int _tabUpdateTrigger = DateTime.now().millisecondsSinceEpoch;
+
   MainShellState get state => _state;
   int get currentIndex => _state.selectedIndex;
   bool get isLoggedIn => _state.isLoggedIn;
   String? get userFirstName => _state.userFirstName;
+  int get tabUpdateTrigger => _tabUpdateTrigger;
 
   MainShellController() {
     _loadUser();
@@ -59,7 +62,6 @@ class MainShellController
   >
   refreshUser() async {
     await _loadUser();
-    // Refresh HomeScreen setelah user data berubah
     homeScreenKey.currentState?.refreshUserData();
   }
 
@@ -71,39 +73,29 @@ class MainShellController
       _state = _state.copyWith(
         selectedIndex: index,
       );
+
+      // SETIAP KALI PINDAH TAB, kita update nilai pemicu agar widget dengan key ini di-rebuild ulang datanya
+      _tabUpdateTrigger = DateTime.now().millisecondsSinceEpoch;
+
       notifyListeners();
     }
   }
 
-  void goToServicesTab() {
-    changeTab(
-      NavigationTarget.services,
-    );
-  }
-
-  void goToOffersTab() {
-    changeTab(
-      NavigationTarget.offers,
-    );
-  }
-
-  void goToHomeTab() {
-    changeTab(
-      NavigationTarget.home,
-    );
-  }
-
-  void goToMyOrdersTab() {
-    changeTab(
-      NavigationTarget.myOrders,
-    );
-  }
-
-  void goToProfileTab() {
-    changeTab(
-      NavigationTarget.profile,
-    );
-  }
+  void goToServicesTab() => changeTab(
+    NavigationTarget.services,
+  );
+  void goToOffersTab() => changeTab(
+    NavigationTarget.offers,
+  );
+  void goToHomeTab() => changeTab(
+    NavigationTarget.home,
+  );
+  void goToMyOrdersTab() => changeTab(
+    NavigationTarget.myOrders,
+  );
+  void goToProfileTab() => changeTab(
+    NavigationTarget.profile,
+  );
 
   void handleNotificationTap(
     BuildContext context,
