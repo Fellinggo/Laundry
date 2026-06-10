@@ -10,9 +10,10 @@ import '../widgets/order_status_segmented_bar.dart';
 import '../widgets/pesanan_order_card.dart';
 import '../widgets/rounded_white_panel.dart';
 
+// UBAH MENJADI StatefulWidget AGAR BISA DI-REFRESH
 class MyOrdersScreen
     extends
-        StatelessWidget {
+        StatefulWidget {
   const MyOrdersScreen({
     super.key,
     this.loggedIn = false,
@@ -21,25 +22,81 @@ class MyOrdersScreen
   final bool loggedIn;
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    // Memantau controller secara reaktif via provider
-    final controller = context
-        .watch<
-          MyOrdersController
-        >();
+  State<
+    MyOrdersScreen
+  >
+  createState() => MyOrdersScreenState();
+}
 
-    // Menjaga sinkronisasi data apabila parameter "loggedIn" dari MainShell berubah
+class MyOrdersScreenState
+    extends
+        State<
+          MyOrdersScreen
+        > {
+  @override
+  void initState() {
+    super.initState();
+    // Inisialisasi controller setelah widget terpasang
     WidgetsBinding.instance.addPostFrameCallback(
       (
         _,
       ) {
+        final controller = context
+            .read<
+              MyOrdersController
+            >();
         controller.updateLoginStatus(
-          loggedIn,
+          widget.loggedIn,
         );
       },
     );
+  }
+
+  @override
+  void didUpdateWidget(
+    MyOrdersScreen oldWidget,
+  ) {
+    super.didUpdateWidget(
+      oldWidget,
+    );
+    if (oldWidget.loggedIn !=
+        widget.loggedIn) {
+      final controller = context
+          .read<
+            MyOrdersController
+          >();
+      controller.updateLoginStatus(
+        widget.loggedIn,
+      );
+    }
+  }
+
+  // METHOD UNTUK REFRESH DARI LUAR
+  Future<
+    void
+  >
+  refreshOrders() async {
+    final controller = context
+        .read<
+          MyOrdersController
+        >();
+    await controller.loadOrders();
+    setState(
+      () {},
+    );
+    debugPrint(
+      'DEBUG - MyOrdersScreen.refreshOrders() dipanggil',
+    );
+  }
+
+  @override
+  Widget build(
+    BuildContext context,
+  ) {
+    final controller = context
+        .watch<
+          MyOrdersController
+        >();
 
     return Scaffold(
       body: ColoredBox(

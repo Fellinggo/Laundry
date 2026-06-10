@@ -485,9 +485,13 @@ class OrderDetailScreen
       child: ElevatedButton(
         onPressed: controller.isSaving
             ? null
-            : () => controller.onConfirmPressed(
-                context,
-              ),
+            : () async {
+                // TAMBAHKAN INI UNTUK MENGHINDARI DOUBLE CLICK
+                if (controller.isSaving) return;
+                await controller.onConfirmPressed(
+                  context,
+                );
+              },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.headerNavy,
           padding: const EdgeInsets.symmetric(

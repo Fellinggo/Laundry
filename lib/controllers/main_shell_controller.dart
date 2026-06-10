@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wushlaundry/views/widgets/login_modal_sheet.dart';
-import '../models/main_shell_model.dart'; // Tetap mengimpor model milikmu
+import '../models/main_shell_model.dart';
 import '../views/screens/home_screen.dart';
+import '../views/screens/my_orders_screen.dart';
 
 class MainShellController
     extends
@@ -21,7 +22,15 @@ class MainShellController
         HomeScreenState
       >();
 
-  // Trigger unik untuk memaksa refresh widget bertipe IndexedStack via key
+  // GLOBAL KEY UNTUK MY ORDERS SCREEN
+  final GlobalKey<
+    MyOrdersScreenState
+  >
+  myOrdersKey =
+      GlobalKey<
+        MyOrdersScreenState
+      >();
+
   int _tabUpdateTrigger = DateTime.now().millisecondsSinceEpoch;
 
   MainShellState get state => _state;
@@ -65,6 +74,18 @@ class MainShellController
     homeScreenKey.currentState?.refreshUserData();
   }
 
+  // METHOD BARU: Refresh My Orders Data
+  Future<
+    void
+  >
+  refreshMyOrdersData() async {
+    // Panggil method refresh dari MyOrdersScreen jika ada
+    await myOrdersKey.currentState?.refreshOrders();
+    debugPrint(
+      'DEBUG - My Orders data refreshed',
+    );
+  }
+
   void changeTab(
     int index,
   ) {
@@ -73,8 +94,6 @@ class MainShellController
       _state = _state.copyWith(
         selectedIndex: index,
       );
-
-      // Setiap kali pindah tab, perbarui nilai pemicu timestamp
       _tabUpdateTrigger = DateTime.now().millisecondsSinceEpoch;
       notifyListeners();
     }

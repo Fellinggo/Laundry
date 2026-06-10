@@ -56,6 +56,7 @@ class OrderDetailController
 
     final prefs = await SharedPreferences.getInstance();
 
+    // 1. Simpan notifikasi
     final notif = "Pesanan ${data.orderId} berhasil dibuat - ${DateTime.now()}";
     final list =
         prefs.getStringList(
@@ -71,25 +72,23 @@ class OrderDetailController
       list,
     );
 
-    // Memastikan format harga bersih tanpa spasi tambahan sebelum masuk Uri query
+    // 2. Format total harga
     final totalHargaFormatted = formatRupiah(
       data.grandTotal,
     ).trim();
 
-    final orderString = Uri(
-      queryParameters: {
-        'orderId': data.orderId,
-        'service': data.serviceSummary,
-        'qty': data.totalQty.toString(),
-        'pickupTime': data.pickupTimeText,
-        'deliveryTime': data.deliveryTimeText,
-        'totalPrice': totalHargaFormatted,
-        'address': data.pickupAddress,
-        'itemsJson': data.itemsJson,
-        'deliveryFee': data.deliveryFee.toString(),
-      },
-    ).query;
+    // 3. BuAT ORDER STRING dengan format yang KONSISTEN
+    //    PERHATIAN: Jangan gunakan Uri().query karena menambahkan '?' di awal
+    //    Gunakan format manual agar sesuai dengan UserOrder.fromQueryString
+    final orderString = _buildOrderString(
+      totalHargaFormatted,
+    );
 
+    debugPrint(
+      'DEBUG - Order string yang disimpan: $orderString',
+    );
+
+    // 4. Simpan ke active_orders
     final existingOrders =
         prefs.getStringList(
           'active_orders',
@@ -112,6 +111,53 @@ class OrderDetailController
 
     _isSaving = false;
     notifyListeners();
+  }
+
+  // METHOD BARU: Membuat order string dengan format yang benar
+  String _buildOrderString(
+    String totalHargaFormatted,
+  ) {
+    // Format: orderId=XXX&service=XXX&qty=XXX&pickupTime=XXX&deliveryTime=XXX&totalPrice=XXX&address=XXX&itemsJson=XXX&deliveryFee=XXX
+    // TANPA tanda '?' di awal!
+    return 'orderId=${data.orderId}'
+        '&service=${Uri.encodeComponent(data.serviceSummary)}'
+        '&qty=${data.totalQty}'
+        '&pickupTime=${Uri.encodeComponent(data.pickupTimeText)}'
+        '&deliveryTime=${Uri.encodeComponent(data.deliveryTimeText)}'
+        '&totalPrice=$totalHargaFormatted'
+        '&address=${Uri.encodeComponent(data.pickupAddress)}'
+        '&itemsJson=${Uri.encodeComponent(data.itemsJson)}'
+        '&deliveryFee=${data.deliveryFee}';
+  }
+
+  void _navigateToHome(
+    BuildContext context,
+  ) {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (
+        _,
+      ) {
+        if (context.mounted) {
+          // SET FLAG UNTUK REFRESH MY ORDERS
+          // Kirim notifikasi bahwa data pesanan berubah
+          Navigator.of(
+            context,
+          ).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder:
+                  (
+                    _,
+                  ) => const MainShellScreen(
+                    refreshMyOrders: true,
+                  ),
+            ),
+            (
+              route,
+            ) => false,
+          );
+        }
+      },
+    );
   }
 
   Future<
@@ -139,22 +185,15 @@ class OrderDetailController
         ),
       );
 
-      Navigator.pushAndRemoveUntil(
+      _navigateToHome(
         context,
-        MaterialPageRoute(
-          builder:
-              (
-                _,
-              ) => const MainShellScreen(),
-        ),
-        (
-          route,
-        ) => false,
       );
     } else {
-      Navigator.pop(
-        context,
-      );
+      if (context.mounted) {
+        Navigator.pop(
+          context,
+        );
+      }
     }
   }
 
@@ -181,33 +220,18 @@ class OrderDetailController
       ),
     );
 
-    Future.delayed(
-      const Duration(
-        seconds: 1,
-      ),
-      () {
-        if (!context.mounted) return;
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder:
-                (
-                  _,
-                ) => const MainShellScreen(),
-          ),
-          (
-            route,
-          ) => false,
-        );
-      },
+    _navigateToHome(
+      context,
     );
   }
 
   void goBack(
     BuildContext context,
   ) {
-    Navigator.pop(
-      context,
-    );
+    if (context.mounted) {
+      Navigator.pop(
+        context,
+      );
+    }
   }
 }

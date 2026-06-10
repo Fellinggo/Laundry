@@ -12,19 +12,32 @@ import '../../controllers/main_shell_controller.dart';
 class MainShellScreen
     extends
         StatelessWidget {
+  final bool refreshMyOrders; // PARAMETER BARU
+
   const MainShellScreen({
     super.key,
+    this.refreshMyOrders = false,
   });
 
   @override
   Widget build(
     BuildContext context,
   ) {
-    // Memantau perubahan state MainShellController lewat Provider
     final shellProvider = context
         .watch<
           MainShellController
         >();
+
+    // Jika perlu refresh My Orders, panggil method refresh
+    if (refreshMyOrders) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (
+          _,
+        ) {
+          shellProvider.refreshMyOrdersData();
+        },
+      );
+    }
 
     final isLoggedIn = shellProvider.isLoggedIn;
     final userFirstName = shellProvider.userFirstName;
@@ -53,9 +66,8 @@ class MainShellScreen
             onOpenDisc: () => shellProvider.goToOffersTab(),
           ),
           MyOrdersScreen(
-            key: ValueKey(
-              'my_orders_tab_${shellProvider.tabUpdateTrigger}',
-            ),
+            // GANTI KEY JADI GLOBAL KEY AGAR BISA DI-REFRESH
+            key: shellProvider.myOrdersKey,
             loggedIn: isLoggedIn,
           ),
           ServicesScreen(

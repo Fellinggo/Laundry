@@ -125,7 +125,7 @@ class _ServiceDetailContent
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Horizontal Filter Chip List
+                  // Horizontal Filter Chip List - DIPERBAIKI
                   SizedBox(
                     height: 44,
                     child: ListView.builder(
@@ -136,31 +136,43 @@ class _ServiceDetailContent
                             context,
                             i,
                           ) {
-                            // Memisahkan penyeleksian status chip agar tidak merender ulang chip lain
-                            final isSelected =
-                                context.select<
-                                  ServiceDetailController,
-                                  bool
-                                >(
+                            // PERBAIKAN: Gunakan Selector widget atau watch
+                            return Selector<
+                              ServiceDetailController,
+                              bool
+                            >(
+                              selector:
                                   (
+                                    _,
                                     c,
                                   ) => c.model.selectedServices.containsKey(
                                     i,
                                   ),
-                                );
-                            final service = controller.model.services[i];
-
-                            return ServiceFilterChip(
-                              isSelected: isSelected,
-                              icon: service.icon,
-                              title: service.title,
-                              onSelected:
+                              builder:
                                   (
-                                    val,
-                                  ) => controller.toggleServiceSelection(
-                                    i,
-                                    val,
-                                  ),
+                                    context,
+                                    isSelected,
+                                    child,
+                                  ) {
+                                    final currentController = context
+                                        .read<
+                                          ServiceDetailController
+                                        >();
+                                    final service = currentController.model.services[i];
+
+                                    return ServiceFilterChip(
+                                      isSelected: isSelected,
+                                      icon: service.icon,
+                                      title: service.title,
+                                      onSelected:
+                                          (
+                                            val,
+                                          ) => currentController.toggleServiceSelection(
+                                            i,
+                                            val,
+                                          ),
+                                    );
+                                  },
                             );
                           },
                     ),
