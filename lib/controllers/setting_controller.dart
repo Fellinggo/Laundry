@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wushlaundry/models/setting_model.dart';
 import 'package:wushlaundry/views/widgets/confirmation_dialog_widget.dart';
 import 'package:wushlaundry/views/widgets/language_sheet_widget.dart';
+import 'package:wushlaundry/controllers/home_controller.dart';
 
 class SettingsController
     extends
@@ -55,13 +56,9 @@ class SettingsController
     }
   }
 
-  Future<
-    void
-  >
-  logout(
-    BuildContext context,
-  ) async {
+  Future<void> logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
+
     await prefs.setBool(
       'isLoggedIn',
       false,
@@ -71,38 +68,26 @@ class SettingsController
       Navigator.pushNamedAndRemoveUntil(
         context,
         '/main',
-        (
-          route,
-        ) => false,
+        (route) => false,
       );
     }
   }
 
-  Future<
-    void
-  >
-  deleteAccount(
-    BuildContext context,
-  ) async {
+  Future<void> deleteAccount(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
+
     await prefs.clear();
 
     if (context.mounted) {
       Navigator.pushNamedAndRemoveUntil(
         context,
         '/main',
-        (
-          route,
-        ) => false,
+        (route) => false,
       );
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Akun berhasil dihapus',
-          ),
+          content: Text('Akun berhasil dihapus'),
           backgroundColor: Colors.red,
         ),
       );

@@ -47,7 +47,7 @@ class HomeController
             'userName',
           )
         : null;
-
+    
     _user = UserModel.fromPreferences(
       isLoggedIn,
       fullName,

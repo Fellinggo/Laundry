@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // <-- Pastikan ini diimport
+import 'package:wushlaundry/controllers/home_controller.dart';
+import 'package:wushlaundry/controllers/main_shell_controller.dart'; // Tambah import ini
 import '../../constants/app_colors.dart';
 import '../../constants/app_spacing.dart';
 import '../../constants/app_text_styles.dart';
@@ -62,26 +64,24 @@ class _LoginScreenState
     }
   }
 
-  Future<
-    void
-  >
-  _handleLogin() async {
-    final loginController = context
-        .read<
-          LoginController
-        >();
+  Future<void> _handleLogin() async {
+    final loginController = context.read<LoginController>();
+
     final success = await loginController.validateAndLogin(
       email: emailController.text.trim(),
       password: passwordController.text.trim(),
     );
 
-    if (success &&
-        mounted) {
+    if (success && mounted) {
+      await context.read<HomeController>().refreshData();
+
       _navigateToMain();
     }
   }
 
   void _navigateToMain() {
+    context.read<MainShellController>().goToHomeTab(); // Tambah baris ini
+
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/main',

@@ -45,11 +45,18 @@ class HomeScreen
   createState() => HomeScreenState();
 }
 
-class HomeScreenState
-    extends
-        State<
-          HomeScreen
-        > {
+class HomeScreenState extends State<HomeScreen> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<HomeController>().refreshData();
+      }
+    });
+  }
+
   final homeServices = serviceDummy
       .where(
         (

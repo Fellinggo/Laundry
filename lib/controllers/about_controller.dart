@@ -14,6 +14,5 @@ class AboutController
     ],
   );
 
-  // Getter untuk mengambil data dari screen
   AboutModel get aboutData => _aboutData;
 }

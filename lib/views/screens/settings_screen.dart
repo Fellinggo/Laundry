@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wushlaundry/controllers/setting_controller.dart';
+import 'package:wushlaundry/controllers/main_shell_controller.dart';
 import 'package:wushlaundry/views/widgets/setting_tile_widget.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_spacing.dart';
@@ -155,17 +156,19 @@ class _SettingsContent
                 icon: Icons.person_off_outlined,
                 title: 'Hapus Akun',
                 danger: true,
-                onTap: () => controller.showDeleteConfirmation(
-                  context,
-                ),
+                onTap: () {
+                  controller.showDeleteConfirmation(context);
+                  context.read<MainShellController>().goToHomeTab();
+                },
               ),
               SettingsTileWidget(
                 icon: Icons.logout,
                 title: 'Keluar',
                 danger: true,
-                onTap: () => controller.showLogoutConfirmation(
-                  context,
-                ),
+                onTap: () {
+                  controller.showLogoutConfirmation(context);
+                  context.read<MainShellController>().goToHomeTab();
+                },
               ),
             ],
           ],
