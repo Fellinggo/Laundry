@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../controllers/address_selector_controller.dart';
 import '../models/pickup_schedule_model.dart';
 
-class PickupScheduleController
-    extends
-        ChangeNotifier {
+class PickupScheduleController extends ChangeNotifier {
   PickupScheduleData _data = PickupScheduleData();
   final TextEditingController customAddressController = TextEditingController();
 
@@ -16,21 +16,10 @@ class PickupScheduleController
     loadAddressesFromPrefs();
   }
 
-  Future<
-    void
-  >
-  loadAddressesFromPrefs() async {
+  Future<void> loadAddressesFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    final isLoggedIn =
-        prefs.getBool(
-          'isLoggedIn',
-        ) ??
-        false;
-    final email =
-        prefs.getString(
-          'userEmail',
-        ) ??
-        '';
+    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    final email = prefs.getString('userEmail') ?? '';
 
     if (!isLoggedIn) {
       _data = _data.copyWith(
@@ -45,41 +34,18 @@ class PickupScheduleController
     final addressKey = 'userAddresses_$email';
     final titlesKey = 'userAddressTitles_$email';
 
-    final savedAddresses =
-        prefs.getStringList(
-          addressKey,
-        ) ??
-        [];
-    final savedTitles =
-        prefs.getStringList(
-          titlesKey,
-        ) ??
-        [];
+    final savedAddresses = prefs.getStringList(addressKey) ?? [];
+    final savedTitles = prefs.getStringList(titlesKey) ?? [];
 
     if (savedAddresses.isNotEmpty) {
-      final Map<
-        String,
-        String
-      >
-      addresses = {};
-      for (
-        int i = 0;
-        i <
-            savedAddresses.length;
-        i++
-      ) {
-        final title =
-            i <
-                savedTitles.length
-            ? savedTitles[i]
-            : 'Alamat ${i + 1}';
+      final Map<String, String> addresses = {};
+      for (int i = 0; i < savedAddresses.length; i++) {
+        final title = i < savedTitles.length ? savedTitles[i] : 'Alamat ${i + 1}';
         addresses[title] = savedAddresses[i];
       }
       _data = _data.copyWith(
         addresses: addresses,
-        selectedAddressType: savedTitles.isNotEmpty
-            ? savedTitles[0]
-            : 'Alamat 1',
+        selectedAddressType: savedTitles.isNotEmpty ? savedTitles[0] : 'Alamat 1',
         isLoadingAddresses: false,
       );
     } else {
@@ -92,9 +58,7 @@ class PickupScheduleController
     notifyListeners();
   }
 
-  void setPickupTime(
-    TimeOfDay? time,
-  ) {
+  void setPickupTime(TimeOfDay? time) {
     _data = _data.copyWith(
       pickupTime: time,
       pickupError: false,
@@ -102,9 +66,7 @@ class PickupScheduleController
     notifyListeners();
   }
 
-  void setDeliveryTime(
-    TimeOfDay? time,
-  ) {
+  void setDeliveryTime(TimeOfDay? time) {
     _data = _data.copyWith(
       deliveryTime: time,
       deliveryError: false,
@@ -112,111 +74,53 @@ class PickupScheduleController
     notifyListeners();
   }
 
-  Future<
-    void
-  >
-  pickTime(
-    BuildContext context,
-    bool isPickup,
-  ) async {
+  Future<void> pickTime(BuildContext context, bool isPickup) async {
     final picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
     );
-    if (picked !=
-        null) {
+    if (picked != null) {
       if (isPickup) {
-        setPickupTime(
-          picked,
-        );
+        setPickupTime(picked);
       } else {
-        setDeliveryTime(
-          picked,
-        );
+        setDeliveryTime(picked);
       }
     }
   }
 
-  void selectAddressType(
-    String type,
-  ) {
-    _data = _data.copyWith(
-      selectedAddressType: type,
-      showAddressOptions: false,
-    );
-    notifyListeners();
-  }
-
-  void toggleAddressOptions() {
-    _data = _data.copyWith(
-      showAddressOptions: !_data.showAddressOptions,
-    );
-    notifyListeners();
-  }
-
-  void useCustomAddress() {
-    if (customAddressController.text.isNotEmpty) {
-      final newAddresses =
-          Map<
-            String,
-            String
-          >.from(
-            _data.addresses,
-          );
-      newAddresses['Custom'] = customAddressController.text;
-      _data = _data.copyWith(
-        selectedAddressType: 'Custom',
-        customAddress: customAddressController.text,
-        addresses: newAddresses,
-        showAddressOptions: false,
-      );
-      notifyListeners();
-    }
-  }
-
-  void validateAndNavigate(
-    BuildContext context,
-    Map<
-      String,
-      dynamic
-    >
-    args,
-  ) {
+  void validateAndNavigate(BuildContext context, Map<String, dynamic> args) {
     bool hasError = false;
 
     if (!_data.isPickupValid) {
-      _data = _data.copyWith(
-        pickupError: true,
-      );
+      _data = _data.copyWith(pickupError: true);
       hasError = true;
     }
     if (!_data.isDeliveryValid) {
-      _data = _data.copyWith(
-        deliveryError: true,
-      );
+      _data = _data.copyWith(deliveryError: true);
       hasError = true;
     }
     notifyListeners();
 
     if (hasError) return;
 
-    final selectedAddress = _data.getSelectedAddress();
-    if (selectedAddress.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
+    final addressController = context.read<AddressSelectorController>();
+    
+    addressController.useCustomAddress();
+    addressController.saveAddressIfNeeded();
+
+    final selectedAddress = addressController.getSelectedAddress();
+    final selectedAddressType = addressController.selectedAddressType;
+
+    if (!addressController.isAddressValid()) {
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Silakan pilih alamat terlebih dahulu',
-          ),
+          content: Text('Silakan pilih alamat terlebih dahulu'),
         ),
       );
       return;
     }
 
-    final orderArgs = OrderArgumentData.fromMap(
-      args,
-    );
+    final orderArgs = OrderArgumentData.fromMap(args);
 
     Navigator.pushNamed(
       context,
@@ -229,26 +133,13 @@ class PickupScheduleController
         'pickupTime': _data.getFormattedPickupTime(),
         'deliveryTime': _data.getFormattedDeliveryTime(),
         'address': selectedAddress,
-        'addressType': _data.selectedAddressType,
+        'addressType': selectedAddressType,
       },
     );
   }
 
-  void navigateToProfile(
-    BuildContext context,
-  ) {
-    Navigator.pushNamed(
-      context,
-      '/profile',
-    );
-  }
-
-  void goBack(
-    BuildContext context,
-  ) {
-    Navigator.pop(
-      context,
-    );
+  void goBack(BuildContext context) {
+    Navigator.pop(context);
   }
 
   @override

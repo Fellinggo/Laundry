@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wushlaundry/controllers/address_selector_controller.dart';
 import 'package:wushlaundry/views/widgets/address_selector_widget.dart';
 import 'package:wushlaundry/views/widgets/schedule_date_field_widget.dart';
 import 'package:wushlaundry/views/widgets/schedule_timePicker_widget.dart';
@@ -21,8 +22,15 @@ class PickupScheduleScreen extends StatelessWidget {
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>? ??
         {};
 
-    return ChangeNotifierProvider<PickupScheduleController>(
-      create: (_) => PickupScheduleController(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<PickupScheduleController>(
+          create: (_) => PickupScheduleController(),
+        ),
+        ChangeNotifierProvider<AddressSelectorController>(
+          create: (_) => AddressSelectorController()..loadAddresses(),
+        ),
+      ],
       child: Consumer<PickupScheduleController>(
         builder: (context, controller, child) {
           final data = controller.data;
@@ -125,19 +133,7 @@ class PickupScheduleScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            AddressSelector(
-                              addresses: data.addresses,
-                              selectedAddressType: data.selectedAddressType,
-                              showAddressOptions: data.showAddressOptions,
-                              isLoadingAddresses: data.isLoadingAddresses,
-                              customAddressController:
-                                  controller.customAddressController,
-                              onAddressTap: controller.toggleAddressOptions,
-                              onAddressSelected: controller.selectAddressType,
-                              onUseCustomAddress: controller.useCustomAddress,
-                              onNavigateToProfile: () =>
-                                  controller.navigateToProfile(context),
-                            ),
+                            const AddressSelector(),
                             const SizedBox(height: AppSpacing.xl),
                             Text(
                               'Tambah catatan',

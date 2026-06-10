@@ -23,7 +23,6 @@ class ServiceDetailScreen
   Widget build(
     BuildContext context,
   ) {
-    // Mengambil argument navigasi secara aman di luar cycle UI build
     final args =
         ModalRoute.of(
               context,
