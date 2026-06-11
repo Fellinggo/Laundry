@@ -7,8 +7,16 @@
     "status": "pending",
     "price": 25000,
     "items": [
-      { "name": "Cuci Kiloan", "qty": 2, "unitPrice": 8000 },
-      { "name": "Setrika",     "qty": 1, "unitPrice": 9000 }
+      {
+        "name": "Cuci Kiloan",
+        "qty": 2,
+        "unitPrice": 8000
+      },
+      {
+        "name": "Setrika",
+        "qty": 1,
+        "unitPrice": 9000
+      }
     ]
   },
   {
@@ -19,7 +27,11 @@
     "status": "washing",
     "price": 16000,
     "items": [
-      { "name": "Cuci Kiloan", "qty": 2, "unitPrice": 8000 }
+      {
+        "name": "Cuci Kiloan",
+        "qty": 2,
+        "unitPrice": 8000
+      }
     ]
   }
 ]
