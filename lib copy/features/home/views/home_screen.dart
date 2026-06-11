@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // <-- Pastikan ini diimport
-import 'package:wushlaundry/controllers/notification_controller.dart';
-import '../widgets/login_modal_sheet.dart';
-import '../widgets/offer_image_slider.dart';
-import '../widgets/rounded_white_panel.dart';
-import '../widgets/section_header_row.dart';
-import '../widgets/service_card_compact.dart';
-import '../widgets/active_order_card.dart';
-import '../../constants/app_colors.dart';
-import '../../constants/app_spacing.dart';
-import '../../constants/app_text_styles.dart';
-import '../../data/service_dummy.dart';
-import '../../controllers/home_controller.dart';
+import 'package:provider/provider.dart';
+
+import '../../../controllers/home_controller.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_spacing.dart';
+import '../../../core/constants/app_text_styles.dart';
+import '../../shared/widgets/active_order_card.dart';
+import '../../shared/widgets/login_modal_sheet.dart';
+import '../../shared/widgets/offer_image_slider.dart';
+import '../../shared/widgets/rounded_white_panel.dart';
+import '../../shared/widgets/section_header_row.dart';
+import '../../shared/widgets/service_card_compact.dart'; // <-- Pastikan ini diimport
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
