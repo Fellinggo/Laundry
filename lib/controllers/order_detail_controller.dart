@@ -130,6 +130,7 @@ class OrderDetailController
         '&deliveryFee=${data.deliveryFee}';
   }
 
+  // KOREKSI: Navigasi ke Home (tab index 0) dengan initialTabIndex
   void _navigateToHome(
     BuildContext context,
   ) {
@@ -140,6 +141,7 @@ class OrderDetailController
         if (context.mounted) {
           // SET FLAG UNTUK REFRESH MY ORDERS
           // Kirim notifikasi bahwa data pesanan berubah
+          // KOREKSI: Tambahkan initialTabIndex: 0 untuk navigasi ke Home
           Navigator.of(
             context,
           ).pushAndRemoveUntil(
@@ -148,6 +150,7 @@ class OrderDetailController
                   (
                     _,
                   ) => const MainShellScreen(
+                    initialTabIndex: 0, // KOREKSI: Arahkan ke tab Home (index 0)
                     refreshMyOrders: true,
                   ),
             ),

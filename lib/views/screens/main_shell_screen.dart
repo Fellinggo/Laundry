@@ -13,10 +13,12 @@ class MainShellScreen
     extends
         StatelessWidget {
   final bool refreshMyOrders; // PARAMETER BARU
+  final int initialTabIndex; // KOREKSI: Parameter untuk mengatur tab awal
 
   const MainShellScreen({
     super.key,
     this.refreshMyOrders = false,
+    this.initialTabIndex = 0, // KOREKSI: Default ke Home (index 0)
   });
 
   @override
@@ -28,16 +30,22 @@ class MainShellScreen
           MainShellController
         >();
 
-    // Jika perlu refresh My Orders, panggil method refresh
-    if (refreshMyOrders) {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (
-          _,
-        ) {
+    // KOREKSI: Set tab awal berdasarkan initialTabIndex
+    WidgetsBinding.instance.addPostFrameCallback(
+      (
+        _,
+      ) {
+        // Set tab ke index yang diinginkan
+        if (shellProvider.currentIndex != initialTabIndex) {
+          shellProvider.changeTab(initialTabIndex);
+        }
+        
+        // Jika perlu refresh My Orders, panggil method refresh
+        if (refreshMyOrders) {
           shellProvider.refreshMyOrdersData();
-        },
-      );
-    }
+        }
+      },
+    );
 
     final isLoggedIn = shellProvider.isLoggedIn;
     final userFirstName = shellProvider.userFirstName;
