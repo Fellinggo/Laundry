@@ -61,7 +61,7 @@ class HomeController extends ChangeNotifier {
 
     _activeOrders = validOrders.map((e) {
       final data = Uri.splitQueryString(e);
-      return OrderModel.fromJson(data);
+      return OrderModel.fromMap(data);
     }).toList();
 
     _isLoading = false;
