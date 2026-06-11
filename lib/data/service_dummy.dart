@@ -1,6 +1,6 @@
 import '../views/widgets/eta_badge.dart';
 
-class ServiceModel {
+class ServiceModelDummy {
   final String title;
   final String price;
   final String eta;
@@ -8,7 +8,7 @@ class ServiceModel {
   final String imagePath;
   final bool isWide;
 
-  ServiceModel({
+  ServiceModelDummy({
     required this.title,
     required this.price,
     required this.eta,
@@ -19,53 +19,52 @@ class ServiceModel {
 }
 
 final List<
-  ServiceModel
+  ServiceModelDummy
 >
 serviceDummy = [
-  ServiceModel(
+  ServiceModelDummy(
     title: 'Cuci Regular',
     price: 'Rp 20.000 / Plastik',
     eta: 'ETA 10 jam',
     etaType: EtaType.normal,
     imagePath: 'assets/images/Cucireg.png',
   ),
-  ServiceModel(
+  ServiceModelDummy(
     title: 'Cuci Setrika',
     price: 'Rp 28.000 / Plastik',
     eta: 'ETA 11 jam',
     etaType: EtaType.fast,
     imagePath: 'assets/images/Cucisetrika.png',
   ),
-  ServiceModel(
+  ServiceModelDummy(
     title: 'Cuci Kering',
     price: 'Rp 23.000 / Plastik',
     eta: 'ETA 12 jam',
     etaType: EtaType.long,
     imagePath: 'assets/images/kering.png',
   ),
-  ServiceModel(
+  ServiceModelDummy(
     title: 'Paket Service',
     price: 'Rp 48.000 / Plastik',
     eta: 'Express',
     etaType: EtaType.express,
     imagePath: 'assets/images/paket.png',
   ),
-  ServiceModel(
+  ServiceModelDummy(
     title: 'Cuci Jas / Gaun',
     price: 'Rp 23.000 / item',
     eta: 'Express',
     etaType: EtaType.express,
     imagePath: 'assets/images/jasgaun.png',
   ),
-  ServiceModel(
+  ServiceModelDummy(
     title: 'Setrika Saja',
     price: 'Rp 21.000 / Plastik',
     eta: 'ETA 11 jam',
     etaType: EtaType.fast,
     imagePath: 'assets/images/setrikasaja.png',
   ),
-
-  ServiceModel(
+  ServiceModelDummy(
     title: 'Cuci Bedcover / Selimut / Sprei',
     price: 'Rp 25.000 / Item',
     eta: 'ETA 12 jam',
@@ -73,7 +72,7 @@ serviceDummy = [
     imagePath: 'assets/images/sprei.png',
     isWide: true,
   ),
-  ServiceModel(
+  ServiceModelDummy(
     title: 'Cuci Sepatu',
     price: 'Rp 20.000 / Item',
     eta: 'ETA 12 jam',

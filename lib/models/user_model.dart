@@ -1,31 +1,29 @@
-class User {
-  final String id;
-  final String name;
-  final String email;
-  final String phone;
+class UserModel {
+  final bool isLoggedIn;
+  final String? firstName;
 
-  User({
-    required this.id,
-    required this.name,
-    required this.email,
-    required this.phone,
+  UserModel({
+    required this.isLoggedIn,
+    this.firstName,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: json['id'],
-      name: json['name'],
-      email: json['email'],
-      phone: json['phone'],
+  factory UserModel.fromPreferences(
+    bool isLoggedIn,
+    String? fullName,
+  ) {
+    String? firstName;
+    if (isLoggedIn &&
+        fullName !=
+            null) {
+      firstName = fullName
+          .split(
+            ' ',
+          )
+          .first;
+    }
+    return UserModel(
+      isLoggedIn: isLoggedIn,
+      firstName: firstName,
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'email': email,
-      'phone': phone,
-    };
   }
 }

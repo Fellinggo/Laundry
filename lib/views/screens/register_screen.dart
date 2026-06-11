@@ -1,212 +1,96 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wushlaundry/constants/app_colors.dart';
-import 'package:wushlaundry/constants/app_spacing.dart';
-import 'package:wushlaundry/constants/app_text_styles.dart';
-import 'package:wushlaundry/views/widgets/curved_navy_header.dart';
-import 'package:wushlaundry/views/widgets/labeled_text_field.dart';
-import 'package:wushlaundry/views/widgets/primary_button.dart';
+import 'package:provider/provider.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_spacing.dart';
+import '../widgets/curved_navy_header.dart';
+import '../widgets/labeled_text_field.dart';
+import '../widgets/primary_button.dart';
+import '../widgets/phone_input_field.dart';
+import '../../controllers/register_controller.dart';
+import '../../controllers/main_shell_controller.dart'; // Tambah import ini
 
-class RegisterScreen
-    extends
-        StatefulWidget {
-  const RegisterScreen({
-    super.key,
-  });
+class RegisterScreen extends StatelessWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<
-    RegisterScreen
-  >
-  createState() => _RegisterScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<RegisterController>(
+      create: (_) => RegisterController(),
+      child: const _RegisterContent(),
+    );
+  }
 }
 
-class _RegisterScreenState
-    extends
-        State<
-          RegisterScreen
-        > {
-  bool _obscure1 = true;
-  bool _obscure2 = true;
+class _RegisterContent extends StatefulWidget {
+  const _RegisterContent();
 
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  @override
+  State<_RegisterContent> createState() => _RegisterContentState();
+}
 
-  String? emailError;
-  String? phoneError;
-  String? passwordError;
-  String? confirmPasswordError;
+class _RegisterContentState extends State<_RegisterContent> {
+  late final TextEditingController _phoneController;
 
-  bool _isValidEmail(
-    String email,
-  ) {
-    return RegExp(
-      r'^[a-zA-Z0-9._%+-]+@('
-      r'gmail\.com|'
-      r'yahoo\.com|'
-      r'yahoo\.co\.id|'
-      r'hotmail\.com|'
-      r'outlook\.com|'
-      r'icloud\.com|'
-      r'[a-zA-Z0-9-.]+\.ac\.id|'
-      r'[a-zA-Z0-9-.]+\.edu'
-      r')$',
-    ).hasMatch(
-      email,
-    );
-  }
-
-  bool _isPhoneValid(
-    String phone,
-  ) {
-    return phone.length >=
-            11 &&
-        RegExp(
-          r'^[0-9]+$',
-        ).hasMatch(
-          phone,
-        );
-  }
-
-  bool _isStrongPassword(
-    String pass,
-  ) {
-    return pass.length >=
-            6 &&
-        pass.contains(
-          RegExp(
-            r'[A-Z]',
-          ),
-        ) &&
-        pass.contains(
-          RegExp(
-            r'[a-z]',
-          ),
-        ) &&
-        pass.contains(
-          RegExp(
-            r'[0-9]',
-          ),
-        );
-  }
-
-  Future<
-    void
-  >
-  handleRegister() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    String name = nameController.text.trim();
-    String email = emailController.text.trim();
-    String phone = phoneController.text.trim();
-    String password = passwordController.text.trim();
-    String confirmPassword = confirmPasswordController.text.trim();
-
-    setState(
-      () {
-        emailError = null;
-        phoneError = null;
-        passwordError = null;
-        confirmPasswordError = null;
-      },
-    );
-
-    bool hasError = false;
-
-    if (!_isValidEmail(
-      email,
-    )) {
-      emailError = "Email tidak valid";
-      hasError = true;
-    }
-
-    if (!_isPhoneValid(
-      phone,
-    )) {
-      phoneError = "Nomor HP tidak valid";
-      hasError = true;
-    }
-
-    if (!_isStrongPassword(
-      password,
-    )) {
-      passwordError = "Min 6 karakter + huruf besar, kecil, dan angka";
-      hasError = true;
-    }
-
-    if (password !=
-        confirmPassword) {
-      confirmPasswordError = "Password tidak sama";
-      hasError = true;
-    }
-
-    if (hasError) {
-      setState(
-        () {},
-      );
-      return;
-    }
-
-    await prefs.setBool(
-      'isLoggedIn',
-      true,
-    );
-    await prefs.setBool(
-      'isSignup',
-      true,
-    );
-    await prefs.setString(
-      'userName',
-      name,
-    );
-    await prefs.setString(
-      'userEmail',
-      email,
-    );
-
-    await prefs.setString(
-      'login_method',
-      'signup',
-    );
-
-    await prefs.remove(
-      'userAddresses',
-    );
-    await prefs.remove(
-      'userAddressTitles',
-    );
-
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/main',
-      (
-        route,
-      ) => false,
-    );
+  @override
+  void initState() {
+    super.initState();
+    _phoneController = TextEditingController();
   }
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  void dispose() {
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleRegister() async {
+    final controller = context.read<RegisterController>();
+    final success = await controller.register(context);
+    if (success && mounted) {
+      context.read<MainShellController>().goToHomeTab(); // Tambah baris ini
+      controller.navigateToMain(context);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = context.read<RegisterController>();
+
+    final isLoading = context.select<RegisterController, bool>(
+      (c) => c.isLoading,
+    );
+    final obscurePassword = context.select<RegisterController, bool>(
+      (c) => c.obscurePassword,
+    );
+    final obscureConfirmPassword = context.select<RegisterController, bool>(
+      (c) => c.obscureConfirmPassword,
+    );
+
+    final emailError = context.select<RegisterController, String?>(
+      (c) => c.emailError,
+    );
+    final phoneError = context.select<RegisterController, String?>(
+      (c) => c.phoneError,
+    );
+    final passwordError = context.select<RegisterController, String?>(
+      (c) => c.passwordError,
+    );
+    final confirmPasswordError = context.select<RegisterController, String?>(
+      (c) => c.confirmPasswordError,
+    );
+
     return Scaffold(
       backgroundColor: AppColors.pageBg,
       body: Column(
         children: [
           const CurvedNavyHeader(
             heightFraction: 0.40,
-            subtitle: 'Daftar untuk pengalaman laundry yang lebih personal dan praktis',
+            subtitle:
+                'Daftar untuk pengalaman laundry yang lebih personal dan praktis',
           ),
-
           Expanded(
             child: Transform.translate(
-              offset: const Offset(
-                0,
-                -50,
-              ),
+              offset: const Offset(0, -50),
               child: ScrollConfiguration(
                 behavior: const _NoOverscrollBehavior(),
                 child: SingleChildScrollView(
@@ -220,84 +104,62 @@ class _RegisterScreenState
                         label: 'Nama Lengkap',
                         hint: 'Masukkan Nama Lengkap',
                         prefixIcon: Icons.person_outline_rounded,
-                        controller: nameController,
+                        onChanged: (value) => controller.updateName(value),
                       ),
-
-                      const SizedBox(
-                        height: 10,
-                      ),
-
+                      const SizedBox(height: 10),
                       LabeledTextField(
                         label: 'Email',
                         hint: 'Masukkan Email',
                         prefixIcon: Icons.email_outlined,
-                        controller: emailController,
                         errorText: emailError,
+                        onChanged: (value) => controller.updateEmail(value),
                       ),
-
-                      const SizedBox(
-                        height: 10,
+                      const SizedBox(height: 10),
+                      PhoneInputField(
+                        controller: _phoneController,
+                        errorText: phoneError,
+                        onChanged: (value) => controller.updatePhone(value),
                       ),
-
-                      _phoneField(),
-
-                      const SizedBox(
-                        height: 10,
-                      ),
-
+                      const SizedBox(height: 10),
                       LabeledTextField(
                         label: 'Password',
                         hint: 'Masukkan Password',
                         prefixIcon: Icons.lock_outline_rounded,
-                        controller: passwordController,
-                        obscure: _obscure1,
+                        obscure: obscurePassword,
                         errorText: passwordError,
+                        onChanged: (value) => controller.updatePassword(value),
                         suffix: IconButton(
-                          onPressed: () => setState(
-                            () {
-                              _obscure1 = !_obscure1;
-                            },
-                          ),
+                          onPressed: controller.togglePasswordVisibility,
                           icon: Icon(
-                            _obscure1
+                            obscurePassword
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined,
                           ),
                         ),
                       ),
-
-                      const SizedBox(
-                        height: 10,
-                      ),
-
+                      const SizedBox(height: 10),
                       LabeledTextField(
                         label: 'Konfirmasi Password',
                         hint: 'Masukkan Konfirmasi Password',
                         prefixIcon: Icons.lock_outline_rounded,
-                        controller: confirmPasswordController,
-                        obscure: _obscure2,
+                        obscure: obscureConfirmPassword,
                         errorText: confirmPasswordError,
+                        onChanged: (value) =>
+                            controller.updateConfirmPassword(value),
                         suffix: IconButton(
-                          onPressed: () => setState(
-                            () {
-                              _obscure2 = !_obscure2;
-                            },
-                          ),
+                          onPressed:
+                              controller.toggleConfirmPasswordVisibility,
                           icon: Icon(
-                            _obscure2
+                            obscureConfirmPassword
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined,
                           ),
                         ),
                       ),
-
-                      const SizedBox(
-                        height: 18,
-                      ),
-
+                      const SizedBox(height: 18),
                       PrimaryButton(
-                        label: 'Daftar',
-                        onPressed: handleRegister,
+                        label: isLoading ? 'Memproses...' : 'Daftar',
+                        onPressed: isLoading ? null : _handleRegister,
                       ),
                     ],
                   ),
@@ -309,87 +171,9 @@ class _RegisterScreenState
       ),
     );
   }
-
-  Widget _phoneField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'No. HP',
-          style: AppTextStyles.sectionTitle.copyWith(
-            fontSize: 14,
-          ),
-        ),
-        const SizedBox(
-          height: 8,
-        ),
-
-        TextField(
-          controller: phoneController,
-          keyboardType: TextInputType.phone,
-          style: AppTextStyles.body,
-          decoration: InputDecoration(
-            hintText: '08XX XXXX XXXX',
-            filled: true,
-            fillColor: AppColors.white,
-            errorText: phoneError,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
-              borderSide: const BorderSide(
-                color: AppColors.borderLight,
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
-              borderSide: const BorderSide(
-                color: AppColors.borderLight,
-                width: 1.2,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
-              borderSide: const BorderSide(
-                color: AppColors.primaryNavy,
-                width: 1.4,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
-              borderSide: const BorderSide(
-                color: Colors.red,
-                width: 1.2,
-              ),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
-              borderSide: const BorderSide(
-                color: Colors.red,
-                width: 1.4,
-              ),
-            ),
-            prefixIcon: const Icon(
-              Icons.phone,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }
 
-class _NoOverscrollBehavior
-    extends
-        ScrollBehavior {
+class _NoOverscrollBehavior extends ScrollBehavior {
   const _NoOverscrollBehavior();
 
   @override
@@ -402,9 +186,7 @@ class _NoOverscrollBehavior
   }
 
   @override
-  ScrollPhysics getScrollPhysics(
-    BuildContext context,
-  ) {
+  ScrollPhysics getScrollPhysics(BuildContext context) {
     return const ClampingScrollPhysics();
   }
 }

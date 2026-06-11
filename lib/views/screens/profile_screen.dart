@@ -1,457 +1,99 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wushlaundry/constants/app_colors.dart';
-import 'package:wushlaundry/constants/app_spacing.dart';
-import 'package:wushlaundry/constants/app_text_styles.dart';
-import 'package:wushlaundry/data/address_dummy.dart';
-import 'package:wushlaundry/views/widgets/rounded_white_panel.dart';
+import 'package:provider/provider.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_spacing.dart';
+import '../../constants/app_text_styles.dart';
+import '../widgets/rounded_white_panel.dart';
+import '../widgets/profile_header_widget.dart';
+import '../widgets/address_card_widget.dart';
+import '../widgets/address_empty_widget.dart';
+import '../../controllers/profile_controller.dart';
 
 class ProfileScreen
     extends
-        StatefulWidget {
+        StatelessWidget {
+  final bool embedded;
+
   const ProfileScreen({
     super.key,
     this.embedded = false,
   });
 
-  final bool embedded;
-
   @override
-  State<
-    ProfileScreen
-  >
-  createState() => _ProfileScreenState();
+  Widget build(
+    BuildContext context,
+  ) {
+    // Menginisialisasi controller menggunakan ChangeNotifierProvider jika belum di-provide di root atasnya
+    return ChangeNotifierProvider<
+      ProfileController
+    >(
+      create:
+          (
+            _,
+          ) => ProfileController(),
+      child: const _ProfileContent(),
+    );
+  }
 }
 
-class _ProfileScreenState
+class _ProfileContent
     extends
-        State<
-          ProfileScreen
-        > {
-  String name = 'Guest';
-  String email = '-';
-  bool isLoggedIn = false;
-  List<
-    Map<
-      String,
-      String
-    >
-  >
-  addresses = [];
-
-  @override
-  void initState() {
-    super.initState();
-    loadUser();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    loadUser();
-  }
-
-  Future<
-    void
-  >
-  _editName() async {
-    final controller = TextEditingController(
-      text: name,
-    );
-    final newName =
-        await showDialog<
-          String
-        >(
-          context: context,
-          builder:
-              (
-                context,
-              ) => AlertDialog(
-                title: const Text(
-                  'Edit Nama',
-                ),
-                content: TextField(
-                  controller: controller,
-                  decoration: const InputDecoration(
-                    labelText: 'Nama',
-                    hintText: 'Masukkan nama baru',
-                  ),
-                  autofocus: true,
-                  textCapitalization: TextCapitalization.words,
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(
-                      context,
-                    ),
-                    child: const Text(
-                      'Batal',
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(
-                      context,
-                      controller.text.trim(),
-                    ),
-                    child: const Text(
-                      'Simpan',
-                    ),
-                  ),
-                ],
-              ),
-        );
-
-    if (newName !=
-            null &&
-        newName.isNotEmpty &&
-        newName !=
-            name) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(
-        'userName',
-        newName,
-      );
-
-      setState(
-        () {
-          name = newName;
-        },
-      );
-    }
-  }
-
-  String get _addressKey => 'userAddresses_$email';
-  String get _titlesKey => 'userAddressTitles_$email';
-
-  Future<
-    void
-  >
-  loadUser() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    setState(
-      () {
-        isLoggedIn =
-            prefs.getBool(
-              'isLoggedIn',
-            ) ??
-            false;
-
-        if (isLoggedIn) {
-          name =
-              prefs.getString(
-                'userName',
-              ) ??
-              'User';
-          email =
-              prefs.getString(
-                'userEmail',
-              ) ??
-              '-';
-
-          final savedAddresses =
-              prefs.getStringList(
-                _addressKey,
-              ) ??
-              [];
-          final savedTitles =
-              prefs.getStringList(
-                _titlesKey,
-              ) ??
-              [];
-
-          if (savedAddresses.isNotEmpty) {
-            addresses = List.generate(
-              savedAddresses.length,
-              (
-                i,
-              ) {
-                return {
-                  'title':
-                      i <
-                          savedTitles.length
-                      ? savedTitles[i]
-                      : 'Alamat',
-                  'address': savedAddresses[i],
-                };
-              },
-            );
-          } else {
-            final isSignup =
-                prefs.getBool(
-                  'isSignup',
-                ) ??
-                false;
-
-            if (isSignup) {
-              addresses = [];
-            } else {
-              addresses = addressDummy
-                  .map(
-                    (
-                      e,
-                    ) => {
-                      'title': e.title,
-                      'address': e.address,
-                    },
-                  )
-                  .toList();
-              _saveAddressesToPrefs();
-            }
-          }
-        } else {
-          name = 'Belum Login';
-          email = 'Silakan login terlebih dahulu';
-          addresses = [];
-        }
-      },
-    );
-  }
-
-  Future<
-    void
-  >
-  _saveAddressesToPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    final addressList = addresses
-        .map(
-          (
-            addr,
-          ) => addr['address']!,
-        )
-        .toList();
-    final titleList = addresses
-        .map(
-          (
-            addr,
-          ) => addr['title']!,
-        )
-        .toList();
-
-    await prefs.setStringList(
-      _addressKey,
-      addressList,
-    );
-    await prefs.setStringList(
-      _titlesKey,
-      titleList,
-    );
-  }
-
-  void _handleProtectedAction(
-    VoidCallback action,
-  ) {
-    if (!isLoggedIn) {
-      Navigator.pushNamed(
-        context,
-        '/login',
-      ).then(
-        (
-          _,
-        ) {
-          loadUser();
-        },
-      );
-    } else {
-      action();
-    }
-  }
-
-  void _deleteAddress(
-    int index,
-  ) async {
-    setState(
-      () {
-        addresses.removeAt(
-          index,
-        );
-      },
-    );
-    await _saveAddressesToPrefs();
-  }
-
-  Future<
-    void
-  >
-  _addNewAddress() async {
-    final result = await Navigator.pushNamed(
-      context,
-      '/add-address',
-    );
-
-    if (result !=
-            null &&
-        result
-            is Map) {
-      setState(
-        () {
-          addresses.add(
-            {
-              'title': result['title'],
-              'address': result['address'],
-            },
-          );
-        },
-      );
-      await _saveAddressesToPrefs();
-    }
-  }
-
-  Future<
-    void
-  >
-  _editAddress(
-    int index,
-  ) async {
-    final result = await Navigator.pushNamed(
-      context,
-      '/edit-address',
-      arguments: {
-        'index': index,
-        'title': addresses[index]['title']!,
-        'address': addresses[index]['address']!,
-      },
-    );
-
-    if (result !=
-            null &&
-        result
-            is Map) {
-      setState(
-        () {
-          addresses[index] = {
-            'title': result['title'],
-            'address': result['address'],
-          };
-        },
-      );
-      await _saveAddressesToPrefs();
-    }
-  }
+        StatelessWidget {
+  const _ProfileContent();
 
   @override
   Widget build(
     BuildContext context,
   ) {
-    final top = Column(
-      children: [
-        SafeArea(
-          bottom: false,
-          child: Container(
-            height: 60,
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8,
-            ),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Text(
-                  'Profil Saya',
-                  style: AppTextStyles.screenTitleWhite.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                Positioned(
-                  right: 0,
-                  child: IconButton(
-                    onPressed: () =>
-                        Navigator.pushNamed(
-                          context,
-                          '/settings',
-                        ).then(
-                          (
-                            _,
-                          ) {
-                            loadUser();
-                          },
-                        ),
-                    icon: const Icon(
-                      Icons.settings_outlined,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
+    final controller = context
+        .read<
+          ProfileController
+        >();
 
-        GestureDetector(
-          onTap: () => _handleProtectedAction(
-            () {
-              _editName();
-            },
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-            ), // 🔥 ini jaraknya
-            child: Row(
-              children: [
-                const CircleAvatar(
-                  radius: 36,
-                  backgroundColor: AppColors.iconCircle,
-                  child: Icon(
-                    Icons.person,
-                    size: 40,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(
-                  width: 14,
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Text(
-                              name,
-                              style: AppTextStyles.sectionTitle.copyWith(
-                                fontSize: 17,
-                                color: Colors.white,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 6,
-                          ),
-                          const Icon(
-                            Icons.edit_outlined,
-                            size: 16,
-                            color: Colors.white70,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      Text(
-                        email,
-                        style: AppTextStyles.bodyMuted.copyWith(
-                          color: Colors.white70,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+    // Menyeleksi data secara reaktif agar komponen rebuild hanya jika field spesifik ini berubah
+    final profile =
+        context.select<
+          ProfileController,
+          dynamic
+        >(
+          (
+            c,
+          ) => c.profile,
+        );
+    final isLoggedIn =
+        context.select<
+          ProfileController,
+          bool
+        >(
+          (
+            c,
+          ) => c.isLoggedIn,
+        );
+    final addresses =
+        context.select<
+          ProfileController,
+          List<
+            dynamic
+          >
+        >(
+          (
+            c,
+          ) => c.addresses,
+        );
+
+    final top = ProfileHeaderWidget(
+      name: profile.name,
+      email: profile.email,
+      isLoggedIn: isLoggedIn,
+      onEditName: () => controller.handleProtectedAction(
+        context,
+        () => controller.editName(
+          context,
         ),
-      ],
+      ),
+      onSettingsTap: () => controller.navigateToSettings(
+        context,
+      ),
     );
 
     final sheet = RoundedWhitePanel(
@@ -472,10 +114,11 @@ class _ProfileScreenState
                 ),
               ),
               IconButton(
-                onPressed: () => _handleProtectedAction(
-                  () {
-                    _addNewAddress();
-                  },
+                onPressed: () => controller.handleProtectedAction(
+                  context,
+                  () => controller.addNewAddress(
+                    context,
+                  ),
                 ),
                 icon: const Icon(
                   Icons.add,
@@ -487,7 +130,6 @@ class _ProfileScreenState
           const SizedBox(
             height: 8,
           ),
-
           if (isLoggedIn &&
               addresses.isNotEmpty)
             ...List.generate(
@@ -495,12 +137,26 @@ class _ProfileScreenState
               (
                 i,
               ) {
+                final address = addresses[i];
                 return Column(
                   children: [
-                    _addressCard(
+                    AddressCardWidget(
                       index: i,
-                      title: addresses[i]['title']!,
-                      address: addresses[i]['address']!,
+                      title: address.title,
+                      address: address.address,
+                      onEdit: () => controller.handleProtectedAction(
+                        context,
+                        () => controller.editAddress(
+                          context,
+                          i,
+                        ),
+                      ),
+                      onDelete: () => controller.handleProtectedAction(
+                        context,
+                        () => controller.deleteAddress(
+                          i,
+                        ),
+                      ),
                     ),
                     const SizedBox(
                       height: 10,
@@ -509,66 +165,16 @@ class _ProfileScreenState
                 );
               },
             )
-          else if (isLoggedIn &&
-              addresses.isEmpty)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(
-                  20.0,
-                ),
-                child: Text(
-                  'Belum ada alamat tersimpan\nTap + untuk menambahkan',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-            )
           else
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(
-                  20.0,
-                ),
-                child: Column(
-                  children: [
-                    const Icon(
-                      Icons.location_off_outlined,
-                      color: Colors.grey,
-                      size: 48,
-                    ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    const Text(
-                      'Silakan login untuk melihat alamat',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.grey,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 16,
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(
-                          context,
-                          '/login',
-                        ).then(
-                          (
-                            _,
-                          ) {
-                            loadUser();
-                          },
-                        );
-                      },
-                      child: const Text(
-                        'Login Sekarang',
-                      ),
-                    ),
-                  ],
+            AddressEmptyWidget(
+              isLoggedIn: isLoggedIn,
+              onLoginTap: () => controller.navigateToLogin(
+                context,
+              ),
+              onAddAddressTap: () => controller.handleProtectedAction(
+                context,
+                () => controller.addNewAddress(
+                  context,
                 ),
               ),
             ),
@@ -576,97 +182,16 @@ class _ProfileScreenState
       ),
     );
 
-    final bodyContent = Column(
-      children: [
-        top,
-        const SizedBox(
-          height: 24,
-        ),
-        Expanded(
-          child: sheet,
-        ),
-      ],
-    );
-
     return Scaffold(
       backgroundColor: AppColors.profileNavy,
-      body: bodyContent,
-    );
-  }
-
-  Widget _addressCard({
-    required int index,
-    required String title,
-    required String address,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(
-        12,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(
-          14,
-        ),
-      ),
-      child: Row(
+      body: Column(
         children: [
-          const Icon(
-            Icons.location_on_outlined,
-            color: AppColors.actionBlue,
-          ),
+          top,
           const SizedBox(
-            width: 10,
+            height: 24,
           ),
-
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(
-                  height: 4,
-                ),
-                Text(
-                  address,
-                  style: const TextStyle(
-                    fontSize: 13,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-
-          GestureDetector(
-            onTap: () => _editAddress(
-              index,
-            ),
-            child: const Icon(
-              Icons.edit_outlined,
-              size: 18,
-            ),
-          ),
-
-          const SizedBox(
-            width: 10,
-          ),
-
-          GestureDetector(
-            onTap: () => _deleteAddress(
-              index,
-            ),
-            child: const Icon(
-              Icons.delete_outline,
-              color: Colors.red,
-              size: 18,
-            ),
+            child: sheet,
           ),
         ],
       ),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:wushlaundry/constants/app_colors.dart';
-import 'package:wushlaundry/constants/app_spacing.dart';
+import 'package:provider/provider.dart';
 import 'package:wushlaundry/constants/app_text_styles.dart';
 import 'package:wushlaundry/views/widgets/labeled_text_field.dart';
 import 'package:wushlaundry/views/widgets/primary_button.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_spacing.dart';
+import '../../controllers/add_address_controller.dart';
 
 class AddAddressScreen
     extends
@@ -26,72 +28,58 @@ class _AddAddressScreenState
         > {
   final TextEditingController addressController = TextEditingController();
 
-  String? selectedTitle;
-  String? addressError;
-  String? titleError;
-
-  final List<
-    String
-  >
-  titleOptions = [
-    'Rumah',
-    'Kantor',
-    'Kos',
-    'Apartemen',
-    'Lainnya',
-  ];
-
-  bool _validate() {
-    setState(
-      () {
-        titleError = null;
-        addressError = null;
-      },
-    );
-
-    bool isValid = true;
-
-    if (selectedTitle ==
-            null ||
-        selectedTitle!.isEmpty) {
-      titleError = 'Pilih tipe alamat';
-      isValid = false;
-    }
-
-    if (addressController.text.trim().isEmpty) {
-      addressError = 'Alamat tidak boleh kosong';
-      isValid = false;
-    } else if (addressController.text.trim().length <
-        10) {
-      addressError = 'Alamat terlalu pendek (minimal 10 karakter)';
-      isValid = false;
-    }
-
-    return isValid;
-  }
-
-  void _saveAddress() {
-    if (!_validate()) return;
-
-    Navigator.pop(
-      context,
-      {
-        'title': selectedTitle,
-        'address': addressController.text.trim(),
-      },
-    );
-  }
-
   @override
   void dispose() {
     addressController.dispose();
+    // Opsional: bersihkan state provider saat keluar halaman jika tidak memakai blok scope provider lokal
+    WidgetsBinding.instance.addPostFrameCallback(
+      (
+        _,
+      ) {
+        if (mounted) {
+          context
+              .read<
+                AddAddressController
+              >()
+              .resetState();
+        }
+      },
+    );
     super.dispose();
+  }
+
+  void _saveAddress() {
+    final provider = context
+        .read<
+          AddAddressController
+        >();
+
+    // Pemicu validasi di controller
+    if (!provider.validate(
+      addressController.text,
+    ))
+      return;
+
+    final addressData = provider.createAddress(
+      addressController.text,
+    );
+
+    Navigator.pop(
+      context,
+      addressData.toMap(),
+    );
   }
 
   @override
   Widget build(
     BuildContext context,
   ) {
+    // Mendengarkan perubahan state dari AddAddressController
+    final addrProvider = context
+        .watch<
+          AddAddressController
+        >();
+
     return Scaffold(
       backgroundColor: AppColors.pageBg,
       appBar: AppBar(
@@ -136,7 +124,7 @@ class _AddAddressScreenState
                 ),
                 border: Border.all(
                   color:
-                      titleError !=
+                      addrProvider.titleError !=
                           null
                       ? Colors.red
                       : AppColors.borderLight,
@@ -147,7 +135,7 @@ class _AddAddressScreenState
                     DropdownButton<
                       String
                     >(
-                      value: selectedTitle,
+                      value: addrProvider.selectedTitle,
                       hint: Text(
                         'Pilih Tipe Alamat',
                         style: AppTextStyles.body.copyWith(
@@ -155,9 +143,9 @@ class _AddAddressScreenState
                         ),
                       ),
                       isExpanded: true,
-                      items: titleOptions.map(
+                      items: addrProvider.titleOptions.map(
                         (
-                          String title,
+                          title,
                         ) {
                           return DropdownMenuItem<
                             String
@@ -174,17 +162,15 @@ class _AddAddressScreenState
                           (
                             String? newValue,
                           ) {
-                            setState(
-                              () {
-                                selectedTitle = newValue;
-                                titleError = null;
-                              },
+                            addrProvider.selectTitle(
+                              newValue,
                             );
                           },
                     ),
               ),
             ),
-            if (titleError !=
+
+            if (addrProvider.titleError !=
                 null)
               Padding(
                 padding: const EdgeInsets.only(
@@ -192,7 +178,7 @@ class _AddAddressScreenState
                   left: 12,
                 ),
                 child: Text(
-                  titleError!,
+                  addrProvider.titleError!,
                   style: const TextStyle(
                     color: Colors.red,
                     fontSize: 12,
@@ -203,13 +189,14 @@ class _AddAddressScreenState
             const SizedBox(
               height: 24,
             ),
+
             LabeledTextField(
               label: 'Alamat Lengkap',
               hint: 'Masukkan alamat lengkap',
               prefixIcon: Icons.location_on_outlined,
               controller: addressController,
               maxLines: 3,
-              errorText: addressError,
+              errorText: addrProvider.addressError,
             ),
 
             const SizedBox(

@@ -1,17 +1,17 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wushlaundry/constants/app_colors.dart';
-import 'package:wushlaundry/constants/app_spacing.dart';
-import 'package:wushlaundry/constants/app_text_styles.dart';
-import 'package:wushlaundry/data/service_dummy.dart';
-import 'package:wushlaundry/views/widgets/login_modal_sheet.dart';
-import 'package:wushlaundry/views/widgets/offer_image_slider.dart';
-import 'package:wushlaundry/views/widgets/rounded_white_panel.dart';
-import 'package:wushlaundry/views/widgets/section_header_row.dart';
-import 'package:wushlaundry/views/widgets/service_card_compact.dart';
-import 'package:wushlaundry/views/widgets/active_order_card.dart';
+import 'package:provider/provider.dart'; // <-- Pastikan ini diimport
+import 'package:wushlaundry/controllers/notification_controller.dart';
+import '../widgets/login_modal_sheet.dart';
+import '../widgets/offer_image_slider.dart';
+import '../widgets/rounded_white_panel.dart';
+import '../widgets/section_header_row.dart';
+import '../widgets/service_card_compact.dart';
+import '../widgets/active_order_card.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_spacing.dart';
+import '../../constants/app_text_styles.dart';
+import '../../data/service_dummy.dart';
+import '../../controllers/home_controller.dart';
 
 class HomeScreen
     extends
@@ -43,15 +43,20 @@ class HomeScreen
   State<
     HomeScreen
   >
-  createState() => _HomeScreenState();
+  createState() => HomeScreenState();
 }
 
-class _HomeScreenState
-    extends
-        State<
-          HomeScreen
-        > {
-  String? userFirstName;
+class HomeScreenState extends State<HomeScreen> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<HomeController>().refreshData();
+      }
+    });
+  }
 
   final homeServices = serviceDummy
       .where(
@@ -64,6 +69,20 @@ class _HomeScreenState
       )
       .toList();
 
+  // Method pembantu jika MainShellController butuh pemicu refresh data user
+  Future<
+    void
+  >
+  refreshUserData() async {
+    if (mounted) {
+      await context
+          .read<
+            HomeController
+          >()
+          .refreshUserData();
+    }
+  }
+
   Widget _buildEmptyOrderBox() {
     return Container(
       width: double.infinity,
@@ -74,7 +93,6 @@ class _HomeScreenState
         ),
         border: Border.all(
           color: AppColors.borderLight,
-          style: BorderStyle.solid,
         ),
       ),
       child: Column(
@@ -99,250 +117,16 @@ class _HomeScreenState
     );
   }
 
-  List<
-    Map<
-      String,
-      dynamic
-    >
-  >
-  activeOrders = [];
-
-  @override
-  void initState() {
-    super.initState();
-    loadActiveOrder();
-    _loadUserName();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    loadActiveOrder();
-    _loadUserName();
-  }
-
-  Future<
-    void
-  >
-  _loadUserName() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isLoggedIn =
-        prefs.getBool(
-          'isLoggedIn',
-        ) ??
-        false;
-
-    if (isLoggedIn) {
-      final fullName =
-          prefs.getString(
-            'userName',
-          ) ??
-          'User';
-      setState(
-        () {
-          userFirstName = fullName
-              .split(
-                ' ',
-              )
-              .first;
-        },
-      );
-    } else {
-      setState(
-        () {
-          userFirstName = null;
-        },
-      );
-    }
-  }
-
-  int _parseRupiahToInt(
-    String rupiah,
-  ) {
-    if (rupiah.isEmpty) return 0;
-    String cleaned = rupiah
-        .replaceAll(
-          'Rp ',
-          '',
-        )
-        .replaceAll(
-          '.',
-          '',
-        );
-    return int.tryParse(
-          cleaned,
-        ) ??
-        0;
-  }
-
-  String _formatRupiah(
-    int number,
-  ) {
-    final s = number.toString();
-    final buffer = StringBuffer();
-    int count = 0;
-    for (
-      int i =
-          s.length -
-          1;
-      i >=
-          0;
-      i--
-    ) {
-      buffer.write(
-        s[i],
-      );
-      count++;
-      if (count %
-                  3 ==
-              0 &&
-          i !=
-              0) {
-        buffer.write(
-          '.',
-        );
-      }
-    }
-    return 'Rp ${buffer.toString().split('').reversed.join()}';
-  }
-
-  Future<
-    void
-  >
-  loadActiveOrder() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isLogin =
-        prefs.getBool(
-          'isLoggedIn',
-        ) ??
-        false;
-
-    if (!isLogin) {
-      setState(
-        () => activeOrders = [],
-      );
-      return;
-    }
-
-    final List<
-      String
-    >
-    activeRaw =
-        prefs.getStringList(
-          'active_orders',
-        ) ??
-        [];
-    final List<
-      String
-    >
-    processRaw =
-        prefs.getStringList(
-          'process_orders',
-        ) ??
-        [];
-
-    final List<
-      String
-    >
-    ordersRaw = [
-      ...activeRaw,
-      ...processRaw,
-    ];
-
-    print(
-      '========== HOME SCREEN ==========',
-    );
-    print(
-      'Jumlah pesanan di SharedPreferences: ${ordersRaw.length}',
-    );
-    print(
-      'active_orders: ${activeRaw.length}',
-    );
-    print(
-      'process_orders: ${processRaw.length}',
-    );
-
-    final List<
-      String
-    >
-    validOrders = ordersRaw.where(
-      (
-        orderString,
-      ) {
-        final data = Uri.splitQueryString(
-          orderString,
-        );
-        final String orderId =
-            data['orderId'] ??
-            '';
-        return orderId.isNotEmpty &&
-            orderId !=
-                '000000';
-      },
-    ).toList();
-
-    setState(
-      () {
-        activeOrders = validOrders.map(
-          (
-            e,
-          ) {
-            final data = Uri.splitQueryString(
-              e,
-            );
-            return {
-              'orderId':
-                  data['orderId'] ??
-                  '000000',
-              'service':
-                  data['service'] ??
-                  'Cuci Regular',
-              'qty':
-                  data['qty'] ??
-                  '1',
-              'pickupTime':
-                  data['pickupTime'] ??
-                  '-',
-              'deliveryTime':
-                  data['deliveryTime'] ??
-                  '-',
-              'totalPrice':
-                  data['totalPrice'] ??
-                  'Rp 0',
-              'address':
-                  data['address'] ??
-                  '-',
-              'itemsJson':
-                  data['itemsJson'] ??
-                  '',
-            };
-          },
-        ).toList();
-      },
-    );
-
-    print(
-      'Active orders loaded: ${activeOrders.length}',
-    );
-    for (var order in activeOrders) {
-      print(
-        '   - Order ID: ${order['orderId']}',
-      );
-    }
-    print(
-      '==================================',
-    );
-  }
-
   void _handleServiceTap(
     BuildContext context,
+    HomeController homeProvider,
     Map<
       String,
       dynamic
     >
     service,
   ) {
-    if (!widget.loggedIn) {
+    if (!homeProvider.isLoggedIn) {
       showLoginModal(
         context,
       );
@@ -355,8 +139,9 @@ class _HomeScreenState
 
   void _handleNotificationTap(
     BuildContext context,
+    HomeController homeProvider,
   ) {
-    if (!widget.loggedIn) {
+    if (!homeProvider.isLoggedIn) {
       showLoginModal(
         context,
       );
@@ -365,11 +150,15 @@ class _HomeScreenState
     widget.onOpenNotifications?.call();
   }
 
-  void _handleOfferTap(
+  Future<
+    void
+  >
+  _handleOfferTap(
     BuildContext context,
+    HomeController homeProvider,
     int index,
   ) async {
-    if (!widget.loggedIn) {
+    if (!homeProvider.isLoggedIn) {
       showLoginModal(
         context,
       );
@@ -388,25 +177,10 @@ class _HomeScreenState
 
     if (code !=
         null) {
-      await Clipboard.setData(
-        ClipboardData(
-          text: code,
-        ),
+      await homeProvider.copyPromoCodeToClipboard(
+        context,
+        code,
       );
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Kode $code berhasil disalin',
-            ),
-            duration: const Duration(
-              milliseconds: 800,
-            ),
-          ),
-        );
-      }
     }
 
     await Future.delayed(
@@ -421,7 +195,12 @@ class _HomeScreenState
   Widget build(
     BuildContext context,
   ) {
-    _loadUserName();
+    // Mendengarkan perubahan state secara reaktif via context.watch
+    final homeProvider = context
+        .watch<
+          HomeController
+        >();
+
     return ColoredBox(
       color: AppColors.headerNavy,
       child: Column(
@@ -429,6 +208,7 @@ class _HomeScreenState
           HomeNavyHeaderBlock(
             onNotification: () => _handleNotificationTap(
               context,
+              homeProvider,
             ),
           ),
           Expanded(
@@ -442,230 +222,192 @@ class _HomeScreenState
               ),
               child: ScrollConfiguration(
                 behavior: const _NoOverscrollBehavior(),
-                child: SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (widget.loggedIn &&
-                          userFirstName !=
-                              null) ...[
-                        Text(
-                          'Hi ${userFirstName} 👋',
-                          style: AppTextStyles.screenTitleNavy.copyWith(
-                            fontSize: 18,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 6,
-                        ),
-                      ],
-
-                      const SectionHeaderRow(
-                        title: 'Layanan Laundry Kami',
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: ServiceCardCompact(
-                                    title: homeServices[0].title,
-                                    priceLabel: homeServices[0].price,
-                                    etaLabel: homeServices[0].eta,
-                                    etaType: homeServices[0].etaType,
-                                    onTap: () => _handleServiceTap(
-                                      context,
-                                      {
-                                        'title': homeServices[0].title,
-                                        'price': homeServices[0].price,
-                                        'eta': homeServices[0].eta,
-                                        'type': homeServices[0].etaType,
-                                      },
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 12,
-                                ),
-                                Expanded(
-                                  child: ServiceCardCompact(
-                                    title: homeServices[1].title,
-                                    priceLabel: homeServices[1].price,
-                                    etaLabel: homeServices[1].eta,
-                                    etaType: homeServices[1].etaType,
-                                    onTap: () => _handleServiceTap(
-                                      context,
-                                      {
-                                        'title': homeServices[1].title,
-                                        'price': homeServices[1].price,
-                                        'eta': homeServices[1].eta,
-                                        'type': homeServices[1].etaType,
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
+                child: RefreshIndicator(
+                  // Fitur tarik ke bawah untuk refresh data otomatis
+                  onRefresh: () => homeProvider.refreshData(),
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (homeProvider.isLoggedIn &&
+                            homeProvider.userFirstName !=
+                                null) ...[
+                          Text(
+                            'Hi ${homeProvider.userFirstName} 👋',
+                            style: AppTextStyles.screenTitleNavy.copyWith(
+                              fontSize: 18,
                             ),
                           ),
                           const SizedBox(
-                            width: 10,
-                          ),
-                          GestureDetector(
-                            onTap: () => widget.onOpenServices?.call(),
-                            child: Container(
-                              height: 100,
-                              width: 50,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(
-                                  14,
-                                ),
-                                border: Border.all(
-                                  color: Colors.grey.shade300,
-                                ),
-                              ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  size: 18,
-                                  color: AppColors.headerNavy,
-                                ),
-                              ),
-                            ),
+                            height: 6,
                           ),
                         ],
-                      ),
-
-                      const SizedBox(
-                        height: AppSpacing.xl,
-                      ),
-                      const SectionHeaderRow(
-                        title: 'Pesanan Aktif',
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
-
-                      SizedBox(
-                        height: 180,
-                        child: activeOrders.isEmpty
-                            ? _buildEmptyOrderBox()
-                            : PageView.builder(
-                                controller: PageController(
-                                  viewportFraction: 0.9,
-                                  initialPage: 0,
-                                ),
-                                itemCount: activeOrders.length,
-                                padEnds: false,
-                                itemBuilder:
-                                    (
-                                      context,
-                                      index,
-                                    ) {
-                                      final order = activeOrders[index];
-
-                                      final bool isDummyOrder =
-                                          order['orderId'] ==
-                                          '100001';
-
-                                      final int currentStep = isDummyOrder
-                                          ? 2
-                                          : 0;
-                                      final String badgeLabel = isDummyOrder
-                                          ? 'Dicuci'
-                                          : 'Diproses';
-
-                                      String rawTotal =
-                                          order['totalPrice']?.toString() ??
-                                          'Rp 0';
-                                      int totalNominal = _parseRupiahToInt(
-                                        rawTotal,
-                                      );
-                                      int finalTotal = isDummyOrder
-                                          ? totalNominal +
-                                                5000
-                                          : totalNominal;
-                                      String displayTotal = _formatRupiah(
-                                        finalTotal,
-                                      );
-
-                                      return GestureDetector(
-                                        behavior: HitTestBehavior.opaque,
-                                        onTap: () {
-                                          final itemsJson = order['itemsJson'];
-
-                                          if (itemsJson !=
-                                                  null &&
-                                              itemsJson.isNotEmpty) {
-                                            try {
-                                              if (itemsJson
-                                                  is String) {
-                                              } else if (itemsJson
-                                                  is List) {}
-                                            } catch (
-                                              e
-                                            ) {
-                                              print(
-                                                'Error parsing itemsJson: $e',
-                                              );
-                                            }
-                                          }
-
-                                          Navigator.pushNamed(
-                                            context,
-                                            '/order-detail',
-                                            arguments: {
-                                              ...order,
-                                              'fromActiveOrder': true,
-                                            },
-                                          );
+                        const SectionHeaderRow(
+                          title: 'Layanan Laundry Kami',
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: ServiceCardCompact(
+                                      title: homeServices[0].title,
+                                      priceLabel: homeServices[0].price,
+                                      etaLabel: homeServices[0].eta,
+                                      etaType: homeServices[0].etaType,
+                                      onTap: () => _handleServiceTap(
+                                        context,
+                                        homeProvider,
+                                        {
+                                          'title': homeServices[0].title,
+                                          'price': homeServices[0].price,
+                                          'eta': homeServices[0].eta,
+                                          'type': homeServices[0].etaType,
                                         },
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            right: 12,
-                                          ),
-                                          child: ActiveOrderCard(
-                                            statusTitle: 'Pesanan ${order['orderId']}',
-                                            subtitle: 'Pickup: ${order['pickupTime']}\nDelivery: ${order['deliveryTime']}',
-                                            totalPrice: displayTotal,
-                                            currentStep: currentStep,
-                                            badgeLabel: badgeLabel,
-                                          ),
-                                        ),
-                                      );
-                                    },
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 12,
+                                  ),
+                                  Expanded(
+                                    child: ServiceCardCompact(
+                                      title: homeServices[1].title,
+                                      priceLabel: homeServices[1].price,
+                                      etaLabel: homeServices[1].eta,
+                                      etaType: homeServices[1].etaType,
+                                      onTap: () => _handleServiceTap(
+                                        context,
+                                        homeProvider,
+                                        {
+                                          'title': homeServices[1].title,
+                                          'price': homeServices[1].price,
+                                          'eta': homeServices[1].eta,
+                                          'type': homeServices[1].etaType,
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                      ),
-
-                      const SizedBox(
-                        height: AppSpacing.xl,
-                      ),
-                      SectionHeaderRow(
-                        title: 'Penawaran Khusus',
-                        actionLabel: 'Lainnya',
-                        onAction: () => widget.onOpenDisc?.call(),
-                      ),
-
-                      OfferImageAutoSlider(
-                        onTap:
-                            (
-                              index,
-                            ) => _handleOfferTap(
-                              context,
-                              index,
                             ),
-                      ),
-
-                      const SizedBox(
-                        height: 24,
-                      ),
-                    ],
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            GestureDetector(
+                              onTap: () => widget.onOpenServices?.call(),
+                              child: Container(
+                                height: 100,
+                                width: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade100,
+                                  borderRadius: BorderRadius.circular(
+                                    14,
+                                  ),
+                                  border: Border.all(
+                                    color: Colors.grey.shade300,
+                                  ),
+                                ),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 18,
+                                    color: AppColors.headerNavy,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: AppSpacing.xl,
+                        ),
+                        const SectionHeaderRow(
+                          title: 'Pesanan Aktif',
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        SizedBox(
+                          height: 180,
+                          child: homeProvider.isLoading
+                              ? const Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                              : homeProvider.activeOrders.isEmpty
+                              ? _buildEmptyOrderBox()
+                              : PageView.builder(
+                                  controller: PageController(
+                                    viewportFraction: 0.9,
+                                    initialPage: 0,
+                                  ),
+                                  itemCount: homeProvider.activeOrders.length,
+                                  padEnds: false,
+                                  itemBuilder:
+                                      (
+                                        context,
+                                        index,
+                                      ) {
+                                        final order = homeProvider.activeOrders[index];
+                                        final displayTotal = homeProvider.getDisplayTotal(
+                                          order,
+                                        );
+                                        return GestureDetector(
+                                          behavior: HitTestBehavior.opaque,
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                              context,
+                                              '/order-detail',
+                                              arguments: {
+                                                ...order.toMap(),
+                                                'fromActiveOrder': true,
+                                              },
+                                            );
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                              right: 12,
+                                            ),
+                                            child: ActiveOrderCard(
+                                              statusTitle: 'Pesanan ${order.orderId}',
+                                              subtitle: 'Pickup: ${order.pickupTime}\nDelivery: ${order.deliveryTime}',
+                                              totalPrice: displayTotal,
+                                              currentStep: order.currentStep,
+                                              badgeLabel: order.badgeLabel,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                ),
+                        ),
+                        const SizedBox(
+                          height: AppSpacing.xl,
+                        ),
+                        SectionHeaderRow(
+                          title: 'Penawaran Khusus',
+                          actionLabel: 'Lainnya',
+                          onAction: () => widget.onOpenDisc?.call(),
+                        ),
+                        OfferImageAutoSlider(
+                          onTap:
+                              (
+                                index,
+                              ) => _handleOfferTap(
+                                context,
+                                homeProvider,
+                                index,
+                              ),
+                        ),
+                        const SizedBox(
+                          height: 24,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -677,9 +419,7 @@ class _HomeScreenState
   }
 }
 
-class HomeNavyHeaderBlock
-    extends
-        StatelessWidget {
+class HomeNavyHeaderBlock extends StatelessWidget {
   const HomeNavyHeaderBlock({
     super.key,
     this.onNotification,
@@ -688,19 +428,14 @@ class HomeNavyHeaderBlock
   final VoidCallback? onNotification;
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final top = MediaQuery.of(
-      context,
-    ).padding.top;
+  Widget build(BuildContext context) {
+    final top = MediaQuery.of(context).padding.top;
 
     return Container(
       color: AppColors.headerNavy,
       padding: EdgeInsets.fromLTRB(
         20,
-        top +
-            15,
+        top + 15,
         20,
         20,
       ),

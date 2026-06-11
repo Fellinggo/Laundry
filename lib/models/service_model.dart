@@ -1,31 +1,49 @@
-class Service {
-  final String id;
-  final String name;
-  final int price;
-  final String description;
+import 'package:wushlaundry/views/widgets/eta_badge.dart';
 
-  Service({
-    required this.id,
-    required this.name,
+// Ini adalah MODEL untuk data service
+class ServiceModel {
+  final String title;
+  final String price;
+  final String eta;
+  final EtaType etaType;
+  final String imagePath;
+  final bool isWide;
+
+  ServiceModel({
+    required this.title,
     required this.price,
-    required this.description,
+    required this.eta,
+    required this.etaType,
+    required this.imagePath,
+    required this.isWide,
   });
 
-  factory Service.fromJson(Map<String, dynamic> json) {
-    return Service(
-      id: json['id'],
-      name: json['name'],
-      price: json['price'],
-      description: json['description'],
+  // Factory untuk konversi dari dummy data ke model
+  factory ServiceModel.fromDummy(
+    dynamic dummyService,
+  ) {
+    return ServiceModel(
+      title: dummyService.title,
+      price: dummyService.price,
+      eta: dummyService.eta,
+      etaType: dummyService.etaType,
+      imagePath: dummyService.imagePath,
+      isWide: dummyService.isWide,
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<
+    String,
+    dynamic
+  >
+  toMap() {
     return {
-      'id': id,
-      'name': name,
+      'title': title,
       'price': price,
-      'description': description,
+      'eta': eta,
+      'etaType': etaType.toString(),
+      'imagePath': imagePath,
+      'isWide': isWide,
     };
   }
 }

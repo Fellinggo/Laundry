@@ -1,40 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:wushlaundry/controllers/splash_controller.dart';
 
 class SplashScreen
     extends
-        StatefulWidget {
+        StatelessWidget {
   const SplashScreen({
     super.key,
   });
 
   @override
-  State<
-    SplashScreen
-  >
-  createState() => _SplashScreenState();
-}
-
-class _SplashScreenState
-    extends
-        State<
-          SplashScreen
-        > {
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(
-      const Duration(
-        seconds: 2,
-      ),
-      () {
-        if (!mounted) return;
-        Navigator.pushReplacementNamed(
-          context,
-          '/onboarding',
-        );
-      },
+  Widget build(
+    BuildContext context,
+  ) {
+    return ChangeNotifierProvider<
+      SplashController
+    >(
+      create:
+          (
+            _,
+          ) => SplashController(),
+      child: const _SplashContent(),
     );
   }
+}
+
+class _SplashContent
+    extends
+        StatelessWidget {
+  const _SplashContent();
 
   @override
   Widget build(
@@ -44,13 +38,62 @@ class _SplashScreenState
       context,
     ).size;
 
+    // Mengambil data model splash secara atomik
+    final splashModel =
+        context.select<
+          SplashController,
+          dynamic
+        >(
+          (
+            c,
+          ) => c.splashModel,
+        );
+
+    // Mendengarkan status perubahan timer
+    final timerFinished =
+        context.select<
+          SplashController,
+          bool
+        >(
+          (
+            c,
+          ) => c.timerFinished,
+        );
+    final isNavigating =
+        context.select<
+          SplashController,
+          bool
+        >(
+          (
+            c,
+          ) => c.isNavigating,
+        );
+
+    // Memicu navigasi aman setelah frame UI selesai digambar sepenuhnya
+    if (timerFinished &&
+        !isNavigating) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (
+          _,
+        ) {
+          if (context.mounted) {
+            context
+                .read<
+                  SplashController
+                >()
+                .navigateToNextScreen(
+                  context,
+                );
+          }
+        },
+      );
+    }
+
     return Scaffold(
-      backgroundColor: const Color(
-        0xFFF6F7FF,
-      ),
+      backgroundColor: splashModel.backgroundColor,
       body: Center(
         child: Image.asset(
-          'assets/images/logo.png',
+          splashModel.logoAssetPath,
           width:
               size.width *
               0.5,

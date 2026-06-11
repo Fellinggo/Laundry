@@ -1,442 +1,164 @@
 import 'package:flutter/material.dart';
-import 'package:wushlaundry/constants/app_colors.dart';
-import 'package:wushlaundry/constants/app_spacing.dart';
-import 'package:wushlaundry/constants/app_text_styles.dart';
-import 'package:wushlaundry/data/service_dummy.dart';
-import 'package:wushlaundry/views/widgets/info_kv_row.dart';
-import 'package:wushlaundry/views/widgets/navy_app_bar.dart';
-import 'package:wushlaundry/views/widgets/primary_button.dart';
-import 'package:wushlaundry/views/widgets/quantity_stepper.dart';
-import 'package:wushlaundry/views/widgets/rounded_white_panel.dart';
+import 'package:provider/provider.dart';
+import 'package:wushlaundry/controllers/service_detail_controller.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_spacing.dart';
+import '../../constants/app_text_styles.dart';
+import '../widgets/navy_app_bar.dart';
+import '../widgets/primary_button.dart';
+import '../widgets/rounded_white_panel.dart';
+import '../widgets/info_kv_row.dart';
+import '../widgets/service_filter_chip.dart';
+import '../widgets/selected_service_item.dart';
+import '../widgets/empty_selected_service.dart';
 
-class ServiceDetailScreen
-    extends
-        StatefulWidget {
+class ServiceDetailScreen extends StatelessWidget {
   const ServiceDetailScreen({
     super.key,
   });
 
   @override
-  State<
-    ServiceDetailScreen
-  >
-  createState() => _ServiceDetailScreenState();
+  Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    return ChangeNotifierProvider<ServiceDetailController>(
+      create: (_) => ServiceDetailController()..initializeWithArgument(args),
+      child: const _ServiceDetailContent(),
+    );
+  }
 }
 
-class _ServiceDetailScreenState
-    extends
-        State<
-          ServiceDetailScreen
-        > {
-  bool _isInit = true;
-
-  late final List<
-    Map<
-      String,
-      dynamic
-    >
-  >
-  services;
-
-  final Map<
-    int,
-    int
-  >
-  selectedServices = {};
+class _ServiceDetailContent extends StatelessWidget {
+  const _ServiceDetailContent();
 
   @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context) {
+    final controller = context.read<ServiceDetailController>();
 
-    services = serviceDummy.map(
-      (
-        e,
-      ) {
-        return {
-          'title': e.title,
-          'displayTitle':
-              e.title ==
-                  'Cuci Bedcover / Selimut / Sprei'
-              ? 'Cuci Bedcover /\nSelimut / Sprei'
-              : e.title,
-          'price': e.price,
-          'image': e.imagePath,
-          'icon': _getIcon(
-            e.title,
-          ),
-        };
-      },
-    ).toList();
-  }
-
-  IconData _getIcon(
-    String title,
-  ) {
-    switch (title) {
-      case 'Cuci Regular':
-        return Icons.local_laundry_service;
-      case 'Cuci Setrika':
-        return Icons.iron;
-      case 'Cuci Kering':
-        return Icons.dry_cleaning_outlined;
-      case 'Paket Service':
-        return Icons.inventory_2_outlined;
-      case 'Cuci Jas / Gaun':
-        return Icons.checkroom;
-      case 'Setrika Saja':
-        return Icons.iron_outlined;
-      case 'Cuci Bedcover / Selimut / Sprei':
-        return Icons.bed;
-      case 'Cuci Sepatu':
-        return Icons.hiking;
-      default:
-        return Icons.local_laundry_service;
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    if (_isInit) {
-      final args =
-          ModalRoute.of(
-                context,
-              )?.settings.arguments
-              as Map<
-                String,
-                dynamic
-              >?;
-
-      if (args !=
-              null &&
-          args['title'] !=
-              null) {
-        final index = services.indexWhere(
-          (
-            s,
-          ) =>
-              s['title'] ==
-              args['title'],
-        );
-
-        if (index !=
-            -1) {
-          selectedServices[index] = 1;
-        }
-      }
-
-      _isInit = false;
-    }
-  }
-
-  int _parsePrice(
-    String price,
-  ) {
-    return int.parse(
-      price.replaceAll(
-        RegExp(
-          r'[^0-9]',
-        ),
-        '',
-      ),
+    // Pemilihan state reaktif menggunakan context.select (efisien & anti-rebuild massal)
+    final total = context.select<ServiceDetailController, int>(
+      (c) => c.totalServiceFee,
     );
-  }
-
-  String _formatRp(
-    int value,
-  ) {
-    return 'Rp ${value.toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}';
-  }
-
-  int get totalServiceFee {
-    int total = 0;
-    selectedServices.forEach(
-      (
-        index,
-        qty,
-      ) {
-        final int price = _parsePrice(
-          services[index]['price'],
-        );
-        total +=
-            price *
-            qty;
-      },
+    final hasSelectedServices = context.select<ServiceDetailController, bool>(
+      (c) => c.hasSelectedServices,
     );
-    return total;
-  }
-
-  @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final int total = totalServiceFee;
+    final servicesLength = context.select<ServiceDetailController, int>(
+      (c) => c.model.services.length,
+    );
+    final selectedServicesMap = context.select<ServiceDetailController, Map<int, int>>(
+      (c) => c.model.selectedServices,
+    );
 
     return Scaffold(
       backgroundColor: AppColors.headerNavy,
       appBar: NavyBackAppBar(
         title: 'Ringkasan Layanan',
-        onBack: () => Navigator.pop(
-          context,
-        ),
+        onBack: () => controller.goBack(context),
       ),
-      body: Column(
-        children: [
-          const SizedBox(
-            height: 8,
-          ),
-          Expanded(
-            child: RoundedWhitePanel(
-              topRadius: AppSpacing.sheetTopRadius,
-              padding: const EdgeInsets.all(
-                AppSpacing.xl,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 44,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: services.length,
-                      itemBuilder:
-                          (
-                            context,
-                            i,
-                          ) {
-                            final s = services[i];
-                            final selected = selectedServices.containsKey(
-                              i,
-                            );
-                            return Padding(
-                              padding: const EdgeInsets.only(
-                                right: 10,
-                              ),
-                              child: FilterChip(
-                                selected: selected,
-                                onSelected:
-                                    (
-                                      val,
-                                    ) {
-                                      setState(
-                                        () {
-                                          if (val) {
-                                            selectedServices[i] = 1;
-                                          } else {
-                                            selectedServices.remove(
-                                              i,
-                                            );
-                                          }
-                                        },
-                                      );
-                                    },
-                                label: Row(
-                                  children: [
-                                    Icon(
-                                      s['icon'],
-                                      size: 18,
-                                    ),
-                                    const SizedBox(
-                                      width: 6,
-                                    ),
-                                    Text(
-                                      s['title'],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
+      body: ScrollConfiguration(
+        behavior: const _NoOverscrollBehavior(),
+        child: Column(
+          children: [
+            const SizedBox(height: 8),
+            Expanded(
+              child: RoundedWhitePanel(
+                topRadius: AppSpacing.sheetTopRadius,
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Horizontal Filter Chip List - DIPERBAIKI
+                    SizedBox(
+                      height: 44,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: servicesLength,
+                        itemBuilder: (context, i) {
+                          // PERBAIKAN: Gunakan Selector widget atau watch
+                          return Selector<ServiceDetailController, bool>(
+                            selector: (_, c) => c.model.selectedServices.containsKey(i),
+                            builder: (context, isSelected, child) {
+                              final currentController = context.read<ServiceDetailController>();
+                              final service = currentController.model.services[i];
+
+                              return ServiceFilterChip(
+                                isSelected: isSelected,
+                                icon: service.icon,
+                                title: service.title,
+                                onSelected: (val) => currentController.toggleServiceSelection(i, val),
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: AppSpacing.xl),
+                    Text(
+                      'Daftar Layanan Dipilih',
+                      style: AppTextStyles.sectionTitle,
+                    ),
+                    const SizedBox(height: 12),
 
-                  const SizedBox(
-                    height: AppSpacing.xl,
-                  ),
+                    // Selected Items List / Empty State
+                    Expanded(
+                      child: !hasSelectedServices
+                          ? const EmptySelectedService()
+                          : ListView.builder(
+                              itemCount: selectedServicesMap.length,
+                              itemBuilder: (context, index) {
+                                final key = selectedServicesMap.keys.elementAt(index);
+                                final service = controller.model.services[key];
+                                final qty = selectedServicesMap[key]!;
 
-                  Text(
-                    'Daftar Layanan Dipilih',
-                    style: AppTextStyles.sectionTitle,
-                  ),
-
-                  const SizedBox(
-                    height: 12,
-                  ),
-
-                  Expanded(
-                    child: selectedServices.isEmpty
-                        ? const Center(
-                            child: Text(
-                              'Belum ada layanan dipilih',
+                                return SelectedServiceItem(
+                                  title: service.title,
+                                  displayTitle: service.displayTitle,
+                                  price: service.price,
+                                  image: service.image,
+                                  quantity: qty,
+                                  priceValue: service.priceValue,
+                                  onQuantityChanged: (newQty) => controller.updateQuantity(key, newQty),
+                                );
+                              },
                             ),
-                          )
-                        : ListView.builder(
-                            itemCount: selectedServices.length,
-                            itemBuilder:
-                                (
-                                  context,
-                                  index,
-                                ) {
-                                  final key = selectedServices.keys.elementAt(
-                                    index,
-                                  );
-                                  final service = services[key];
-                                  final int qty = selectedServices[key]!;
-
-                                  final int price = _parsePrice(
-                                    service['price'],
-                                  );
-
-                                  return Container(
-                                    margin: const EdgeInsets.only(
-                                      bottom: 12,
-                                    ),
-                                    padding: const EdgeInsets.all(
-                                      12,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(
-                                        14,
-                                      ),
-                                      border: Border.all(
-                                        color: Colors.grey.shade300,
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                          child: Image.asset(
-                                            service['image'],
-                                            width: 60,
-                                            height: 60,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          width: 12,
-                                        ),
-
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                service['displayTitle'] ??
-                                                    service['title'],
-                                                style: AppTextStyles.sectionTitle.copyWith(
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                              Text(
-                                                '${_formatRp(price)}',
-                                                style: AppTextStyles.bodyMuted,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-
-                                        QuantityStepper(
-                                          value: qty,
-                                          onChanged:
-                                              (
-                                                v,
-                                              ) {
-                                                setState(
-                                                  () {
-                                                    selectedServices[key] = v;
-                                                  },
-                                                );
-                                              },
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                          ),
-                  ),
-
-                  InfoKvRow(
-                    label: 'Total',
-                    value: _formatRp(
-                      total,
                     ),
-                    valueBold: true,
-                  ),
-
-                  const SizedBox(
-                    height: 12,
-                  ),
-
-                  PrimaryButton(
-                    label: 'Jadwalkan Penjemputan',
-                    onPressed: selectedServices.isEmpty
-                        ? null
-                        : () {
-                            final List<
-                              Map<
-                                String,
-                                dynamic
-                              >
-                            >
-                            orderItems = [];
-
-                            int serviceFee = 0;
-
-                            selectedServices.forEach(
-                              (
-                                index,
-                                qty,
-                              ) {
-                                final service = services[index];
-
-                                final int price = _parsePrice(
-                                  service['price'],
-                                );
-                                final int subtotal =
-                                    price *
-                                    qty;
-
-                                serviceFee += subtotal;
-
-                                orderItems.add(
-                                  {
-                                    'title': service['title'],
-                                    'price': price,
-                                    'qty': qty,
-                                    'subtotal': subtotal,
-                                    'image': service['image'],
-                                  },
-                                );
-                              },
-                            );
-
-                            const int deliveryFee = 5000;
-                            final int total =
-                                serviceFee +
-                                deliveryFee;
-
-                            Navigator.pushNamed(
-                              context,
-                              '/pickup-schedule',
-                              arguments: {
-                                'items': orderItems,
-                                'serviceFee': serviceFee,
-                                'deliveryFee': deliveryFee,
-                                'total': total,
-                              },
-                            );
-                          },
-                  ),
-                ],
+                    InfoKvRow(
+                      label: 'Total',
+                      value: controller.formatPrice(total),
+                      valueBold: true,
+                    ),
+                    const SizedBox(height: 12),
+                    PrimaryButton(
+                      label: 'Jadwalkan Penjemputan',
+                      onPressed: hasSelectedServices
+                          ? () => controller.navigateToPickupSchedule(context)
+                          : null,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+}
+
+class _NoOverscrollBehavior extends ScrollBehavior {
+  const _NoOverscrollBehavior();
+
+  @override
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    return child;
+  }
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return const ClampingScrollPhysics();
   }
 }

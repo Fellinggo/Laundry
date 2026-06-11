@@ -1,31 +1,51 @@
-class Address {
-  final String id;
-  final String label;
-  final String fullAddress;
-  final String phone;
+class AddressModel {
+  final String title;
+  final String address;
 
-  Address({
-    required this.id,
-    required this.label,
-    required this.fullAddress,
-    required this.phone,
+  AddressModel({
+    required this.title,
+    required this.address,
   });
 
-  factory Address.fromJson(Map<String, dynamic> json) {
-    return Address(
-      id: json['id'],
-      label: json['label'],
-      fullAddress: json['full_address'],
-      phone: json['phone'],
+  factory AddressModel.fromMap(
+    Map<
+      String,
+      dynamic
+    >
+    map,
+  ) {
+    return AddressModel(
+      title:
+          map['title'] ??
+          'Alamat',
+      address:
+          map['address'] ??
+          '',
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<
+    String,
+    dynamic
+  >
+  toMap() {
     return {
-      'id': id,
-      'label': label,
-      'full_address': fullAddress,
-      'phone': phone,
+      'title': title,
+      'address': address,
     };
+  }
+
+  AddressModel copyWith({
+    String? title,
+    String? address,
+  }) {
+    return AddressModel(
+      title:
+          title ??
+          this.title,
+      address:
+          address ??
+          this.address,
+    );
   }
 }

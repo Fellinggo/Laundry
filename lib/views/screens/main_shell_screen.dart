@@ -1,151 +1,109 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wushlaundry/constants/app_colors.dart';
-import 'package:wushlaundry/views/screens/home_screen.dart';
-import 'package:wushlaundry/views/screens/my_orders_screen.dart';
-import 'package:wushlaundry/views/screens/offers_screen.dart';
-import 'package:wushlaundry/views/screens/profile_screen.dart';
-import 'package:wushlaundry/views/screens/services_screen.dart';
-import 'package:wushlaundry/views/widgets/app_bottom_nav_bar.dart';
-import 'package:wushlaundry/views/widgets/login_modal_sheet.dart';
+import 'package:provider/provider.dart';
+import '../../constants/app_colors.dart';
+import '../screens/home_screen.dart';
+import '../screens/my_orders_screen.dart';
+import '../screens/offers_screen.dart';
+import '../screens/profile_screen.dart';
+import '../screens/services_screen.dart';
+import '../widgets/app_bottom_nav_bar.dart';
+import '../../controllers/main_shell_controller.dart';
+import '../../controllers/notification_controller.dart';
 
-class MainShellScreen
-    extends
-        StatefulWidget {
+class MainShellScreen extends StatefulWidget {
+  final bool refreshMyOrders;
+  final int initialTabIndex;
+
   const MainShellScreen({
     super.key,
+    this.refreshMyOrders = false,
+    this.initialTabIndex = 0,
   });
 
   @override
-  State<
-    MainShellScreen
-  >
-  createState() => _MainShellScreenState();
+  State<MainShellScreen> createState() => _MainShellScreenState();
 }
 
-class _MainShellScreenState
-    extends
-        State<
-          MainShellScreen
-        > {
-  int _index = 0;
-  bool loggedIn = false;
-  String? userFirstName;
+class _MainShellScreenState extends State<MainShellScreen> {
+  bool _hasInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    loadUser();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !_hasInitialized) {
+        final shellProvider = context.read<MainShellController>();
+        
+        // Set tab awal
+        if (shellProvider.currentIndex != widget.initialTabIndex) {
+          shellProvider.changeTab(widget.initialTabIndex);
+        }
+        
+        // Refresh data jika diperlukan
+        if (widget.refreshMyOrders) {
+          shellProvider.refreshMyOrdersData();
+          
+          // KOREKSI: Refresh notifikasi dari SharedPreferences
+          try {
+            final notificationController = context.read<NotificationsController>();
+            notificationController.loadNotifications();
+            debugPrint('🔔 Notifications refreshed after order confirmation');
+          } catch (e) {
+            debugPrint('⚠️ Error refreshing notifications: $e');
+          }
+        }
+        
+        _hasInitialized = true;
+      }
+    });
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    loadUser();
-  }
+  Widget build(BuildContext context) {
+    final shellProvider = context.watch<MainShellController>();
 
-  Future<
-    void
-  >
-  loadUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(
-      () {
-        loggedIn =
-            prefs.getBool(
-              'isLoggedIn',
-            ) ??
-            false;
-        userFirstName = prefs.getString(
-          'userName',
-        );
-      },
-    );
-  }
+    final isLoggedIn = shellProvider.isLoggedIn;
+    final userFirstName = shellProvider.userFirstName;
+    final currentIndex = shellProvider.currentIndex;
 
-  void _handleNotificationTap() {
-    if (!loggedIn) {
-      showLoginModal(
-        context,
-      );
-      return;
-    }
-    Navigator.pushNamed(
-      context,
-      '/notifications',
-    );
-  }
-
-  void _goToServicesTab() => setState(
-    () => _index = 2,
-  );
-  void _goToServiceDetail(
-    Map<
-      String,
-      dynamic
-    >
-    service,
-  ) {
-    Navigator.pushNamed(
-      context,
-      '/service-detail',
-      arguments: service,
-    );
-  }
-
-  void _goToDisc() => setState(
-    () => _index = 3,
-  );
-
-  @override
-  Widget build(
-    BuildContext context,
-  ) {
     return Scaffold(
       backgroundColor: AppColors.pageBg,
       body: IndexedStack(
-        index: _index,
+        index: currentIndex,
         children: [
           HomeScreen(
-            loggedIn: loggedIn,
+            key: shellProvider.homeScreenKey,
+            loggedIn: isLoggedIn,
             userFirstName: userFirstName,
-            onOpenNotifications: _handleNotificationTap,
-            onOpenServices: _goToServicesTab,
-            onOpenServiceDetail: _goToServiceDetail,
-            onOpenDisc: _goToDisc,
+            onOpenNotifications: () => shellProvider.handleNotificationTap(context),
+            onOpenServices: () => shellProvider.goToServicesTab(),
+            onOpenServiceDetail: (service) => shellProvider.handleServiceDetail(context, service),
+            onOpenDisc: () => shellProvider.goToOffersTab(),
           ),
           MyOrdersScreen(
-            loggedIn: loggedIn,
+            key: shellProvider.myOrdersKey,
+            loggedIn: isLoggedIn,
           ),
           ServicesScreen(
-            loggedIn: loggedIn,
-            onOpenNotifications: _handleNotificationTap,
+            loggedIn: isLoggedIn,
+            onOpenNotifications: () => shellProvider.handleNotificationTap(context),
           ),
-
           OffersScreen(
-            loggedIn: loggedIn,
-            onOpenNotifications: _handleNotificationTap,
-            onOpenServices: _goToServicesTab,
+            loggedIn: isLoggedIn,
+            onOpenNotifications: () => shellProvider.handleNotificationTap(context),
+            onOpenServices: () => shellProvider.goToServicesTab(),
           ),
-
           ProfileScreen(
-            key: ValueKey(
-              loggedIn,
-            ),
+            key: ValueKey(isLoggedIn),
           ),
         ],
       ),
       bottomNavigationBar: AppBottomNavBar(
-        currentIndex: _index,
-        onTap:
-            (
-              i,
-            ) {
-              setState(
-                () => _index = i,
-              );
-              loadUser();
-            },
+        currentIndex: currentIndex,
+        onTap: (index) {
+          shellProvider.changeTab(index);
+          shellProvider.refreshUser();
+        },
       ),
     );
   }

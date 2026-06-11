@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:wushlaundry/constants/app_colors.dart';
-import 'package:wushlaundry/constants/app_spacing.dart';
-import 'package:wushlaundry/constants/app_text_styles.dart';
+import 'package:provider/provider.dart';
+
+import '../../constants/app_colors.dart';
+import '../../constants/app_spacing.dart';
+import '../../constants/app_text_styles.dart';
+import '../../controllers/edit_address_controller.dart';
 
 class EditAddressScreen
     extends
@@ -24,26 +27,59 @@ class _EditAddressScreenState
         > {
   final titleController = TextEditingController();
   final addressController = TextEditingController();
+  bool _isLoaded = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
+    if (_isLoaded) return;
+
+    // Mengambil argument dari Navigator
     final args =
         ModalRoute.of(
               context,
-            )!.settings.arguments
+            )?.settings.arguments
             as Map?;
 
-    if (args !=
-        null) {
-      titleController.text =
-          args['title'] ??
-          '';
-      addressController.text =
-          args['address'] ??
-          '';
-    }
+    // Memanggil fungsi load pada Provider
+    final editProvider = context
+        .read<
+          EditAddressController
+        >();
+    editProvider.loadAddress(
+      args,
+    );
+
+    // Sinkronisasi data dari Provider ke TextFields
+    titleController.text = editProvider.title;
+    addressController.text = editProvider.address;
+
+    _isLoaded = true;
+  }
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    addressController.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    final editProvider = context
+        .read<
+          EditAddressController
+        >();
+
+    final addressData = editProvider.saveAddress(
+      title: titleController.text,
+      address: addressController.text,
+    );
+
+    Navigator.pop(
+      context,
+      addressData.toMap(),
+    );
   }
 
   @override
@@ -52,7 +88,6 @@ class _EditAddressScreenState
   ) {
     return Scaffold(
       backgroundColor: AppColors.profileNavy,
-
       appBar: AppBar(
         backgroundColor: AppColors.profileNavy,
         elevation: 0,
@@ -66,7 +101,6 @@ class _EditAddressScreenState
           ),
         ),
       ),
-
       body: Container(
         margin: const EdgeInsets.only(
           top: 12,
@@ -90,11 +124,9 @@ class _EditAddressScreenState
                 "Judul Alamat",
                 style: AppTextStyles.sectionTitle,
               ),
-
               const SizedBox(
                 height: 8,
               ),
-
               TextField(
                 controller: titleController,
                 decoration: InputDecoration(
@@ -109,20 +141,16 @@ class _EditAddressScreenState
                   ),
                 ),
               ),
-
               const SizedBox(
                 height: AppSpacing.lg,
               ),
-
               Text(
                 "Alamat Lengkap",
                 style: AppTextStyles.sectionTitle,
               ),
-
               const SizedBox(
                 height: 8,
               ),
-
               TextField(
                 controller: addressController,
                 maxLines: 4,
@@ -138,9 +166,7 @@ class _EditAddressScreenState
                   ),
                 ),
               ),
-
               const Spacer(),
-
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -155,15 +181,7 @@ class _EditAddressScreenState
                       ),
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.pop(
-                      context,
-                      {
-                        'title': titleController.text,
-                        'address': addressController.text,
-                      },
-                    );
-                  },
+                  onPressed: _save,
                   child: const Text(
                     "Simpan",
                     style: TextStyle(

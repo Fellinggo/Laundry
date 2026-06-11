@@ -17,6 +17,7 @@ class LabeledTextField
     this.controller,
     this.keyboardType,
     this.errorText,
+    this.onChanged, // ← TAMBAHKAN INI
   });
 
   final String label;
@@ -28,6 +29,10 @@ class LabeledTextField
   final TextEditingController? controller;
   final TextInputType? keyboardType;
   final String? errorText;
+  final Function(
+    String,
+  )?
+  onChanged; // ← TAMBAHKAN INI
 
   @override
   Widget build(
@@ -55,22 +60,18 @@ class LabeledTextField
               : maxLines,
           keyboardType: keyboardType,
           style: AppTextStyles.body,
-
           cursorColor: AppColors.primaryNavy,
-
+          onChanged: onChanged, // ← TAMBAHKAN INI
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: AppTextStyles.bodyMuted,
             filled: true,
             fillColor: AppColors.white,
-
             errorText: errorText,
-
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
               vertical: 14,
             ),
-
             prefixIcon:
                 prefixIcon !=
                     null
@@ -80,9 +81,7 @@ class LabeledTextField
                     size: 22,
                   )
                 : null,
-
             suffixIcon: suffix,
-
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 AppSpacing.inputRadius,
@@ -91,7 +90,6 @@ class LabeledTextField
                 color: AppColors.borderLight,
               ),
             ),
-
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 AppSpacing.inputRadius,
@@ -101,7 +99,6 @@ class LabeledTextField
                 width: 1.2,
               ),
             ),
-
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 AppSpacing.inputRadius,
@@ -111,7 +108,6 @@ class LabeledTextField
                 width: 1.4,
               ),
             ),
-
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 AppSpacing.inputRadius,
@@ -121,7 +117,6 @@ class LabeledTextField
                 width: 1.2,
               ),
             ),
-
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(
                 AppSpacing.inputRadius,

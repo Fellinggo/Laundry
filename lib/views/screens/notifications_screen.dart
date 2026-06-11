@@ -1,70 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wushlaundry/constants/app_colors.dart';
-import 'package:wushlaundry/constants/app_spacing.dart';
-import 'package:wushlaundry/constants/app_text_styles.dart';
-import 'package:wushlaundry/views/widgets/notification_filter_tab.dart';
-import 'package:wushlaundry/views/widgets/notification_list_tile.dart';
+import 'package:provider/provider.dart';
+import 'package:wushlaundry/controllers/notification_controller.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_spacing.dart';
+import '../../constants/app_text_styles.dart';
+import '../widgets/notification_filter_tab.dart';
+import '../widgets/notification_list_tile.dart';
+import '../widgets/notification_date_header.dart';
+import '../../models/notification_model.dart';
 
 class NotificationsScreen
     extends
-        StatefulWidget {
+        StatelessWidget {
   const NotificationsScreen({
     super.key,
   });
 
   @override
-  State<
-    NotificationsScreen
-  >
-  createState() => _NotificationsScreenState();
-}
-
-class _NotificationsScreenState
-    extends
-        State<
-          NotificationsScreen
-        > {
-  int _filter = 0;
-
-  List<
-    String
-  >
-  notifications = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadNotif();
-  }
-
-  Future<
-    void
-  >
-  _loadNotif() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(
-      () {
-        notifications =
-            prefs.getStringList(
-              'notifications',
-            ) ??
-            [];
-      },
-    );
-  }
-
-  @override
   Widget build(
     BuildContext context,
   ) {
+    // Membaca state NotificationsController secara reaktif
+    final controller = context
+        .watch<
+          NotificationsController
+        >();
+
     return Scaffold(
       backgroundColor: AppColors.pageBgCool,
       appBar: AppBar(
         backgroundColor: AppColors.pageBgCool,
         elevation: 0,
         leading: IconButton(
-          onPressed: () => Navigator.pop(
+          onPressed: () => controller.goBack(
             context,
           ),
           icon: const Icon(
@@ -80,6 +48,19 @@ class _NotificationsScreenState
           ),
         ),
         centerTitle: true,
+        actions: [
+          if (controller.notifications.isNotEmpty)
+            IconButton(
+              icon: const Icon(
+                Icons.delete_outline,
+                color: AppColors.textSecondary,
+              ),
+              onPressed: () => _confirmClearAll(
+                context,
+                controller,
+              ),
+            ),
+        ],
       ),
       body: Column(
         children: [
@@ -94,38 +75,40 @@ class _NotificationsScreenState
                   icon: Icons.list_alt_rounded,
                   label: 'Semua',
                   selected:
-                      _filter ==
-                      0,
+                      controller.currentFilter ==
+                      NotificationFilter.all,
                   activeColor: AppColors.accentBlue,
-                  onTap: () => setState(
-                    () => _filter = 0,
+                  onTap: () => controller.changeFilter(
+                    NotificationFilter.all,
                   ),
                 ),
                 NotificationFilterTab(
                   icon: Icons.assignment_outlined,
                   label: 'Pesanan',
                   selected:
-                      _filter ==
-                      1,
+                      controller.currentFilter ==
+                      NotificationFilter.orders,
                   activeColor: AppColors.skyTab,
-                  onTap: () => setState(
-                    () => _filter = 1,
+                  onTap: () => controller.changeFilter(
+                    NotificationFilter.orders,
                   ),
                 ),
               ],
             ),
           ),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xl,
-              ),
-              children:
-                  _filter ==
-                      0
-                  ? _buildAll()
-                  : _buildOrdersOnly(),
-            ),
+            child: controller.isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : ListView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xl,
+                    ),
+                    children: _buildContent(
+                      controller,
+                    ),
+                  ),
           ),
         ],
       ),
@@ -135,100 +118,135 @@ class _NotificationsScreenState
   List<
     Widget
   >
-  _buildAll() {
-    return [
-      _dateHeader(
-        'Hari Ini',
-      ),
+  _buildContent(
+    NotificationsController controller,
+  ) {
+    final filteredNotifications = controller.getFilteredNotifications();
+    final isOrdersOnly =
+        controller.currentFilter ==
+        NotificationFilter.orders;
 
-      NotificationListTile(
-        leading: const NotificationIconBubble(
-          icon: Icons.settings_outlined,
-          color: AppColors.skyTab,
-        ),
-        title: 'Sistem',
-        subtitle: 'Laundry sudah buka! kami siap melayani anda!',
-        dateLabel: 'Hari ini',
-      ),
-
-      const SizedBox(
-        height: 10,
-      ),
-
-      if (notifications.isEmpty)
-        const Text(
-          "",
-        )
-      else
-        ...notifications.map(
-          (
-            n,
-          ) {
-            return NotificationListTile(
-              leading: const NotificationIconBubble(
-                icon: Icons.local_laundry_service,
-                color: AppColors.skyTab,
-              ),
-              title: 'Pesanan',
-              subtitle: n,
-              dateLabel: 'Baru saja',
-            );
-          },
-        ).toList(),
-    ];
-  }
-
-  List<
-    Widget
-  >
-  _buildOrdersOnly() {
-    if (notifications.isEmpty) {
+    if (isOrdersOnly &&
+        filteredNotifications.isEmpty) {
       return [
-        _dateHeader(
-          'Hari Ini',
+        const NotificationDateHeader(
+          title: 'Hari Ini',
         ),
-        const Text(
-          "Belum ada pesanan",
+        const Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: 20,
+          ),
+          child: Text(
+            "Belum ada pesanan",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: AppColors.textMuted,
+            ),
+          ),
         ),
       ];
     }
 
-    return [
-      _dateHeader(
-        'Hari Ini',
-      ),
-      ...notifications.map(
-        (
-          n,
-        ) {
-          return NotificationListTile(
-            leading: const NotificationIconBubble(
-              icon: Icons.local_laundry_service,
-              color: AppColors.skyTab,
+    final widgets =
+        <
+          Widget
+        >[
+          const NotificationDateHeader(
+            title: 'Hari Ini',
+          ),
+        ];
+
+    // System notification (only for "Semua" filter)
+    if (!isOrdersOnly) {
+      widgets.add(
+        NotificationListTile(
+          leading: const NotificationIconBubble(
+            icon: Icons.settings_outlined,
+            color: AppColors.skyTab,
+          ),
+          title: 'Sistem',
+          subtitle: NotificationsController.systemMessage,
+          dateLabel: 'Hari ini',
+        ),
+      );
+      widgets.add(
+        const SizedBox(
+          height: 10,
+        ),
+      );
+    }
+
+    // Order notifications
+    if (filteredNotifications.isNotEmpty) {
+      for (var notification in filteredNotifications) {
+        widgets.add(
+          NotificationListTile(
+            leading: NotificationIconBubble(
+              icon: notification.icon,
+              color: notification.iconColor,
             ),
-            title: 'Pesanan',
-            subtitle: n,
-            dateLabel: 'Baru saja',
-          );
-        },
-      ).toList(),
-    ];
+            title: notification.title,
+            subtitle: notification.subtitle,
+            dateLabel: notification.dateLabel,
+          ),
+        );
+        widgets.add(
+          const SizedBox(
+            height: 10,
+          ),
+        );
+      }
+    }
+
+    return widgets;
   }
 
-  Widget _dateHeader(
-    String t,
+  void _confirmClearAll(
+    BuildContext context,
+    NotificationsController controller,
   ) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: 8,
-        bottom: 12,
-      ),
-      child: Text(
-        t,
-        style: AppTextStyles.sectionTitle.copyWith(
-          fontSize: 15,
-        ),
-      ),
+    showDialog(
+      context: context,
+      builder:
+          (
+            ctx,
+          ) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(
+                16,
+              ),
+            ),
+            title: const Text(
+              'Hapus Semua Notifikasi',
+            ),
+            content: const Text(
+              'Apakah Anda yakin ingin menghapus semua notifikasi?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(
+                  ctx,
+                ),
+                child: const Text(
+                  'Batal',
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(
+                    ctx,
+                  );
+                  controller.clearAllNotifications();
+                },
+                child: const Text(
+                  'Hapus',
+                  style: TextStyle(
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            ],
+          ),
     );
   }
 }
