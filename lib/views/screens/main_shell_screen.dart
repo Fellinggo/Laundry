@@ -9,43 +9,50 @@ import '../screens/services_screen.dart';
 import '../widgets/app_bottom_nav_bar.dart';
 import '../../controllers/main_shell_controller.dart';
 
-class MainShellScreen
-    extends
-        StatelessWidget {
-  final bool refreshMyOrders; // PARAMETER BARU
-  final int initialTabIndex; // KOREKSI: Parameter untuk mengatur tab awal
+// KOREKSI: Ubah dari StatelessWidget menjadi StatefulWidget
+class MainShellScreen extends StatefulWidget {
+  final bool refreshMyOrders;
+  final int initialTabIndex;
 
   const MainShellScreen({
     super.key,
     this.refreshMyOrders = false,
-    this.initialTabIndex = 0, // KOREKSI: Default ke Home (index 0)
+    this.initialTabIndex = 0,
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final shellProvider = context
-        .watch<
-          MainShellController
-        >();
+  State<MainShellScreen> createState() => _MainShellScreenState();
+}
 
-    // KOREKSI: Set tab awal berdasarkan initialTabIndex
-    WidgetsBinding.instance.addPostFrameCallback(
-      (
-        _,
-      ) {
-        // Set tab ke index yang diinginkan
-        if (shellProvider.currentIndex != initialTabIndex) {
-          shellProvider.changeTab(initialTabIndex);
+class _MainShellScreenState extends State<MainShellScreen> {
+  bool _hasInitialized = false; // KOREKSI: Flag untuk mencegah reset berulang
+
+  @override
+  void initState() {
+    super.initState();
+    // KOREKSI: Inisialisasi hanya sekali di initState
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !_hasInitialized) {
+        final shellProvider = context.read<MainShellController>();
+        
+        // Set tab awal hanya sekali
+        if (shellProvider.currentIndex != widget.initialTabIndex) {
+          shellProvider.changeTab(widget.initialTabIndex);
         }
         
-        // Jika perlu refresh My Orders, panggil method refresh
-        if (refreshMyOrders) {
+        // Refresh data jika diperlukan
+        if (widget.refreshMyOrders) {
           shellProvider.refreshMyOrdersData();
         }
-      },
-    );
+        
+        _hasInitialized = true;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final shellProvider = context.watch<MainShellController>();
 
     final isLoggedIn = shellProvider.isLoggedIn;
     final userFirstName = shellProvider.userFirstName;
@@ -64,17 +71,13 @@ class MainShellScreen
               context,
             ),
             onOpenServices: () => shellProvider.goToServicesTab(),
-            onOpenServiceDetail:
-                (
-                  service,
-                ) => shellProvider.handleServiceDetail(
-                  context,
-                  service,
-                ),
+            onOpenServiceDetail: (service) => shellProvider.handleServiceDetail(
+              context,
+              service,
+            ),
             onOpenDisc: () => shellProvider.goToOffersTab(),
           ),
           MyOrdersScreen(
-            // GANTI KEY JADI GLOBAL KEY AGAR BISA DI-REFRESH
             key: shellProvider.myOrdersKey,
             loggedIn: isLoggedIn,
           ),
@@ -92,23 +95,16 @@ class MainShellScreen
             onOpenServices: () => shellProvider.goToServicesTab(),
           ),
           ProfileScreen(
-            key: ValueKey(
-              isLoggedIn,
-            ),
+            key: ValueKey(isLoggedIn),
           ),
         ],
       ),
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: currentIndex,
-        onTap:
-            (
-              index,
-            ) {
-              shellProvider.changeTab(
-                index,
-              );
-              shellProvider.refreshUser();
-            },
+        onTap: (index) {
+          shellProvider.changeTab(index);
+          shellProvider.refreshUser();
+        },
       ),
     );
   }
