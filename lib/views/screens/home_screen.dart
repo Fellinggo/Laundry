@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // <-- Pastikan ini diimport
+import 'package:wushlaundry/controllers/notification_controller.dart';
 import '../widgets/login_modal_sheet.dart';
 import '../widgets/offer_image_slider.dart';
 import '../widgets/rounded_white_panel.dart';
@@ -418,9 +419,7 @@ class HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class HomeNavyHeaderBlock
-    extends
-        StatelessWidget {
+class HomeNavyHeaderBlock extends StatelessWidget {
   const HomeNavyHeaderBlock({
     super.key,
     this.onNotification,
@@ -429,19 +428,14 @@ class HomeNavyHeaderBlock
   final VoidCallback? onNotification;
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final top = MediaQuery.of(
-      context,
-    ).padding.top;
+  Widget build(BuildContext context) {
+    final top = MediaQuery.of(context).padding.top;
 
     return Container(
       color: AppColors.headerNavy,
       padding: EdgeInsets.fromLTRB(
         20,
-        top +
-            15,
+        top + 15,
         20,
         20,
       ),

@@ -8,8 +8,8 @@ import '../screens/profile_screen.dart';
 import '../screens/services_screen.dart';
 import '../widgets/app_bottom_nav_bar.dart';
 import '../../controllers/main_shell_controller.dart';
+import '../../controllers/notification_controller.dart';
 
-// KOREKSI: Ubah dari StatelessWidget menjadi StatefulWidget
 class MainShellScreen extends StatefulWidget {
   final bool refreshMyOrders;
   final int initialTabIndex;
@@ -25,17 +25,16 @@ class MainShellScreen extends StatefulWidget {
 }
 
 class _MainShellScreenState extends State<MainShellScreen> {
-  bool _hasInitialized = false; // KOREKSI: Flag untuk mencegah reset berulang
+  bool _hasInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    // KOREKSI: Inisialisasi hanya sekali di initState
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && !_hasInitialized) {
         final shellProvider = context.read<MainShellController>();
         
-        // Set tab awal hanya sekali
+        // Set tab awal
         if (shellProvider.currentIndex != widget.initialTabIndex) {
           shellProvider.changeTab(widget.initialTabIndex);
         }
@@ -43,6 +42,15 @@ class _MainShellScreenState extends State<MainShellScreen> {
         // Refresh data jika diperlukan
         if (widget.refreshMyOrders) {
           shellProvider.refreshMyOrdersData();
+          
+          // KOREKSI: Refresh notifikasi dari SharedPreferences
+          try {
+            final notificationController = context.read<NotificationsController>();
+            notificationController.loadNotifications();
+            debugPrint('🔔 Notifications refreshed after order confirmation');
+          } catch (e) {
+            debugPrint('⚠️ Error refreshing notifications: $e');
+          }
         }
         
         _hasInitialized = true;
@@ -67,14 +75,9 @@ class _MainShellScreenState extends State<MainShellScreen> {
             key: shellProvider.homeScreenKey,
             loggedIn: isLoggedIn,
             userFirstName: userFirstName,
-            onOpenNotifications: () => shellProvider.handleNotificationTap(
-              context,
-            ),
+            onOpenNotifications: () => shellProvider.handleNotificationTap(context),
             onOpenServices: () => shellProvider.goToServicesTab(),
-            onOpenServiceDetail: (service) => shellProvider.handleServiceDetail(
-              context,
-              service,
-            ),
+            onOpenServiceDetail: (service) => shellProvider.handleServiceDetail(context, service),
             onOpenDisc: () => shellProvider.goToOffersTab(),
           ),
           MyOrdersScreen(
@@ -83,15 +86,11 @@ class _MainShellScreenState extends State<MainShellScreen> {
           ),
           ServicesScreen(
             loggedIn: isLoggedIn,
-            onOpenNotifications: () => shellProvider.handleNotificationTap(
-              context,
-            ),
+            onOpenNotifications: () => shellProvider.handleNotificationTap(context),
           ),
           OffersScreen(
             loggedIn: isLoggedIn,
-            onOpenNotifications: () => shellProvider.handleNotificationTap(
-              context,
-            ),
+            onOpenNotifications: () => shellProvider.handleNotificationTap(context),
             onOpenServices: () => shellProvider.goToServicesTab(),
           ),
           ProfileScreen(
