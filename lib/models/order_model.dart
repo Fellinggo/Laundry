@@ -19,20 +19,21 @@ class OrderModel {
     required this.itemsJson,
   });
 
-  factory OrderModel.fromMap(Map<String, dynamic> map) {
+  // ✅ Factory constructor untuk parsing JSON
+  factory OrderModel.fromJson(Map<String, dynamic> json) {
     return OrderModel(
-      orderId: map['orderId'] ?? '000000',
-      service: map['service'] ?? 'Cuci Regular',
-      qty: map['qty'] ?? '1',
-      pickupTime: map['pickupTime'] ?? '-',
-      deliveryTime: map['deliveryTime'] ?? '-',
-      totalPrice: map['totalPrice'] ?? 'Rp 0',
-      address: map['address'] ?? '-',
-      itemsJson: map['itemsJson'] ?? '',
+      orderId: json['orderId'] ?? '',
+      service: json['service'] ?? '',
+      qty: json['qty']?.toString() ?? '0',
+      pickupTime: json['pickupTime'] ?? '',
+      deliveryTime: json['deliveryTime'] ?? '',
+      totalPrice: json['totalPrice']?.toString() ?? '0',
+      address: json['address'] ?? '',
+      itemsJson: json['itemsJson'] ?? '',
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'orderId': orderId,
       'service': service,
@@ -45,9 +46,8 @@ class OrderModel {
     };
   }
 
+  // Method lain tetap bisa dipertahankan
   bool get isDummyOrder => orderId == '100001';
-
   int get currentStep => isDummyOrder ? 2 : 0;
-
   String get badgeLabel => isDummyOrder ? 'Dicuci' : 'Diproses';
 }
