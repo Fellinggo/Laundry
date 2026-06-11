@@ -268,7 +268,7 @@ class HomeScreenState extends State<HomeScreen> {
                                           context,
                                           '/order-detail',
                                           arguments: {
-                                            ...order.toMap(),
+                                            ...order.toJson(),
                                             'fromActiveOrder': true,
                                           },
                                         );
