@@ -1,9 +1,6 @@
 class PrivacyPolicySection {
   final String title;
-  final List<
-    String
-  >
-  items;
+  final List<String> items;
   final bool hasLearnMoreButton;
 
   PrivacyPolicySection({
@@ -16,10 +13,7 @@ class PrivacyPolicySection {
 class PrivacyPolicyModel {
   final String mainTitle;
   final String mainContent;
-  final List<
-    PrivacyPolicySection
-  >
-  sections;
+  final List<PrivacyPolicySection> sections;
 
   PrivacyPolicyModel({
     required this.mainTitle,
@@ -31,7 +25,8 @@ class PrivacyPolicyModel {
   factory PrivacyPolicyModel.defaultPolicy() {
     return PrivacyPolicyModel(
       mainTitle: 'Kebijakan Privasi',
-      mainContent: 'Kami menghormati privasi Anda. Data pribadi digunakan untuk memproses pesanan, komunikasi layanan, dan peningkatan pengalaman aplikasi.',
+      mainContent:
+          'Kami menghormati privasi Anda. Data pribadi digunakan untuk memproses pesanan, komunikasi layanan, dan peningkatan pengalaman aplikasi.',
       sections: [
         PrivacyPolicySection(
           title: 'Pedoman Pengguna',
@@ -54,62 +49,29 @@ class PrivacyPolicyModel {
   }
 
   // Untuk mengambil data dari API/local storage
-  factory PrivacyPolicyModel.fromJson(
-    Map<
-      String,
-      dynamic
-    >
-    json,
-  ) {
+  factory PrivacyPolicyModel.fromJson(Map<String, dynamic> json) {
     return PrivacyPolicyModel(
-      mainTitle:
-          json['mainTitle'] ??
-          'Kebijakan Privasi',
-      mainContent:
-          json['mainContent'] ??
-          '',
+      mainTitle: json['mainTitle'] ?? 'Kebijakan Privasi',
+      mainContent: json['mainContent'] ?? '',
       sections:
-          (json['sections']
-                  as List?)
-              ?.map(
-                (
-                  section,
-                ) {
-                  return PrivacyPolicySection(
-                    title:
-                        section['title'] ??
-                        '',
-                    items:
-                        (section['items']
-                                as List?)
-                            ?.cast<
-                              String
-                            >() ??
-                        [],
-                    hasLearnMoreButton:
-                        section['hasLearnMoreButton'] ??
-                        false,
-                  );
-                },
-              )
-              .toList() ??
+          (json['sections'] as List?)?.map((section) {
+            return PrivacyPolicySection(
+              title: section['title'] ?? '',
+              items: (section['items'] as List?)?.cast<String>() ?? [],
+              hasLearnMoreButton: section['hasLearnMoreButton'] ?? false,
+            );
+          }).toList() ??
           [],
     );
   }
 
-  Map<
-    String,
-    dynamic
-  >
-  toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'mainTitle': mainTitle,
       'mainContent': mainContent,
       'sections': sections
           .map(
-            (
-              section,
-            ) => {
+            (section) => {
               'title': section.title,
               'items': section.items,
               'hasLearnMoreButton': section.hasLearnMoreButton,

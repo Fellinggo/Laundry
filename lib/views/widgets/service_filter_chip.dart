@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 
-class ServiceFilterChip
-    extends
-        StatelessWidget {
+class ServiceFilterChip extends StatelessWidget {
   final bool isSelected;
   final IconData icon;
   final String title;
-  final Function(
-    bool,
-  )
-  onSelected;
+  final Function(bool) onSelected;
 
   const ServiceFilterChip({
     super.key,
@@ -20,28 +15,17 @@ class ServiceFilterChip
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-        right: 10,
-      ),
+      padding: const EdgeInsets.only(right: 10),
       child: FilterChip(
         selected: isSelected,
         onSelected: onSelected,
         label: Row(
           children: [
-            Icon(
-              icon,
-              size: 18,
-            ),
-            const SizedBox(
-              width: 6,
-            ),
-            Text(
-              title,
-            ),
+            Icon(icon, size: 18),
+            const SizedBox(width: 6),
+            Text(title),
           ],
         ),
       ),

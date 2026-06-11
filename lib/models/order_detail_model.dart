@@ -18,68 +18,27 @@ class OrderItemDetail {
     this.image,
   });
 
-  factory OrderItemDetail.fromMap(
-    Map<
-      String,
-      dynamic
-    >
-    map,
-  ) {
+  factory OrderItemDetail.fromMap(Map<String, dynamic> map) {
     return OrderItemDetail(
-      title:
-          map['title'] ??
-          map['name'] ??
-          'Layanan',
-      qty: _toInt(
-        map['qty'],
-      ),
-      price: _toInt(
-        map['price'],
-      ),
-      subtotal:
-          _toInt(
-                map['subtotal'],
-              ) !=
-              0
-          ? _toInt(
-              map['subtotal'],
-            )
-          : (_toInt(
-                  map['qty'],
-                ) *
-                _toInt(
-                  map['price'],
-                )),
+      title: map['title'] ?? map['name'] ?? 'Layanan',
+      qty: _toInt(map['qty']),
+      price: _toInt(map['price']),
+      subtotal: _toInt(map['subtotal']) != 0
+          ? _toInt(map['subtotal'])
+          : (_toInt(map['qty']) * _toInt(map['price'])),
       image: map['image'],
     );
   }
 
-  static int _toInt(
-    dynamic value,
-  ) {
-    if (value ==
-        null)
-      return 0;
-    if (value
-        is int)
-      return value;
-    if (value
-        is String)
-      return int.tryParse(
-            value,
-          ) ??
-          0;
-    if (value
-        is double)
-      return value.toInt();
+  static int _toInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? 0;
+    if (value is double) return value.toInt();
     return 0;
   }
 
-  Map<
-    String,
-    dynamic
-  >
-  toMap() {
+  Map<String, dynamic> toMap() {
     return {
       'title': title,
       'qty': qty,
@@ -96,10 +55,7 @@ class OrderDetailData {
   final bool isFromProcessOrder;
   final bool isDummyOrder;
   final int activeStepIndex;
-  final List<
-    OrderItemDetail
-  >
-  orderItems;
+  final List<OrderItemDetail> orderItems;
   final int totalQty;
   final int totalProductPrice;
   final String pickupTimeText;
@@ -136,291 +92,125 @@ class OrderDetailData {
 
   static String _generateOrderId() {
     final random = Random();
-    return (100000 +
-            random.nextInt(
-              900000,
-            ))
-        .toString();
+    return (100000 + random.nextInt(900000)).toString();
   }
 
-  static int _toInt(
-    dynamic value,
-  ) {
-    if (value ==
-        null)
-      return 0;
-    if (value
-        is int)
-      return value;
-    if (value
-        is String) {
-      String cleaned = value
-          .replaceAll(
-            'Rp ',
-            '',
-          )
-          .replaceAll(
-            '.',
-            '',
-          );
-      return int.tryParse(
-            cleaned,
-          ) ??
-          0;
+  static int _toInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is String) {
+      String cleaned = value.replaceAll('Rp ', '').replaceAll('.', '');
+      return int.tryParse(cleaned) ?? 0;
     }
-    if (value
-        is double)
-      return value.toInt();
+    if (value is double) return value.toInt();
     return 0;
   }
 
-  static List<
-    OrderItemDetail
-  >
-  _decodeItemsFromJson(
-    String? itemsJson,
-  ) {
-    if (itemsJson ==
-            null ||
-        itemsJson.isEmpty)
-      return [];
+  static List<OrderItemDetail> _decodeItemsFromJson(String? itemsJson) {
+    if (itemsJson == null || itemsJson.isEmpty) return [];
     try {
-      final decoded = jsonDecode(
-        itemsJson,
-      );
-      if (decoded
-          is List) {
-        return decoded
-            .map(
-              (
-                item,
-              ) => OrderItemDetail.fromMap(
-                item,
-              ),
-            )
-            .toList();
+      final decoded = jsonDecode(itemsJson);
+      if (decoded is List) {
+        return decoded.map((item) => OrderItemDetail.fromMap(item)).toList();
       }
       return [];
-    } catch (
-      e
-    ) {
-      debugPrint(
-        'Error decoding items JSON: $e',
-      );
+    } catch (e) {
+      debugPrint('Error decoding items JSON: $e');
       return [];
     }
   }
 
-  static int _calculateDurationMinutes(
-    String pickup,
-    String delivery,
-  ) {
+  static int _calculateDurationMinutes(String pickup, String delivery) {
     try {
-      final p = DateTime.parse(
-        pickup,
-      );
-      final d = DateTime.parse(
-        delivery,
-      );
-      return d
-          .difference(
-            p,
-          )
-          .inMinutes;
-    } catch (
-      e
-    ) {
+      final p = DateTime.parse(pickup);
+      final d = DateTime.parse(delivery);
+      return d.difference(p).inMinutes;
+    } catch (e) {
       return 120;
     }
   }
 
-  factory OrderDetailData.fromArguments(
-    Map<
-      String,
-      dynamic
-    >
-    args,
-  ) {
-    final isFromActiveOrder =
-        args['fromActiveOrder'] ==
-        true;
-    final isFromProcessOrder =
-        args['fromProcessOrder'] ==
-        true;
-    final orderIdTemp =
-        args['orderId']?.toString() ??
-        '';
-    final isDummyOrder =
-        orderIdTemp ==
-        '100001';
-    final activeStepIndex = isDummyOrder
-        ? 2
-        : 0;
+  factory OrderDetailData.fromArguments(Map<String, dynamic> args) {
+    final isFromActiveOrder = args['fromActiveOrder'] == true;
+    final isFromProcessOrder = args['fromProcessOrder'] == true;
+    final orderIdTemp = args['orderId']?.toString() ?? '';
+    final isDummyOrder = orderIdTemp == '100001';
+    final activeStepIndex = isDummyOrder ? 2 : 0;
 
-    List<
-      OrderItemDetail
-    >
-    orderItems = [];
+    List<OrderItemDetail> orderItems = [];
 
-    if (args['itemsJson'] !=
-            null &&
-        args['itemsJson'].toString().isNotEmpty) {
-      orderItems = _decodeItemsFromJson(
-        args['itemsJson'].toString(),
-      );
+    if (args['itemsJson'] != null && args['itemsJson'].toString().isNotEmpty) {
+      orderItems = _decodeItemsFromJson(args['itemsJson'].toString());
     }
 
     if (orderItems.isEmpty &&
-        args['orderItems'] !=
-            null &&
-        args['orderItems']
-            is List) {
-      orderItems =
-          (args['orderItems']
-                  as List)
-              .map(
-                (
-                  item,
-                ) => OrderItemDetail.fromMap(
-                  item,
-                ),
-              )
-              .toList();
+        args['orderItems'] != null &&
+        args['orderItems'] is List) {
+      orderItems = (args['orderItems'] as List)
+          .map((item) => OrderItemDetail.fromMap(item))
+          .toList();
     }
 
-    if (orderItems.isEmpty &&
-        args['items'] !=
-            null &&
-        args['items']
-            is List) {
-      orderItems =
-          (args['items']
-                  as List)
-              .map(
-                (
-                  item,
-                ) => OrderItemDetail.fromMap(
-                  item,
-                ),
-              )
-              .toList();
+    if (orderItems.isEmpty && args['items'] != null && args['items'] is List) {
+      orderItems = (args['items'] as List)
+          .map((item) => OrderItemDetail.fromMap(item))
+          .toList();
     }
 
-    final orderId =
-        (isFromActiveOrder ||
-            isFromProcessOrder)
-        ? (args['orderId']?.toString() ??
-              '000000')
-        : (args['orderId'] ??
-              _generateOrderId());
+    final orderId = (isFromActiveOrder || isFromProcessOrder)
+        ? (args['orderId']?.toString() ?? '000000')
+        : (args['orderId'] ?? _generateOrderId());
 
     int totalQty = 0;
     int totalProductPrice = 0;
 
     if (orderItems.isNotEmpty) {
-      totalQty = orderItems.fold(
-        0,
-        (
-          sum,
-          item,
-        ) =>
-            sum +
-            item.qty,
-      );
+      totalQty = orderItems.fold(0, (sum, item) => sum + item.qty);
       totalProductPrice = orderItems.fold(
         0,
-        (
-          sum,
-          item,
-        ) =>
-            sum +
-            item.subtotal,
+        (sum, item) => sum + item.subtotal,
       );
     } else {
-      totalQty = _toInt(
-        args['qty'] ??
-            1,
-      );
-      totalProductPrice = _toInt(
-        args['serviceFee'] ??
-            0,
-      );
+      totalQty = _toInt(args['qty'] ?? 1);
+      totalProductPrice = _toInt(args['serviceFee'] ?? 0);
     }
 
-    final pickupTimeText =
-        args['pickupTime']?.toString() ??
-        '-';
-    final deliveryTimeText =
-        args['deliveryTime']?.toString() ??
-        '-';
-    final pickupAddress =
-        args['address']?.toString() ??
-        'Alamat belum diisi';
+    final pickupTimeText = args['pickupTime']?.toString() ?? '-';
+    final deliveryTimeText = args['deliveryTime']?.toString() ?? '-';
+    final pickupAddress = args['address']?.toString() ?? 'Alamat belum diisi';
     final deliveryAddress =
-        args['deliveryAddress']?.toString() ??
-        pickupAddress;
-    final deliveryFee = _toInt(
-      args['deliveryFee'] ??
-          5000,
-    );
+        args['deliveryAddress']?.toString() ?? pickupAddress;
+    final deliveryFee = _toInt(args['deliveryFee'] ?? 5000);
 
     final int grandTotal;
-    if (isFromActiveOrder ||
-        isFromProcessOrder) {
-      final savedTotalPrice =
-          args['totalPrice']?.toString() ??
-          'Rp 0';
-      int savedTotal = _toInt(
-        savedTotalPrice,
-      );
+    if (isFromActiveOrder || isFromProcessOrder) {
+      final savedTotalPrice = args['totalPrice']?.toString() ?? 'Rp 0';
+      int savedTotal = _toInt(savedTotalPrice);
       if (isDummyOrder) {
-        grandTotal =
-            savedTotal +
-            deliveryFee;
+        grandTotal = savedTotal + deliveryFee;
       } else {
         grandTotal = savedTotal;
       }
     } else {
-      grandTotal =
-          totalProductPrice +
-          deliveryFee;
+      grandTotal = totalProductPrice + deliveryFee;
     }
 
     final String serviceSummary = orderItems.isEmpty
-        ? (args['service']?.toString() ??
-              'Laundry')
-        : orderItems
-              .map(
-                (
-                  item,
-                ) => '${item.title} (${item.qty})',
-              )
-              .join(
-                ' + ',
-              );
+        ? (args['service']?.toString() ?? 'Laundry')
+        : orderItems.map((item) => '${item.title} (${item.qty})').join(' + ');
 
     final durationMinutes = _calculateDurationMinutes(
       pickupTimeText,
       deliveryTimeText,
     );
-    final durationText =
-        durationMinutes >=
-            60
+    final durationText = durationMinutes >= 60
         ? '${(durationMinutes / 60).round()} jam'
         : '$durationMinutes menit';
 
     final itemsJson = jsonEncode(
-      orderItems
-          .map(
-            (
-              item,
-            ) => item.toMap(),
-          )
-          .toList(),
+      orderItems.map((item) => item.toMap()).toList(),
     );
-    final statusText = isDummyOrder
-        ? 'Dicuci'
-        : 'Diproses';
+    final statusText = isDummyOrder ? 'Dicuci' : 'Diproses';
 
     return OrderDetailData(
       orderId: orderId,

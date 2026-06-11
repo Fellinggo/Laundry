@@ -4,18 +4,10 @@ import '../../../constants/app_colors.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_text_styles.dart';
 
-class LanguageSheetWidget
-    extends
-        StatelessWidget {
+class LanguageSheetWidget extends StatelessWidget {
   final int selectedIndex;
-  final List<
-    LanguageOption
-  >
-  languageOptions;
-  final Function(
-    int,
-  )
-  onLanguageSelected;
+  final List<LanguageOption> languageOptions;
+  final Function(int) onLanguageSelected;
 
   const LanguageSheetWidget({
     super.key,
@@ -25,69 +17,41 @@ class LanguageSheetWidget
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(
-        AppSpacing.xl,
-      ),
-      padding: const EdgeInsets.all(
-        AppSpacing.lg,
-      ),
+      margin: const EdgeInsets.all(AppSpacing.xl),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(
-          20,
-        ),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        children: List.generate(
-          languageOptions.length,
-          (
-            index,
-          ) {
-            final option = languageOptions[index];
+        children: List.generate(languageOptions.length, (index) {
+          final option = languageOptions[index];
 
-            return ListTile(
-              title: Text(
-                option.name,
-              ),
-              subtitle:
-                  !option.isAvailable &&
-                      option.comingSoonText !=
-                          null
-                  ? Text(
-                      option.comingSoonText!,
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.danger,
-                        fontSize: 11,
-                      ),
-                    )
-                  : null,
-              trailing:
-                  selectedIndex ==
-                          index &&
-                      option.isAvailable
-                  ? const Icon(
-                      Icons.check_circle,
-                      color: AppColors.primaryNavy,
-                    )
-                  : null,
-              onTap: () {
-                if (option.isAvailable) {
-                  onLanguageSelected(
-                    index,
-                  );
-                  Navigator.pop(
-                    context,
-                  );
-                }
-              },
-            );
-          },
-        ),
+          return ListTile(
+            title: Text(option.name),
+            subtitle: !option.isAvailable && option.comingSoonText != null
+                ? Text(
+                    option.comingSoonText!,
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.danger,
+                      fontSize: 11,
+                    ),
+                  )
+                : null,
+            trailing: selectedIndex == index && option.isAvailable
+                ? const Icon(Icons.check_circle, color: AppColors.primaryNavy)
+                : null,
+            onTap: () {
+              if (option.isAvailable) {
+                onLanguageSelected(index);
+                Navigator.pop(context);
+              }
+            },
+          );
+        }),
       ),
     );
   }

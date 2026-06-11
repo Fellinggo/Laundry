@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AddressSelectorController extends ChangeNotifier {
   final TextEditingController customAddressController = TextEditingController();
-  
+
   Map<String, String> _addresses = {};
   String _selectedAddressType = '';
   bool _showAddressOptions = false;
@@ -32,7 +32,9 @@ class AddressSelectorController extends ChangeNotifier {
       _addresses = {};
       if (savedAddresses.isNotEmpty) {
         for (int i = 0; i < savedAddresses.length; i++) {
-          final title = i < savedTitles.length ? savedTitles[i] : 'Alamat ${i + 1}';
+          final title = i < savedTitles.length
+              ? savedTitles[i]
+              : 'Alamat ${i + 1}';
           _addresses[title] = savedAddresses[i];
         }
       }
@@ -65,7 +67,7 @@ class AddressSelectorController extends ChangeNotifier {
 
   void useCustomAddress() {
     if (customAddressController.text.trim().isEmpty) return;
-    
+
     _selectedAddressType = 'Custom';
     _showAddressOptions = false;
     notifyListeners();
@@ -74,7 +76,7 @@ class AddressSelectorController extends ChangeNotifier {
   Future<void> saveAddressIfNeeded() async {
     if (_saveToProfile && customAddressController.text.trim().isNotEmpty) {
       final address = customAddressController.text.trim();
-      
+
       final prefs = await SharedPreferences.getInstance();
       final email = prefs.getString('userEmail') ?? '';
       final addressKey = 'userAddresses_$email';
@@ -84,7 +86,7 @@ class AddressSelectorController extends ChangeNotifier {
       final savedTitles = prefs.getStringList(titlesKey) ?? [];
 
       final newTitle = 'Alamat ${savedAddresses.length + 1}';
-      
+
       savedAddresses.add(address);
       savedTitles.add(newTitle);
 
@@ -93,7 +95,7 @@ class AddressSelectorController extends ChangeNotifier {
 
       _addresses[newTitle] = address;
       _saveToProfile = false;
-      
+
       notifyListeners();
     }
   }
@@ -102,14 +104,16 @@ class AddressSelectorController extends ChangeNotifier {
     if (_selectedAddressType == 'Custom') {
       return customAddressController.text;
     }
-    if (_selectedAddressType.isNotEmpty && _addresses.containsKey(_selectedAddressType)) {
+    if (_selectedAddressType.isNotEmpty &&
+        _addresses.containsKey(_selectedAddressType)) {
       return _addresses[_selectedAddressType]!;
     }
     return '';
   }
 
   bool isAddressValid() {
-    if (_selectedAddressType.isEmpty && customAddressController.text.trim().isEmpty) {
+    if (_selectedAddressType.isEmpty &&
+        customAddressController.text.trim().isEmpty) {
       return false;
     }
     return true;

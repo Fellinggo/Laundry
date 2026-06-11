@@ -8,59 +8,37 @@ import '../../controllers/help_controller.dart';
 import '../widgets/navy_app_bar.dart';
 import '../widgets/rounded_white_panel.dart';
 
-class HelpScreen
-    extends
-        StatelessWidget {
-  const HelpScreen({
-    super.key,
-  });
+class HelpScreen extends StatelessWidget {
+  const HelpScreen({super.key});
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     // Mengambil data secara efisien menggunakan context.read karena datanya statis
-    final helpController = context
-        .read<
-          HelpController
-        >();
+    final helpController = context.read<HelpController>();
     final helpData = helpController.helpData;
 
     return Scaffold(
       backgroundColor: AppColors.profileNavy,
       appBar: NavyBackAppBar(
         title: 'Bantuan',
-        onBack: () => Navigator.pop(
-          context,
-        ),
+        onBack: () => Navigator.pop(context),
       ),
       body: SizedBox.expand(
         child: RoundedWhitePanel(
           topRadius: 28,
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(
-              AppSpacing.xl,
-            ),
+            padding: const EdgeInsets.all(AppSpacing.xl),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (
-                  int i = 0;
-                  i <
-                      helpData.paragraphs.length;
-                  i++
-                ) ...[
+                for (int i = 0; i < helpData.paragraphs.length; i++) ...[
                   Text(
                     helpData.paragraphs[i],
                     style: AppTextStyles.body,
                     textAlign: TextAlign.justify,
                   ),
-                  if (i !=
-                      helpData.paragraphs.length -
-                          1)
-                    const SizedBox(
-                      height: AppSpacing.lg,
-                    ),
+                  if (i != helpData.paragraphs.length - 1)
+                    const SizedBox(height: AppSpacing.lg),
                 ],
               ],
             ),

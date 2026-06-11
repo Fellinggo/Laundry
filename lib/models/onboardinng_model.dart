@@ -15,7 +15,8 @@ class OnboardingPage {
     return const OnboardingPage(
       image: 'assets/images/onb1.png',
       title: 'Selamat Datang di WushLaundry!',
-      description: 'Layanan laundry praktis dengan antar-jemput cepat, bersih dan hemat waktu, tanpa ribet — biar kami yang urus cucian kamu.',
+      description:
+          'Layanan laundry praktis dengan antar-jemput cepat, bersih dan hemat waktu, tanpa ribet — biar kami yang urus cucian kamu.',
     );
   }
 
@@ -23,7 +24,8 @@ class OnboardingPage {
     return const OnboardingPage(
       image: 'assets/images/onb2.png',
       title: 'Antar-Jemput Cepat & Praktis',
-      description: 'Kami jemput cucian kamu, proses, dan antar kembali dengan rapi.',
+      description:
+          'Kami jemput cucian kamu, proses, dan antar kembali dengan rapi.',
     );
   }
 
@@ -39,15 +41,13 @@ class OnboardingPage {
     return const OnboardingPage(
       image: 'assets/images/onb4.png',
       title: 'Siap jemput cucian kamu ✨✨',
-      description: 'Pilih lokasi kamu & mulai order.\nKurir kami aktif dan siap menjemput kapan saja.',
+      description:
+          'Pilih lokasi kamu & mulai order.\nKurir kami aktif dan siap menjemput kapan saja.',
       isFinalPage: true,
     );
   }
 
-  static List<
-    OnboardingPage
-  >
-  getDefaultPages() {
+  static List<OnboardingPage> getDefaultPages() {
     return [
       OnboardingPage.defaultPage1(),
       OnboardingPage.defaultPage2(),
@@ -59,15 +59,9 @@ class OnboardingPage {
 
 class OnboardingState {
   final int currentPageIndex;
-  final List<
-    OnboardingPage
-  >
-  pages;
+  final List<OnboardingPage> pages;
 
-  OnboardingState({
-    required this.currentPageIndex,
-    required this.pages,
-  });
+  OnboardingState({required this.currentPageIndex, required this.pages});
 
   factory OnboardingState.initial() {
     return OnboardingState(
@@ -78,31 +72,19 @@ class OnboardingState {
 
   OnboardingPage get currentPage => pages[currentPageIndex];
 
-  bool get isFirstPage =>
-      currentPageIndex ==
-      0;
+  bool get isFirstPage => currentPageIndex == 0;
 
-  bool get isLastPage =>
-      currentPageIndex ==
-      pages.length -
-          1;
+  bool get isLastPage => currentPageIndex == pages.length - 1;
 
   bool get isFinalPage => currentPage.isFinalPage;
 
   OnboardingState copyWith({
     int? currentPageIndex,
-    List<
-      OnboardingPage
-    >?
-    pages,
+    List<OnboardingPage>? pages,
   }) {
     return OnboardingState(
-      currentPageIndex:
-          currentPageIndex ??
-          this.currentPageIndex,
-      pages:
-          pages ??
-          this.pages,
+      currentPageIndex: currentPageIndex ?? this.currentPageIndex,
+      pages: pages ?? this.pages,
     );
   }
 }

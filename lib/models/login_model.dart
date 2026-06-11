@@ -9,19 +9,11 @@ class LoginCredentials {
     required this.staySignedIn,
   });
 
-  String get userName => email.split(
-    '@',
-  )[0];
-  bool get isEmailValid => _isValidEmail(
-    email,
-  );
-  bool get isPasswordValid => _isValidPassword(
-    password,
-  );
+  String get userName => email.split('@')[0];
+  bool get isEmailValid => _isValidEmail(email);
+  bool get isPasswordValid => _isValidPassword(password);
 
-  static bool _isValidEmail(
-    String email,
-  ) {
+  static bool _isValidEmail(String email) {
     return RegExp(
       r'^[a-zA-Z0-9._%+-]+@('
       r'gmail\.com|'
@@ -33,37 +25,16 @@ class LoginCredentials {
       r'[a-zA-Z0-9-.]+\.ac\.id|'
       r'[a-zA-Z0-9-.]+\.edu'
       r')$',
-    ).hasMatch(
-      email,
-    );
+    ).hasMatch(email);
   }
 
-  static bool _isValidPassword(
-    String password,
-  ) {
-    bool hasMinLength =
-        password.length >=
-        6;
-    bool hasUppercase = password.contains(
-      RegExp(
-        r'[A-Z]',
-      ),
-    );
-    bool hasLowercase = password.contains(
-      RegExp(
-        r'[a-z]',
-      ),
-    );
-    bool hasNumber = password.contains(
-      RegExp(
-        r'[0-9]',
-      ),
-    );
+  static bool _isValidPassword(String password) {
+    bool hasMinLength = password.length >= 6;
+    bool hasUppercase = password.contains(RegExp(r'[A-Z]'));
+    bool hasLowercase = password.contains(RegExp(r'[a-z]'));
+    bool hasNumber = password.contains(RegExp(r'[0-9]'));
 
-    return hasMinLength &&
-        hasUppercase &&
-        hasLowercase &&
-        hasNumber;
+    return hasMinLength && hasUppercase && hasLowercase && hasNumber;
   }
 
   String? get emailErrorMessage {
@@ -80,9 +51,7 @@ class LoginCredentials {
     return null;
   }
 
-  bool get isValid =>
-      isEmailValid &&
-      isPasswordValid;
+  bool get isValid => isEmailValid && isPasswordValid;
 }
 
 class LoginResult {

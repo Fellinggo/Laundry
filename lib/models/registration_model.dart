@@ -27,44 +27,21 @@ class RegistrationData {
       r'[a-zA-Z0-9-.]+\.ac\.id|'
       r'[a-zA-Z0-9-.]+\.edu'
       r')$',
-    ).hasMatch(
-      email,
-    );
+    ).hasMatch(email);
   }
 
   bool get isPhoneValid {
-    return phone.length >=
-            11 &&
-        RegExp(
-          r'^[0-9]+$',
-        ).hasMatch(
-          phone,
-        );
+    return phone.length >= 11 && RegExp(r'^[0-9]+$').hasMatch(phone);
   }
 
   bool get isStrongPassword {
-    return password.length >=
-            6 &&
-        password.contains(
-          RegExp(
-            r'[A-Z]',
-          ),
-        ) &&
-        password.contains(
-          RegExp(
-            r'[a-z]',
-          ),
-        ) &&
-        password.contains(
-          RegExp(
-            r'[0-9]',
-          ),
-        );
+    return password.length >= 6 &&
+        password.contains(RegExp(r'[A-Z]')) &&
+        password.contains(RegExp(r'[a-z]')) &&
+        password.contains(RegExp(r'[0-9]'));
   }
 
-  bool get doPasswordsMatch =>
-      password ==
-      confirmPassword;
+  bool get doPasswordsMatch => password == confirmPassword;
 
   String? get emailErrorMessage {
     if (email.isEmpty) return null;
@@ -108,21 +85,11 @@ class RegistrationData {
     String? confirmPassword,
   }) {
     return RegistrationData(
-      name:
-          name ??
-          this.name,
-      email:
-          email ??
-          this.email,
-      phone:
-          phone ??
-          this.phone,
-      password:
-          password ??
-          this.password,
-      confirmPassword:
-          confirmPassword ??
-          this.confirmPassword,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      password: password ?? this.password,
+      confirmPassword: confirmPassword ?? this.confirmPassword,
     );
   }
 }

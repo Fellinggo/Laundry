@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
 
-class NavyCenterTitleAppBar
-    extends
-        StatelessWidget
-    implements
-        PreferredSizeWidget {
+class NavyCenterTitleAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
   const NavyCenterTitleAppBar({
     super.key,
     required this.title,
@@ -17,40 +14,24 @@ class NavyCenterTitleAppBar
 
   final String title;
   final Widget? leading;
-  final List<
-    Widget
-  >?
-  actions;
+  final List<Widget>? actions;
   final Color backgroundColor;
 
   @override
-  Size get preferredSize => const Size.fromHeight(
-    56,
-  );
+  Size get preferredSize => const Size.fromHeight(56);
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final top = MediaQuery.paddingOf(
-      context,
-    ).top;
+  Widget build(BuildContext context) {
+    final top = MediaQuery.paddingOf(context).top;
     return Material(
       color: backgroundColor,
       child: SizedBox(
-        height:
-            56 +
-            top,
+        height: 56 + top,
         child: Padding(
-          padding: EdgeInsets.only(
-            top: top,
-          ),
+          padding: EdgeInsets.only(top: top),
           child: Row(
             children: [
-              leading ??
-                  const SizedBox(
-                    width: 48,
-                  ),
+              leading ?? const SizedBox(width: 48),
               Expanded(
                 child: Text(
                   title,
@@ -62,9 +43,7 @@ class NavyCenterTitleAppBar
                 width: 48,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
-                  children:
-                      actions ??
-                      const [],
+                  children: actions ?? const [],
                 ),
               ),
             ],
@@ -75,11 +54,7 @@ class NavyCenterTitleAppBar
   }
 }
 
-class NavyBackAppBar
-    extends
-        StatelessWidget
-    implements
-        PreferredSizeWidget {
+class NavyBackAppBar extends StatelessWidget implements PreferredSizeWidget {
   const NavyBackAppBar({
     super.key,
     required this.title,
@@ -90,42 +65,25 @@ class NavyBackAppBar
 
   final String title;
   final VoidCallback? onBack;
-  final List<
-    Widget
-  >?
-  actions;
+  final List<Widget>? actions;
   final Color backgroundColor;
 
   @override
-  Size get preferredSize => const Size.fromHeight(
-    56,
-  );
+  Size get preferredSize => const Size.fromHeight(56);
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final top = MediaQuery.paddingOf(
-      context,
-    ).top;
+  Widget build(BuildContext context) {
+    final top = MediaQuery.paddingOf(context).top;
     return Material(
       color: backgroundColor,
       child: SizedBox(
-        height:
-            56 +
-            top,
+        height: 56 + top,
         child: Padding(
-          padding: EdgeInsets.only(
-            top: top,
-          ),
+          padding: EdgeInsets.only(top: top),
           child: Row(
             children: [
               IconButton(
-                onPressed:
-                    onBack ??
-                    () => Navigator.maybePop(
-                      context,
-                    ),
+                onPressed: onBack ?? () => Navigator.maybePop(context),
                 icon: Container(
                   width: 40,
                   height: 40,
@@ -147,16 +105,10 @@ class NavyBackAppBar
                   style: AppTextStyles.screenTitleWhite,
                 ),
               ),
-              if (actions !=
-                      null &&
-                  actions!.isNotEmpty)
-                Row(
-                  children: actions!,
-                )
+              if (actions != null && actions!.isNotEmpty)
+                Row(children: actions!)
               else
-                const SizedBox(
-                  width: 48,
-                ),
+                const SizedBox(width: 48),
             ],
           ),
         ),

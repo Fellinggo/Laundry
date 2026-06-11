@@ -2,28 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/pin_entry_model.dart';
 
-class PinEntryController
-    extends
-        ChangeNotifier {
+class PinEntryController extends ChangeNotifier {
   PinEntryModel _model = PinEntryModel.initial();
   bool _isProcessing = false;
 
   PinEntryModel get model => _model;
   bool get isProcessing => _isProcessing;
-  List<
-    int
-  >
-  get digits => _model.digits;
+  List<int> get digits => _model.digits;
   bool get isPinComplete => _model.isFull;
   String get pinString => _model.pinString;
 
-  void addDigit(
-    int digit,
-  ) {
+  void addDigit(int digit) {
     if (_isProcessing) return;
-    _model = _model.addDigit(
-      digit,
-    );
+    _model = _model.addDigit(digit);
     notifyListeners();
   }
 
@@ -39,52 +30,28 @@ class PinEntryController
     notifyListeners();
   }
 
-  Future<
-    void
-  >
-  saveOrder(
-    Map<
-      String,
-      dynamic
-    >
-    orderData,
-  ) async {
+  Future<void> saveOrder(Map<String, dynamic> orderData) async {
     _isProcessing = true;
     notifyListeners();
 
     try {
       final prefs = await SharedPreferences.getInstance();
 
-      await prefs.setBool(
-        'active_order_exists',
-        true,
-      );
-      await prefs.setString(
-        'active_order_service',
-        orderData['service'] ??
-            '',
-      );
-      await prefs.setInt(
-        'active_order_qty',
-        orderData['qty'] ??
-            1,
-      );
+      await prefs.setBool('active_order_exists', true);
+      await prefs.setString('active_order_service', orderData['service'] ?? '');
+      await prefs.setInt('active_order_qty', orderData['qty'] ?? 1);
       await prefs.setString(
         'active_order_pickup',
-        orderData['pickupTime'] ??
-            '',
+        orderData['pickupTime'] ?? '',
       );
       await prefs.setString(
         'active_order_delivery',
-        orderData['deliveryTime'] ??
-            '',
+        orderData['deliveryTime'] ?? '',
       );
 
       _isProcessing = false;
       notifyListeners();
-    } catch (
-      e
-    ) {
+    } catch (e) {
       _isProcessing = false;
       notifyListeners();
       rethrow;
@@ -93,18 +60,12 @@ class PinEntryController
 
   void confirmAndNavigate(
     BuildContext context,
-    Map<
-      String,
-      dynamic
-    >
-    orderData,
+    Map<String, dynamic> orderData,
   ) async {
     if (!_model.isFull) return;
 
     try {
-      await saveOrder(
-        orderData,
-      );
+      await saveOrder(orderData);
 
       if (context.mounted) {
         Navigator.pushReplacementNamed(
@@ -113,17 +74,11 @@ class PinEntryController
           arguments: orderData,
         );
       }
-    } catch (
-      e
-    ) {
+    } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              'Gagal menyimpan pesanan: $e',
-            ),
+            content: Text('Gagal menyimpan pesanan: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -131,11 +86,7 @@ class PinEntryController
     }
   }
 
-  void goBack(
-    BuildContext context,
-  ) {
-    Navigator.pop(
-      context,
-    );
+  void goBack(BuildContext context) {
+    Navigator.pop(context);
   }
 }

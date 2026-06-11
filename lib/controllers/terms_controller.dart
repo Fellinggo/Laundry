@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/terms_model.dart';
 
-class TermsController
-    extends
-        ChangeNotifier {
+class TermsController extends ChangeNotifier {
   TermsModel _termsModel = TermsModel.defaultTerms();
   bool _isLoading = false;
   String? _errorMessage;
@@ -16,45 +14,29 @@ class TermsController
     loadTermsData();
   }
 
-  Future<
-    void
-  >
-  loadTermsData() async {
+  Future<void> loadTermsData() async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
       // Simulasi loading data (Lokal/API)
-      await Future.delayed(
-        const Duration(
-          milliseconds: 100,
-        ),
-      );
+      await Future.delayed(const Duration(milliseconds: 100));
       _termsModel = TermsModel.defaultTerms();
       _isLoading = false;
       notifyListeners();
-    } catch (
-      e
-    ) {
+    } catch (e) {
       _errorMessage = e.toString();
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<
-    void
-  >
-  refreshTerms() async {
+  Future<void> refreshTerms() async {
     await loadTermsData();
   }
 
-  void goBack(
-    BuildContext context,
-  ) {
-    Navigator.pop(
-      context,
-    );
+  void goBack(BuildContext context) {
+    Navigator.pop(context);
   }
 }

@@ -2,9 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/splash_model.dart';
 
-class SplashController
-    extends
-        ChangeNotifier {
+class SplashController extends ChangeNotifier {
   SplashModel _splashModel = SplashModel.defaultSplash();
   Timer? _splashTimer;
   bool _isNavigating = false;
@@ -20,9 +18,7 @@ class SplashController
 
   void _startSplashTimer() {
     _splashTimer = Timer(
-      Duration(
-        seconds: _splashModel.splashDurationInSeconds,
-      ),
+      Duration(seconds: _splashModel.splashDurationInSeconds),
       () {
         if (!_isNavigating) {
           _timerFinished = true;
@@ -32,23 +28,16 @@ class SplashController
     );
   }
 
-  void navigateToNextScreen(
-    BuildContext context,
-  ) {
+  void navigateToNextScreen(BuildContext context) {
     if (_isNavigating) return;
 
     _isNavigating = true;
     _splashTimer?.cancel();
 
-    Navigator.pushReplacementNamed(
-      context,
-      _splashModel.redirectRoute,
-    );
+    Navigator.pushReplacementNamed(context, _splashModel.redirectRoute);
   }
 
-  void updateSplashModel(
-    SplashModel newModel,
-  ) {
+  void updateSplashModel(SplashModel newModel) {
     _splashModel = newModel;
     notifyListeners();
   }

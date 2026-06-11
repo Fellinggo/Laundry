@@ -1,25 +1,14 @@
 class TermsSection {
   final String title;
-  final List<
-    String
-  >
-  items;
+  final List<String> items;
 
-  TermsSection({
-    required this.title,
-    required this.items,
-  });
+  TermsSection({required this.title, required this.items});
 }
 
 class TermsModel {
-  final List<
-    TermsSection
-  >
-  sections;
+  final List<TermsSection> sections;
 
-  TermsModel({
-    required this.sections,
-  });
+  TermsModel({required this.sections});
 
   // Factory method untuk data default
   factory TermsModel.defaultTerms() {
@@ -52,33 +41,16 @@ class TermsModel {
   }
 
   // Untuk kemudahan jika nanti ingin mengambil data dari API/local storage
-  factory TermsModel.fromJson(
-    Map<
-      String,
-      dynamic
-    >
-    json,
-  ) {
+  factory TermsModel.fromJson(Map<String, dynamic> json) {
     // Implementasi jika data berasal dari JSON
     // Untuk sekarang return default
     return TermsModel.defaultTerms();
   }
 
-  Map<
-    String,
-    dynamic
-  >
-  toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'sections': sections
-          .map(
-            (
-              section,
-            ) => {
-              'title': section.title,
-              'items': section.items,
-            },
-          )
+          .map((section) => {'title': section.title, 'items': section.items})
           .toList(),
     };
   }

@@ -8,9 +8,7 @@ import '../widgets/service_grid_card.dart';
 import '../widgets/service_wide_card.dart';
 import '../widgets/service_section_header.dart';
 
-class ServicesScreen
-    extends
-        StatelessWidget {
+class ServicesScreen extends StatelessWidget {
   const ServicesScreen({
     super.key,
     this.onOpenNotifications,
@@ -21,68 +19,38 @@ class ServicesScreen
   final bool loggedIn;
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     // Menggunakan ProxyProvider untuk menyinkronkan parameter luar ke dalam Controller secara dinamis
-    return ChangeNotifierProxyProvider0<
-      ServicesController
-    >(
-      create:
-          (
-            _,
-          ) => ServicesController(
-            loggedIn: loggedIn,
-            onOpenNotifications: onOpenNotifications,
-          ),
-      update:
-          (
-            _,
-            controller,
-          ) {
-            return controller!..updateDependencies(
-              loggedIn: loggedIn,
-              onOpenNotifications: onOpenNotifications,
-            );
-          },
+    return ChangeNotifierProxyProvider0<ServicesController>(
+      create: (_) => ServicesController(
+        loggedIn: loggedIn,
+        onOpenNotifications: onOpenNotifications,
+      ),
+      update: (_, controller) {
+        return controller!..updateDependencies(
+          loggedIn: loggedIn,
+          onOpenNotifications: onOpenNotifications,
+        );
+      },
       child: const _ServicesContent(),
     );
   }
 }
 
-class _ServicesContent
-    extends
-        StatelessWidget {
+class _ServicesContent extends StatelessWidget {
   const _ServicesContent();
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final controller = context
-        .read<
-          ServicesController
-        >();
+  Widget build(BuildContext context) {
+    final controller = context.read<ServicesController>();
 
     // Mengambil data list secara atomik (Hanya merender ulang jika isi list berubah)
-    final gridServices =
-        context.select<
-          ServicesController,
-          List
-        >(
-          (
-            c,
-          ) => c.gridServices,
-        );
-    final wideServices =
-        context.select<
-          ServicesController,
-          List
-        >(
-          (
-            c,
-          ) => c.wideServices,
-        );
+    final gridServices = context.select<ServicesController, List>(
+      (c) => c.gridServices,
+    );
+    final wideServices = context.select<ServicesController, List>(
+      (c) => c.wideServices,
+    );
 
     return Scaffold(
       backgroundColor: AppColors.headerNavy,
@@ -90,13 +58,9 @@ class _ServicesContent
         title: 'Layanan',
         actions: [
           Padding(
-            padding: const EdgeInsets.only(
-              right: 20,
-            ),
+            padding: const EdgeInsets.only(right: 20),
             child: GestureDetector(
-              onTap: () => controller.handleNotificationTap(
-                context,
-              ),
+              onTap: () => controller.handleNotificationTap(context),
               child: const Icon(
                 Icons.notifications_none_rounded,
                 color: Colors.white,
@@ -108,41 +72,23 @@ class _ServicesContent
       ),
       body: Container(
         width: double.infinity,
-        margin: const EdgeInsets.only(
-          top: 12,
-        ),
+        margin: const EdgeInsets.only(top: 12),
         decoration: const BoxDecoration(
           color: AppColors.white,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(
-              28,
-            ),
-          ),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(
-              28,
-            ),
-          ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           child: ScrollConfiguration(
-            behavior: const ScrollBehavior().copyWith(
-              overscroll: false,
-            ),
+            behavior: const ScrollBehavior().copyWith(overscroll: false),
             child: SingleChildScrollView(
               physics: const ClampingScrollPhysics(),
-              padding: const EdgeInsets.all(
-                AppSpacing.xl,
-              ),
+              padding: const EdgeInsets.all(AppSpacing.xl),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const ServiceSectionHeader(
-                    title: 'Layanan Lainnya',
-                  ),
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  const ServiceSectionHeader(title: 'Layanan Lainnya'),
+                  const SizedBox(height: 16),
 
                   // Grid Services Section
                   GridView.count(
@@ -152,53 +98,35 @@ class _ServicesContent
                     mainAxisSpacing: 16,
                     crossAxisSpacing: 16,
                     childAspectRatio: 0.85,
-                    children: gridServices.map(
-                      (
-                        service,
-                      ) {
-                        return ServiceGridCard(
-                          title: service.title,
-                          price: service.price,
-                          eta: service.eta,
-                          etaType: service.etaType,
-                          imagePath: service.imagePath,
-                          onTap: () => controller.handleServiceTap(
-                            context,
-                            service.title,
-                          ),
-                        );
-                      },
-                    ).toList(),
+                    children: gridServices.map((service) {
+                      return ServiceGridCard(
+                        title: service.title,
+                        price: service.price,
+                        eta: service.eta,
+                        etaType: service.etaType,
+                        imagePath: service.imagePath,
+                        onTap: () =>
+                            controller.handleServiceTap(context, service.title),
+                      );
+                    }).toList(),
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
 
                   // Wide Services Section
-                  ...wideServices.map(
-                    (
-                      service,
-                    ) {
-                      return Padding(
-                        padding: const EdgeInsets.only(
-                          bottom: 20,
-                        ),
-                        child: ServiceWideCard(
-                          title: service.title,
-                          price: service.price,
-                          eta: service.eta,
-                          imagePath: service.imagePath,
-                          onTap: () => controller.handleServiceTap(
-                            context,
-                            service.title,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(
-                    height: 80,
-                  ),
+                  ...wideServices.map((service) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: ServiceWideCard(
+                        title: service.title,
+                        price: service.price,
+                        eta: service.eta,
+                        imagePath: service.imagePath,
+                        onTap: () =>
+                            controller.handleServiceTap(context, service.title),
+                      ),
+                    );
+                  }),
+                  const SizedBox(height: 80),
                 ],
               ),
             ),

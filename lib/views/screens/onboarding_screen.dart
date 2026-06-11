@@ -7,22 +7,13 @@ import '../widgets/onboarding_page_widget.dart';
 import '../widgets/onboarding_dots_indicator.dart';
 import '../../controllers/onboarding_controller.dart';
 
-class OnboardingScreen
-    extends
-        StatelessWidget {
-  const OnboardingScreen({
-    super.key,
-  });
+class OnboardingScreen extends StatelessWidget {
+  const OnboardingScreen({super.key});
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     // Memantau state OnboardingController secara reaktif
-    final controller = context
-        .watch<
-          OnboardingController
-        >();
+    final controller = context.watch<OnboardingController>();
     final pages = controller.pages;
     final currentIndex = controller.currentIndex;
     final currentPage = controller.currentPage;
@@ -36,37 +27,22 @@ class OnboardingScreen
               child: PageView.builder(
                 controller: controller.pageController,
                 itemCount: pages.length,
-                onPageChanged:
-                    (
-                      index,
-                    ) => controller.onPageChanged(
-                      index,
-                    ),
-                itemBuilder:
-                    (
-                      context,
-                      index,
-                    ) {
-                      return OnboardingPageWidget(
-                        page: pages[index],
-                      );
-                    },
+                onPageChanged: (index) => controller.onPageChanged(index),
+                itemBuilder: (context, index) {
+                  return OnboardingPageWidget(page: pages[index]);
+                },
               ),
             ),
             if (!currentPage.isFinalPage)
               Padding(
-                padding: const EdgeInsets.only(
-                  bottom: 12,
-                ),
+                padding: const EdgeInsets.only(bottom: 12),
                 child: OnboardingDotsIndicator(
                   currentIndex: currentIndex,
                   totalPages: pages.length,
                 ),
               )
             else
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.fromLTRB(
                 AppSpacing.xl,
@@ -78,12 +54,8 @@ class OnboardingScreen
                 isFinalPage: currentPage.isFinalPage,
                 isLastPage: controller.isLastPage,
                 onSkip: () => controller.skipToLastPage(),
-                onNext: () => controller.nextPage(
-                  context,
-                ),
-                onStart: () => controller.goToMain(
-                  context,
-                ),
+                onNext: () => controller.nextPage(context),
+                onStart: () => controller.goToMain(context),
               ),
             ),
           ],

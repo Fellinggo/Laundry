@@ -18,10 +18,7 @@ class ServiceModelDummy {
   });
 }
 
-final List<
-  ServiceModelDummy
->
-serviceDummy = [
+final List<ServiceModelDummy> serviceDummy = [
   ServiceModelDummy(
     title: 'Cuci Regular',
     price: 'Rp 20.000 / Plastik',

@@ -18,25 +18,12 @@ class OrderItemModel {
   });
 
   int get priceValue {
-    return int.parse(
-      price.replaceAll(
-        RegExp(
-          r'[^0-9]',
-        ),
-        '',
-      ),
-    );
+    return int.parse(price.replaceAll(RegExp(r'[^0-9]'), ''));
   }
 
-  int get subtotal =>
-      priceValue *
-      quantity;
+  int get subtotal => priceValue * quantity;
 
-  Map<
-    String,
-    dynamic
-  >
-  toOrderMap() {
+  Map<String, dynamic> toOrderMap() {
     return {
       'title': title,
       'price': priceValue,
@@ -46,18 +33,10 @@ class OrderItemModel {
     };
   }
 
-  factory OrderItemModel.fromService(
-    Map<
-      String,
-      dynamic
-    >
-    service,
-  ) {
+  factory OrderItemModel.fromService(Map<String, dynamic> service) {
     return OrderItemModel(
       title: service['title'],
-      displayTitle:
-          service['displayTitle'] ??
-          service['title'],
+      displayTitle: service['displayTitle'] ?? service['title'],
       price: service['price'],
       image: service['image'],
       icon: service['icon'],

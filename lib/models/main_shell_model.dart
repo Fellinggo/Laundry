@@ -15,15 +15,9 @@ class MainShellState {
     String? userFirstName,
   }) {
     return MainShellState(
-      selectedIndex:
-          selectedIndex ??
-          this.selectedIndex,
-      isLoggedIn:
-          isLoggedIn ??
-          this.isLoggedIn,
-      userFirstName:
-          userFirstName ??
-          this.userFirstName,
+      selectedIndex: selectedIndex ?? this.selectedIndex,
+      isLoggedIn: isLoggedIn ?? this.isLoggedIn,
+      userFirstName: userFirstName ?? this.userFirstName,
     );
   }
 }
@@ -47,10 +41,7 @@ class ScreenConfig {
     required this.title,
   });
 
-  static const List<
-    ScreenConfig
-  >
-  screens = [
+  static const List<ScreenConfig> screens = [
     ScreenConfig(
       index: NavigationTarget.home,
       routeName: '/home',
@@ -78,20 +69,10 @@ class ScreenConfig {
     ),
   ];
 
-  static ScreenConfig? fromIndex(
-    int index,
-  ) {
+  static ScreenConfig? fromIndex(int index) {
     try {
-      return screens.firstWhere(
-        (
-          screen,
-        ) =>
-            screen.index ==
-            index,
-      );
-    } catch (
-      e
-    ) {
+      return screens.firstWhere((screen) => screen.index == index);
+    } catch (e) {
       return null;
     }
   }

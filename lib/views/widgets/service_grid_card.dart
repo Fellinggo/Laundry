@@ -3,9 +3,7 @@ import 'package:wushlaundry/views/widgets/eta_badge.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_text_styles.dart';
 
-class ServiceGridCard
-    extends
-        StatelessWidget {
+class ServiceGridCard extends StatelessWidget {
   final String title;
   final String price;
   final String eta;
@@ -24,37 +22,21 @@ class ServiceGridCard
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color.fromARGB(
-          255,
-          255,
-          255,
-          255,
-        ),
-        borderRadius: BorderRadius.circular(
-          16,
-        ),
+        color: const Color.fromARGB(255, 255, 255, 255),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
-              0.36,
-            ),
+            color: Colors.black.withOpacity(0.36),
             blurRadius: 10,
-            offset: const Offset(
-              0,
-              4,
-            ),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(
-          16,
-        ),
+        borderRadius: BorderRadius.circular(16),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
@@ -75,18 +57,13 @@ class ServiceGridCard
                       Positioned(
                         top: 8,
                         right: 8,
-                        child: EtaBadge(
-                          label: eta,
-                          type: etaType,
-                        ),
+                        child: EtaBadge(label: eta, type: etaType),
                       ),
                     ],
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(
-                    12,
-                  ),
+                  padding: const EdgeInsets.all(12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -97,9 +74,7 @@ class ServiceGridCard
                           color: Colors.grey[600],
                         ),
                       ),
-                      const SizedBox(
-                        height: 2,
-                      ),
+                      const SizedBox(height: 2),
                       Text(
                         title,
                         maxLines: 1,

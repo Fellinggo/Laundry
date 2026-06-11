@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_colors.dart';
 
-class OnboardingDotsIndicator
-    extends
-        StatelessWidget {
+class OnboardingDotsIndicator extends StatelessWidget {
   final int currentIndex;
   final int totalPages;
   final double dotSize;
@@ -20,41 +18,24 @@ class OnboardingDotsIndicator
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(
-        totalPages,
-        (
-          index,
-        ) {
-          final isActive =
-              index ==
-              currentIndex;
-          return AnimatedContainer(
-            duration: const Duration(
-              milliseconds: 200,
-            ),
-            margin: EdgeInsets.symmetric(
-              horizontal: spacing,
-            ),
-            width: isActive
-                ? activeDotSize
-                : dotSize,
-            height: isActive
-                ? activeDotSize
-                : dotSize,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isActive
-                  ? AppColors.wushOnboardingNavy
-                  : AppColors.onboardingDotInactive,
-            ),
-          );
-        },
-      ),
+      children: List.generate(totalPages, (index) {
+        final isActive = index == currentIndex;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: EdgeInsets.symmetric(horizontal: spacing),
+          width: isActive ? activeDotSize : dotSize,
+          height: isActive ? activeDotSize : dotSize,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isActive
+                ? AppColors.wushOnboardingNavy
+                : AppColors.onboardingDotInactive,
+          ),
+        );
+      }),
     );
   }
 }

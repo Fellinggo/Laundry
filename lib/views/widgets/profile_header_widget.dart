@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_text_styles.dart';
 
-class ProfileHeaderWidget
-    extends
-        StatelessWidget {
+class ProfileHeaderWidget extends StatelessWidget {
   final String name;
   final String email;
   final bool isLoggedIn;
@@ -21,9 +19,7 @@ class ProfileHeaderWidget
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Column(
       children: [
         SafeArea(
@@ -31,9 +27,7 @@ class ProfileHeaderWidget
           child: Container(
             height: 60,
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Stack(
               alignment: Alignment.center,
               children: [
@@ -58,17 +52,11 @@ class ProfileHeaderWidget
             ),
           ),
         ),
-        const SizedBox(
-          height: 10,
-        ),
+        const SizedBox(height: 10),
         GestureDetector(
-          onTap: isLoggedIn
-              ? onEditName
-              : null,
+          onTap: isLoggedIn ? onEditName : null,
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
                 const CircleAvatar(
@@ -80,9 +68,7 @@ class ProfileHeaderWidget
                     color: AppColors.textSecondary,
                   ),
                 ),
-                const SizedBox(
-                  width: 14,
-                ),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,9 +87,7 @@ class ProfileHeaderWidget
                             ),
                           ),
                           if (isLoggedIn) ...[
-                            const SizedBox(
-                              width: 6,
-                            ),
+                            const SizedBox(width: 6),
                             const Icon(
                               Icons.edit_outlined,
                               size: 16,
@@ -112,9 +96,7 @@ class ProfileHeaderWidget
                           ],
                         ],
                       ),
-                      const SizedBox(
-                        height: 4,
-                      ),
+                      const SizedBox(height: 4),
                       Text(
                         email,
                         style: AppTextStyles.bodyMuted.copyWith(

@@ -3,16 +3,11 @@ import '../../../constants/app_colors.dart';
 import '../../../constants/app_text_styles.dart';
 import 'info_kv_row.dart';
 
-class OrderReviewPaymentDetail
-    extends
-        StatelessWidget {
+class OrderReviewPaymentDetail extends StatelessWidget {
   final int serviceFee;
   final int deliveryFee;
   final int totalPayment;
-  final String Function(
-    int,
-  )
-  formatRupiah;
+  final String Function(int) formatRupiah;
 
   const OrderReviewPaymentDetail({
     super.key,
@@ -23,9 +18,7 @@ class OrderReviewPaymentDetail
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -36,36 +29,24 @@ class OrderReviewPaymentDetail
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(
-          height: 12,
-        ),
+        const SizedBox(height: 12),
         Container(
-          padding: const EdgeInsets.all(
-            16,
-          ),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: AppColors.inputFill,
-            borderRadius: BorderRadius.circular(
-              12,
-            ),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
             children: [
               InfoKvRow(
                 label: 'Total Pesanan',
-                value: formatRupiah(
-                  serviceFee,
-                ),
+                value: formatRupiah(serviceFee),
               ),
               InfoKvRow(
                 label: 'Biaya Pengiriman',
-                value: formatRupiah(
-                  deliveryFee,
-                ),
+                value: formatRupiah(deliveryFee),
               ),
-              const Divider(
-                height: 16,
-              ),
+              const Divider(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -76,9 +57,7 @@ class OrderReviewPaymentDetail
                     ),
                   ),
                   Text(
-                    formatRupiah(
-                      totalPayment,
-                    ),
+                    formatRupiah(totalPayment),
                     style: AppTextStyles.body.copyWith(
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryNavy,

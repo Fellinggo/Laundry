@@ -3,9 +3,7 @@ import '../../constants/app_colors.dart';
 import '../../constants/app_spacing.dart';
 import '../../constants/app_text_styles.dart';
 
-class LabeledTextField
-    extends
-        StatelessWidget {
+class LabeledTextField extends StatelessWidget {
   const LabeledTextField({
     super.key,
     required this.label,
@@ -17,7 +15,7 @@ class LabeledTextField
     this.controller,
     this.keyboardType,
     this.errorText,
-    this.onChanged, // ← TAMBAHKAN INI
+    this.onChanged,
   });
 
   final String label;
@@ -29,35 +27,21 @@ class LabeledTextField
   final TextEditingController? controller;
   final TextInputType? keyboardType;
   final String? errorText;
-  final Function(
-    String,
-  )?
-  onChanged; // ← TAMBAHKAN INI
+  final Function(String)? onChanged;
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: AppTextStyles.sectionTitle.copyWith(
-            fontSize: 14,
-          ),
-        ),
+        Text(label, style: AppTextStyles.sectionTitle.copyWith(fontSize: 14)),
 
-        const SizedBox(
-          height: 8,
-        ),
+        const SizedBox(height: 8),
 
         TextField(
           controller: controller,
           obscureText: obscure,
-          maxLines: obscure
-              ? 1
-              : maxLines,
+          maxLines: obscure ? 1 : maxLines,
           keyboardType: keyboardType,
           style: AppTextStyles.body,
           cursorColor: AppColors.primaryNavy,
@@ -72,59 +56,35 @@ class LabeledTextField
               horizontal: 14,
               vertical: 14,
             ),
-            prefixIcon:
-                prefixIcon !=
-                    null
-                ? Icon(
-                    prefixIcon,
-                    color: AppColors.textSecondary,
-                    size: 22,
-                  )
+            prefixIcon: prefixIcon != null
+                ? Icon(prefixIcon, color: AppColors.textSecondary, size: 22)
                 : null,
             suffixIcon: suffix,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
-              borderSide: const BorderSide(
-                color: AppColors.borderLight,
-              ),
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+              borderSide: const BorderSide(color: AppColors.borderLight),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
               borderSide: const BorderSide(
                 color: AppColors.borderLight,
                 width: 1.2,
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
               borderSide: const BorderSide(
                 color: AppColors.primaryNavy,
                 width: 1.4,
               ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
-              borderSide: const BorderSide(
-                color: Colors.red,
-                width: 1.2,
-              ),
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+              borderSide: const BorderSide(color: Colors.red, width: 1.2),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.inputRadius,
-              ),
-              borderSide: const BorderSide(
-                color: Colors.red,
-                width: 1.4,
-              ),
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+              borderSide: const BorderSide(color: Colors.red, width: 1.4),
             ),
           ),
         ),

@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
 
-class NotificationFilterTab
-    extends
-        StatelessWidget {
+class NotificationFilterTab extends StatelessWidget {
   const NotificationFilterTab({
     super.key,
     required this.icon,
@@ -21,44 +19,28 @@ class NotificationFilterTab
   final Color? activeColor;
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     final c = selected
-        ? (activeColor ??
-              AppColors.skyTab)
+        ? (activeColor ?? AppColors.skyTab)
         : AppColors.textMuted;
     return Expanded(
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(
-            14,
-          ),
+          borderRadius: BorderRadius.circular(14),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 12,
-              horizontal: 8,
-            ),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  icon,
-                  size: 20,
-                  color: c,
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
+                Icon(icon, size: 20, color: c),
+                const SizedBox(width: 8),
                 Text(
                   label,
                   style: AppTextStyles.body.copyWith(
                     color: c,
-                    fontWeight: selected
-                        ? FontWeight.w700
-                        : FontWeight.w500,
+                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                     fontSize: 14,
                   ),
                 ),

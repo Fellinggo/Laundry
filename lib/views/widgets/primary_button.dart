@@ -3,9 +3,7 @@ import '../../constants/app_colors.dart';
 import '../../constants/app_spacing.dart';
 import '../../constants/app_text_styles.dart';
 
-class PrimaryButton
-    extends
-        StatelessWidget {
+class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
     super.key,
     required this.label,
@@ -30,9 +28,7 @@ class PrimaryButton
   final bool loading;
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     final child = loading
         ? SizedBox(
             height: 22,
@@ -46,18 +42,10 @@ class PrimaryButton
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (leading !=
-                  null) ...[
-                leading!,
-                const SizedBox(
-                  width: 8,
-                ),
-              ],
+              if (leading != null) ...[leading!, const SizedBox(width: 8)],
               Text(
                 label,
-                style: AppTextStyles.button.copyWith(
-                  color: foregroundColor,
-                ),
+                style: AppTextStyles.button.copyWith(color: foregroundColor),
               ),
             ],
           );
@@ -65,39 +53,23 @@ class PrimaryButton
     final button = Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: loading
-            ? null
-            : onPressed,
-        borderRadius: BorderRadius.circular(
-          borderRadius,
-        ),
+        onTap: loading ? null : onPressed,
+        borderRadius: BorderRadius.circular(borderRadius),
         child: Ink(
           height: height,
           decoration: BoxDecoration(
-            color:
-                onPressed ==
-                        null &&
-                    !loading
-                ? backgroundColor.withValues(
-                    alpha: 0.5,
-                  )
+            color: onPressed == null && !loading
+                ? backgroundColor.withValues(alpha: 0.5)
                 : backgroundColor,
-            borderRadius: BorderRadius.circular(
-              borderRadius,
-            ),
+            borderRadius: BorderRadius.circular(borderRadius),
           ),
-          child: Center(
-            child: child,
-          ),
+          child: Center(child: child),
         ),
       ),
     );
 
     if (expanded) {
-      return SizedBox(
-        width: double.infinity,
-        child: button,
-      );
+      return SizedBox(width: double.infinity, child: button);
     }
     return button;
   }

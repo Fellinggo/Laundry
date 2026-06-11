@@ -3,23 +3,15 @@ import 'package:flutter/services.dart';
 import 'package:wushlaundry/views/widgets/login_modal_sheet.dart';
 import '../models/offer_model.dart';
 
-class OffersController
-    extends
-        ChangeNotifier {
+class OffersController extends ChangeNotifier {
   bool _loggedIn;
   final VoidCallback? onOpenNotifications;
   final VoidCallback? onOpenServices;
 
-  List<
-    OfferModel
-  >
-  _offers = [];
+  List<OfferModel> _offers = [];
   bool _isLoading = false;
 
-  List<
-    OfferModel
-  >
-  get offers => _offers;
+  List<OfferModel> get offers => _offers;
   bool get isLoading => _isLoading;
   bool get isLoggedIn => _loggedIn;
 
@@ -32,11 +24,8 @@ class OffersController
   }
 
   /// Memperbarui status login secara dinamis dari parameter widget di luar
-  void updateLoginStatus(
-    bool loggedIn,
-  ) {
-    if (_loggedIn !=
-        loggedIn) {
+  void updateLoginStatus(bool loggedIn) {
+    if (_loggedIn != loggedIn) {
       _loggedIn = loggedIn;
       notifyListeners();
     }
@@ -47,99 +36,54 @@ class OffersController
     notifyListeners();
   }
 
-  List<
-    OfferModel
-  >
-  getNewUserOffers() {
+  List<OfferModel> getNewUserOffers() {
     return _offers
-        .where(
-          (
-            offer,
-          ) =>
-              offer.category ==
-              OfferCategory.newUser,
-        )
+        .where((offer) => offer.category == OfferCategory.newUser)
         .toList();
   }
 
-  List<
-    OfferModel
-  >
-  getSpecialOffers() {
+  List<OfferModel> getSpecialOffers() {
     return _offers
-        .where(
-          (
-            offer,
-          ) =>
-              offer.category ==
-              OfferCategory.special,
-        )
+        .where((offer) => offer.category == OfferCategory.special)
         .toList();
   }
 
-  void handleNotificationTap(
-    BuildContext context,
-  ) {
+  void handleNotificationTap(BuildContext context) {
     if (!_loggedIn) {
-      showLoginModal(
-        context,
-      );
+      showLoginModal(context);
       return;
     }
     onOpenNotifications?.call();
   }
 
-  Future<
-    void
-  >
-  handlePromoCardTap(
+  Future<void> handlePromoCardTap(
     BuildContext context,
     OfferModel offer,
   ) async {
     if (!_loggedIn) {
-      showLoginModal(
-        context,
-      );
+      showLoginModal(context);
       return;
     }
 
     // Copy promo code to clipboard
-    await Clipboard.setData(
-      ClipboardData(
-        text: offer.promoCode,
-      ),
-    );
+    await Clipboard.setData(ClipboardData(text: offer.promoCode));
 
     if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Kode ${offer.promoCode} berhasil disalin',
-          ),
-          duration: const Duration(
-            milliseconds: 800,
-          ),
+          content: Text('Kode ${offer.promoCode} berhasil disalin'),
+          duration: const Duration(milliseconds: 800),
         ),
       );
     }
 
     // Wait a bit before navigating
-    await Future.delayed(
-      const Duration(
-        milliseconds: 500,
-      ),
-    );
+    await Future.delayed(const Duration(milliseconds: 500));
 
     onOpenServices?.call();
   }
 
-  void goBack(
-    BuildContext context,
-  ) {
-    Navigator.pop(
-      context,
-    );
+  void goBack(BuildContext context) {
+    Navigator.pop(context);
   }
 }

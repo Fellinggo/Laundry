@@ -13,13 +13,12 @@ import '../widgets/selected_service_item.dart';
 import '../widgets/empty_selected_service.dart';
 
 class ServiceDetailScreen extends StatelessWidget {
-  const ServiceDetailScreen({
-    super.key,
-  });
+  const ServiceDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
     return ChangeNotifierProvider<ServiceDetailController>(
       create: (_) => ServiceDetailController()..initializeWithArgument(args),
@@ -45,9 +44,10 @@ class _ServiceDetailContent extends StatelessWidget {
     final servicesLength = context.select<ServiceDetailController, int>(
       (c) => c.model.services.length,
     );
-    final selectedServicesMap = context.select<ServiceDetailController, Map<int, int>>(
-      (c) => c.model.selectedServices,
-    );
+    final selectedServicesMap = context
+        .select<ServiceDetailController, Map<int, int>>(
+          (c) => c.model.selectedServices,
+        );
 
     return Scaffold(
       backgroundColor: AppColors.headerNavy,
@@ -76,16 +76,20 @@ class _ServiceDetailContent extends StatelessWidget {
                         itemBuilder: (context, i) {
                           // PERBAIKAN: Gunakan Selector widget atau watch
                           return Selector<ServiceDetailController, bool>(
-                            selector: (_, c) => c.model.selectedServices.containsKey(i),
+                            selector: (_, c) =>
+                                c.model.selectedServices.containsKey(i),
                             builder: (context, isSelected, child) {
-                              final currentController = context.read<ServiceDetailController>();
-                              final service = currentController.model.services[i];
+                              final currentController = context
+                                  .read<ServiceDetailController>();
+                              final service =
+                                  currentController.model.services[i];
 
                               return ServiceFilterChip(
                                 isSelected: isSelected,
                                 icon: service.icon,
                                 title: service.title,
-                                onSelected: (val) => currentController.toggleServiceSelection(i, val),
+                                onSelected: (val) => currentController
+                                    .toggleServiceSelection(i, val),
                               );
                             },
                           );
@@ -106,7 +110,9 @@ class _ServiceDetailContent extends StatelessWidget {
                           : ListView.builder(
                               itemCount: selectedServicesMap.length,
                               itemBuilder: (context, index) {
-                                final key = selectedServicesMap.keys.elementAt(index);
+                                final key = selectedServicesMap.keys.elementAt(
+                                  index,
+                                );
                                 final service = controller.model.services[key];
                                 final qty = selectedServicesMap[key]!;
 
@@ -117,7 +123,8 @@ class _ServiceDetailContent extends StatelessWidget {
                                   image: service.image,
                                   quantity: qty,
                                   priceValue: service.priceValue,
-                                  onQuantityChanged: (newQty) => controller.updateQuantity(key, newQty),
+                                  onQuantityChanged: (newQty) =>
+                                      controller.updateQuantity(key, newQty),
                                 );
                               },
                             ),

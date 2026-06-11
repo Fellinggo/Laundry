@@ -9,25 +9,14 @@ import '../widgets/curved_navy_header.dart';
 import '../widgets/primary_button.dart';
 import '../../controllers/login_controller.dart';
 
-class LoginScreen
-    extends
-        StatefulWidget {
-  const LoginScreen({
-    super.key,
-  });
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<
-    LoginScreen
-  >
-  createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState
-    extends
-        State<
-          LoginScreen
-        > {
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -35,11 +24,7 @@ class _LoginScreenState
   void initState() {
     super.initState();
     // Menjalankan pengecekan auto-login setelah frame pertama selesai dirender
-    WidgetsBinding.instance.addPostFrameCallback(
-      (
-        _,
-      ) => _checkAutoLogin(),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkAutoLogin());
   }
 
   @override
@@ -49,17 +34,10 @@ class _LoginScreenState
     super.dispose();
   }
 
-  Future<
-    void
-  >
-  _checkAutoLogin() async {
-    final loginController = context
-        .read<
-          LoginController
-        >();
+  Future<void> _checkAutoLogin() async {
+    final loginController = context.read<LoginController>();
     final canAutoLogin = await loginController.isAutoLoginAvailable();
-    if (canAutoLogin &&
-        mounted) {
+    if (canAutoLogin && mounted) {
       _navigateToMain();
     }
   }
@@ -82,47 +60,27 @@ class _LoginScreenState
   void _navigateToMain() {
     context.read<MainShellController>().goToHomeTab(); // Tambah baris ini
 
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/main',
-      (
-        route,
-      ) => false,
-    );
+    Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
   }
 
   void _navigateToRegister() {
-    Navigator.pushReplacementNamed(
-      context,
-      '/register',
-    );
+    Navigator.pushReplacementNamed(context, '/register');
   }
 
-  OutlineInputBorder _border(
-    bool error,
-  ) {
+  OutlineInputBorder _border(bool error) {
     return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(
-        12,
-      ),
+      borderRadius: BorderRadius.circular(12),
       borderSide: BorderSide(
-        color: error
-            ? Colors.red
-            : AppColors.borderLight,
+        color: error ? Colors.red : AppColors.borderLight,
         width: 1.2,
       ),
     );
   }
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     // Memantau state LoginController secara reaktif
-    final loginProvider = context
-        .watch<
-          LoginController
-        >();
+    final loginProvider = context.watch<LoginController>();
 
     return Scaffold(
       backgroundColor: AppColors.pageBg,
@@ -141,24 +99,15 @@ class _LoginScreenState
                 AppSpacing.lg,
               ),
               child: Container(
-                padding: const EdgeInsets.all(
-                  AppSpacing.xl,
-                ),
+                padding: const EdgeInsets.all(AppSpacing.xl),
                 decoration: BoxDecoration(
                   color: AppColors.white,
-                  borderRadius: BorderRadius.circular(
-                    30,
-                  ),
+                  borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(
-                        0.05,
-                      ),
+                      color: Colors.black.withOpacity(0.05),
                       blurRadius: 12,
-                      offset: const Offset(
-                        0,
-                        6,
-                      ),
+                      offset: const Offset(0, 6),
                     ),
                   ],
                 ),
@@ -168,36 +117,23 @@ class _LoginScreenState
                     TextField(
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
-                      onChanged:
-                          (
-                            _,
-                          ) => loginProvider.clearErrors(),
+                      onChanged: (_) => loginProvider.clearErrors(),
                       decoration: InputDecoration(
                         labelText: "Email",
                         hintText: "Masukkan Email",
-                        prefixIcon: const Icon(
-                          Icons.email_outlined,
-                        ),
-                        border: _border(
-                          loginProvider.emailError !=
-                              null,
-                        ),
+                        prefixIcon: const Icon(Icons.email_outlined),
+                        border: _border(loginProvider.emailError != null),
                         enabledBorder: _border(
-                          loginProvider.emailError !=
-                              null,
+                          loginProvider.emailError != null,
                         ),
                         focusedBorder: _border(
-                          loginProvider.emailError !=
-                              null,
+                          loginProvider.emailError != null,
                         ),
                       ),
                     ),
-                    if (loginProvider.emailError !=
-                        null)
+                    if (loginProvider.emailError != null)
                       Padding(
-                        padding: const EdgeInsets.only(
-                          top: 6,
-                        ),
+                        padding: const EdgeInsets.only(top: 6),
                         child: Text(
                           loginProvider.emailError!,
                           style: const TextStyle(
@@ -206,33 +142,21 @@ class _LoginScreenState
                           ),
                         ),
                       ),
-                    const SizedBox(
-                      height: AppSpacing.lg,
-                    ),
+                    const SizedBox(height: AppSpacing.lg),
                     TextField(
                       controller: passwordController,
                       obscureText: loginProvider.obscure,
-                      onChanged:
-                          (
-                            _,
-                          ) => loginProvider.clearErrors(),
+                      onChanged: (_) => loginProvider.clearErrors(),
                       decoration: InputDecoration(
                         labelText: "Password",
                         hintText: "Masukkan Password",
-                        prefixIcon: const Icon(
-                          Icons.lock_outline_rounded,
-                        ),
-                        border: _border(
-                          loginProvider.passwordError !=
-                              null,
-                        ),
+                        prefixIcon: const Icon(Icons.lock_outline_rounded),
+                        border: _border(loginProvider.passwordError != null),
                         enabledBorder: _border(
-                          loginProvider.passwordError !=
-                              null,
+                          loginProvider.passwordError != null,
                         ),
                         focusedBorder: _border(
-                          loginProvider.passwordError !=
-                              null,
+                          loginProvider.passwordError != null,
                         ),
                         suffixIcon: IconButton(
                           onPressed: () => loginProvider.toggleObscure(),
@@ -245,12 +169,9 @@ class _LoginScreenState
                         ),
                       ),
                     ),
-                    if (loginProvider.passwordError !=
-                        null)
+                    if (loginProvider.passwordError != null)
                       Padding(
-                        padding: const EdgeInsets.only(
-                          top: 6,
-                        ),
+                        padding: const EdgeInsets.only(top: 6),
                         child: Text(
                           loginProvider.passwordError!,
                           style: const TextStyle(
@@ -259,15 +180,11 @@ class _LoginScreenState
                           ),
                         ),
                       ),
-                    const SizedBox(
-                      height: AppSpacing.md,
-                    ),
+                    const SizedBox(height: AppSpacing.md),
                     Row(
                       children: [
                         InkWell(
-                          borderRadius: BorderRadius.circular(
-                            20,
-                          ),
+                          borderRadius: BorderRadius.circular(20),
                           onTap: () => loginProvider.toggleStaySignedIn(),
                           child: Row(
                             children: [
@@ -280,9 +197,7 @@ class _LoginScreenState
                                     : AppColors.textSecondary,
                                 size: 22,
                               ),
-                              const SizedBox(
-                                width: 8,
-                              ),
+                              const SizedBox(width: 8),
                               Text(
                                 'Tetap masuk',
                                 style: AppTextStyles.body.copyWith(
@@ -294,9 +209,8 @@ class _LoginScreenState
                         ),
                         const Spacer(),
                         TextButton(
-                          onPressed: () => loginProvider.showForgotPasswordMessage(
-                            context,
-                          ),
+                          onPressed: () =>
+                              loginProvider.showForgotPasswordMessage(context),
                           child: Text(
                             'Lupa password',
                             style: AppTextStyles.link,
@@ -304,20 +218,12 @@ class _LoginScreenState
                         ),
                       ],
                     ),
-                    const SizedBox(
-                      height: AppSpacing.xl,
-                    ),
+                    const SizedBox(height: AppSpacing.xl),
                     PrimaryButton(
-                      label: loginProvider.isLoading
-                          ? 'Memproses...'
-                          : 'Masuk',
-                      onPressed: loginProvider.isLoading
-                          ? null
-                          : _handleLogin,
+                      label: loginProvider.isLoading ? 'Memproses...' : 'Masuk',
+                      onPressed: loginProvider.isLoading ? null : _handleLogin,
                     ),
-                    const SizedBox(
-                      height: AppSpacing.xl,
-                    ),
+                    const SizedBox(height: AppSpacing.xl),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -327,10 +233,7 @@ class _LoginScreenState
                         ),
                         TextButton(
                           onPressed: _navigateToRegister,
-                          child: Text(
-                            'Daftar',
-                            style: AppTextStyles.link,
-                          ),
+                          child: Text('Daftar', style: AppTextStyles.link),
                         ),
                       ],
                     ),

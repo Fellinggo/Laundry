@@ -5,11 +5,7 @@ class PickupScheduleData {
   final TimeOfDay? deliveryTime;
   final String selectedAddressType;
   final String customAddress;
-  final Map<
-    String,
-    String
-  >
-  addresses;
+  final Map<String, String> addresses;
   final bool showAddressOptions;
   final bool isLoadingAddresses;
   final bool pickupError;
@@ -28,52 +24,28 @@ class PickupScheduleData {
   });
 
   String getSelectedAddress() {
-    if (selectedAddressType ==
-        'Custom') {
+    if (selectedAddressType == 'Custom') {
       return customAddress;
     }
     if (selectedAddressType.isNotEmpty &&
-        addresses.containsKey(
-          selectedAddressType,
-        )) {
+        addresses.containsKey(selectedAddressType)) {
       return addresses[selectedAddressType]!;
     }
     return '';
   }
 
-  bool get isPickupValid =>
-      pickupTime !=
-      null;
-  bool get isDeliveryValid =>
-      deliveryTime !=
-      null;
+  bool get isPickupValid => pickupTime != null;
+  bool get isDeliveryValid => deliveryTime != null;
   bool get isAddressValid => getSelectedAddress().isNotEmpty;
-  bool get isFormValid =>
-      isPickupValid &&
-      isDeliveryValid &&
-      isAddressValid;
+  bool get isFormValid => isPickupValid && isDeliveryValid && isAddressValid;
 
-  String getFormattedPickupTime() => _formatTime(
-    pickupTime,
-  );
-  String getFormattedDeliveryTime() => _formatTime(
-    deliveryTime,
-  );
+  String getFormattedPickupTime() => _formatTime(pickupTime);
+  String getFormattedDeliveryTime() => _formatTime(deliveryTime);
 
-  static String _formatTime(
-    TimeOfDay? time,
-  ) {
-    if (time ==
-        null)
-      return 'Pilih jam';
-    final h = time.hour.toString().padLeft(
-      2,
-      '0',
-    );
-    final m = time.minute.toString().padLeft(
-      2,
-      '0',
-    );
+  static String _formatTime(TimeOfDay? time) {
+    if (time == null) return 'Pilih jam';
+    final h = time.hour.toString().padLeft(2, '0');
+    final m = time.minute.toString().padLeft(2, '0');
     return '$h:$m';
   }
 
@@ -82,53 +54,28 @@ class PickupScheduleData {
     TimeOfDay? deliveryTime,
     String? selectedAddressType,
     String? customAddress,
-    Map<
-      String,
-      String
-    >?
-    addresses,
+    Map<String, String>? addresses,
     bool? showAddressOptions,
     bool? isLoadingAddresses,
     bool? pickupError,
     bool? deliveryError,
   }) {
     return PickupScheduleData(
-      pickupTime:
-          pickupTime ??
-          this.pickupTime,
-      deliveryTime:
-          deliveryTime ??
-          this.deliveryTime,
-      selectedAddressType:
-          selectedAddressType ??
-          this.selectedAddressType,
-      customAddress:
-          customAddress ??
-          this.customAddress,
-      addresses:
-          addresses ??
-          this.addresses,
-      showAddressOptions:
-          showAddressOptions ??
-          this.showAddressOptions,
-      isLoadingAddresses:
-          isLoadingAddresses ??
-          this.isLoadingAddresses,
-      pickupError:
-          pickupError ??
-          this.pickupError,
-      deliveryError:
-          deliveryError ??
-          this.deliveryError,
+      pickupTime: pickupTime ?? this.pickupTime,
+      deliveryTime: deliveryTime ?? this.deliveryTime,
+      selectedAddressType: selectedAddressType ?? this.selectedAddressType,
+      customAddress: customAddress ?? this.customAddress,
+      addresses: addresses ?? this.addresses,
+      showAddressOptions: showAddressOptions ?? this.showAddressOptions,
+      isLoadingAddresses: isLoadingAddresses ?? this.isLoadingAddresses,
+      pickupError: pickupError ?? this.pickupError,
+      deliveryError: deliveryError ?? this.deliveryError,
     );
   }
 }
 
 class OrderArgumentData {
-  final List<
-    dynamic
-  >
-  items;
+  final List<dynamic> items;
   final int serviceFee;
   final int deliveryFee;
   final int total;
@@ -140,26 +87,12 @@ class OrderArgumentData {
     required this.total,
   });
 
-  factory OrderArgumentData.fromMap(
-    Map<
-      String,
-      dynamic
-    >
-    map,
-  ) {
+  factory OrderArgumentData.fromMap(Map<String, dynamic> map) {
     return OrderArgumentData(
-      items:
-          map['items'] ??
-          [],
-      serviceFee:
-          map['serviceFee'] ??
-          0,
-      deliveryFee:
-          map['deliveryFee'] ??
-          5000,
-      total:
-          map['total'] ??
-          0,
+      items: map['items'] ?? [],
+      serviceFee: map['serviceFee'] ?? 0,
+      deliveryFee: map['deliveryFee'] ?? 5000,
+      total: map['total'] ?? 0,
     );
   }
 }

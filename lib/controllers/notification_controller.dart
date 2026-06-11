@@ -11,7 +11,8 @@ class NotificationsController extends ChangeNotifier {
   List<NotificationModel> get notifications => _notifications;
   bool get isLoading => _isLoading;
 
-  static const String systemMessage = 'Laundry sudah buka! kami siap melayani anda!';
+  static const String systemMessage =
+      'Laundry sudah buka! kami siap melayani anda!';
 
   NotificationsController() {
     loadNotifications();
@@ -38,7 +39,7 @@ class NotificationsController extends ChangeNotifier {
     }).toList();
 
     debugPrint('🔔 Notifications loaded: ${_notifications.length} items');
-    
+
     _isLoading = false;
     notifyListeners();
   }
@@ -77,9 +78,7 @@ class NotificationsController extends ChangeNotifier {
   }
 
   int get orderNotificationsCount {
-    return _notifications
-        .where((n) => n.type == NotificationType.order)
-        .length;
+    return _notifications.where((n) => n.type == NotificationType.order).length;
   }
 
   void goBack(BuildContext context) {

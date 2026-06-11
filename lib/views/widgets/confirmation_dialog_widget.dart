@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_text_styles.dart';
 
-class ConfirmationDialogWidget
-    extends
-        StatelessWidget {
+class ConfirmationDialogWidget extends StatelessWidget {
   final String title;
   final String content;
   final String confirmText;
@@ -21,45 +19,25 @@ class ConfirmationDialogWidget
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(
-          16,
-        ),
-      ),
-      title: Text(
-        title,
-        style: AppTextStyles.sectionTitle,
-      ),
-      content: Text(
-        content,
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text(title, style: AppTextStyles.sectionTitle),
+      content: Text(content),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(
-            context,
-          ),
-          child: Text(
-            'Batal',
-            style: AppTextStyles.bodyMuted,
-          ),
+          onPressed: () => Navigator.pop(context),
+          child: Text('Batal', style: AppTextStyles.bodyMuted),
         ),
         TextButton(
           onPressed: () {
-            Navigator.pop(
-              context,
-            );
+            Navigator.pop(context);
             onConfirm();
           },
           child: Text(
             confirmText,
             style: TextStyle(
-              color: isDangerous
-                  ? AppColors.danger
-                  : AppColors.primaryNavy,
+              color: isDangerous ? AppColors.danger : AppColors.primaryNavy,
               fontWeight: FontWeight.bold,
             ),
           ),

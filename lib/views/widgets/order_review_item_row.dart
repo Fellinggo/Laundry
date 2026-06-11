@@ -3,14 +3,9 @@ import '../../../constants/app_colors.dart';
 import '../../../constants/app_text_styles.dart';
 import '../../../models/order_review_model.dart';
 
-class OrderReviewItemRow
-    extends
-        StatelessWidget {
+class OrderReviewItemRow extends StatelessWidget {
   final OrderItem item;
-  final String Function(
-    int,
-  )
-  formatRupiah;
+  final String Function(int) formatRupiah;
 
   const OrderReviewItemRow({
     super.key,
@@ -19,52 +14,32 @@ class OrderReviewItemRow
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 8,
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          if (item.image !=
-                  null &&
-              item.image!.isNotEmpty)
+          if (item.image != null && item.image!.isNotEmpty)
             ClipRRect(
-              borderRadius: BorderRadius.circular(
-                8,
-              ),
+              borderRadius: BorderRadius.circular(8),
               child: Image.asset(
                 item.image!,
                 width: 45,
                 height: 45,
                 fit: BoxFit.cover,
-                errorBuilder:
-                    (
-                      context,
-                      error,
-                      stackTrace,
-                    ) {
-                      return Container(
-                        width: 45,
-                        height: 45,
-                        color: Colors.grey.shade200,
-                        child: const Icon(
-                          Icons.local_laundry_service,
-                          size: 20,
-                        ),
-                      );
-                    },
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: 45,
+                    height: 45,
+                    color: Colors.grey.shade200,
+                    child: const Icon(Icons.local_laundry_service, size: 20),
+                  );
+                },
               ),
             ),
-          if (item.image !=
-                  null &&
-              item.image!.isNotEmpty)
-            const SizedBox(
-              width: 12,
-            ),
+          if (item.image != null && item.image!.isNotEmpty)
+            const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,17 +54,13 @@ class OrderReviewItemRow
                 ),
                 Text(
                   '${formatRupiah(item.price)} x ${item.qty}',
-                  style: AppTextStyles.bodyMuted.copyWith(
-                    fontSize: 12,
-                  ),
+                  style: AppTextStyles.bodyMuted.copyWith(fontSize: 12),
                 ),
               ],
             ),
           ),
           Text(
-            formatRupiah(
-              item.subtotal,
-            ),
+            formatRupiah(item.subtotal),
             style: AppTextStyles.body.copyWith(
               fontWeight: FontWeight.w600,
               color: AppColors.primaryNavy,

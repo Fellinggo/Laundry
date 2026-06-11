@@ -4,14 +4,9 @@ import '../../../constants/app_text_styles.dart';
 import '../../../models/order_review_model.dart';
 import 'order_review_item_row.dart';
 
-class OrderReviewServiceSummary
-    extends
-        StatelessWidget {
+class OrderReviewServiceSummary extends StatelessWidget {
   final OrderReviewData data;
-  final String Function(
-    int,
-  )
-  formatRupiah;
+  final String Function(int) formatRupiah;
 
   const OrderReviewServiceSummary({
     super.key,
@@ -20,19 +15,13 @@ class OrderReviewServiceSummary
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     if (!data.hasOrderItems) {
       return Container(
-        padding: const EdgeInsets.all(
-          16,
-        ),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.inputFill,
-          borderRadius: BorderRadius.circular(
-            12,
-          ),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
@@ -46,9 +35,7 @@ class OrderReviewServiceSummary
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(
-                    height: 4,
-                  ),
+                  const SizedBox(height: 4),
                   Text(
                     '${data.totalQty} x ${formatRupiah(data.serviceFee)}',
                     style: AppTextStyles.bodyMuted,
@@ -59,14 +46,9 @@ class OrderReviewServiceSummary
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+                Text('Total Layanan', style: AppTextStyles.caption),
                 Text(
-                  'Total Layanan',
-                  style: AppTextStyles.caption,
-                ),
-                Text(
-                  formatRupiah(
-                    data.serviceFee,
-                  ),
+                  formatRupiah(data.serviceFee),
                   style: AppTextStyles.body.copyWith(
                     fontWeight: FontWeight.bold,
                     color: AppColors.primaryNavy,
@@ -81,22 +63,16 @@ class OrderReviewServiceSummary
     }
 
     return Container(
-      padding: const EdgeInsets.all(
-        16,
-      ),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(
-          12,
-        ),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(
-              bottom: 12,
-            ),
+            padding: const EdgeInsets.only(bottom: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -117,29 +93,19 @@ class OrderReviewServiceSummary
             ),
           ),
           ...data.orderItems.map(
-            (
-              item,
-            ) => OrderReviewItemRow(
-              item: item,
-              formatRupiah: formatRupiah,
-            ),
+            (item) =>
+                OrderReviewItemRow(item: item, formatRupiah: formatRupiah),
           ),
-          const Divider(
-            height: 24,
-          ),
+          const Divider(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Total Pesanan',
-                style: AppTextStyles.body.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
               ),
               Text(
-                formatRupiah(
-                  data.serviceFee,
-                ),
+                formatRupiah(data.serviceFee),
                 style: AppTextStyles.body.copyWith(
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryNavy,

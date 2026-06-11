@@ -3,9 +3,7 @@ import '../models/order_item_model.dart';
 import '../models/service_detail_model.dart';
 import '../../data/service_dummy.dart';
 
-class ServiceDetailController
-    extends
-        ChangeNotifier {
+class ServiceDetailController extends ChangeNotifier {
   ServiceDetailModel _model;
   bool _isInit = true;
 
@@ -16,44 +14,28 @@ class ServiceDetailController
   int get deliveryFee => _model.deliveryFee;
 
   ServiceDetailController()
-    : _model = ServiceDetailModel(
-        services: [],
-        selectedServices: {},
-      ) {
+    : _model = ServiceDetailModel(services: [], selectedServices: {}) {
     _loadServices();
   }
 
   void _loadServices() {
-    final services = serviceDummy.map(
-      (
-        e,
-      ) {
-        return OrderItemModel(
-          title: e.title,
-          displayTitle:
-              e.title ==
-                  'Cuci Bedcover / Selimut / Sprei'
-              ? 'Cuci Bedcover /\nSelimut / Sprei'
-              : e.title,
-          price: e.price,
-          image: e.imagePath,
-          icon: _getIcon(
-            e.title,
-          ),
-        );
-      },
-    ).toList();
+    final services = serviceDummy.map((e) {
+      return OrderItemModel(
+        title: e.title,
+        displayTitle: e.title == 'Cuci Bedcover / Selimut / Sprei'
+            ? 'Cuci Bedcover /\nSelimut / Sprei'
+            : e.title,
+        price: e.price,
+        image: e.imagePath,
+        icon: _getIcon(e.title),
+      );
+    }).toList();
 
-    _model = ServiceDetailModel(
-      services: services,
-      selectedServices: {},
-    );
+    _model = ServiceDetailModel(services: services, selectedServices: {});
     notifyListeners();
   }
 
-  IconData _getIcon(
-    String title,
-  ) {
+  IconData _getIcon(String title) {
     switch (title) {
       case 'Cuci Regular':
         return Icons.local_laundry_service;
@@ -76,40 +58,16 @@ class ServiceDetailController
     }
   }
 
-  void initializeWithArgument(
-    Map<
-      String,
-      dynamic
-    >?
-    args,
-  ) {
+  void initializeWithArgument(Map<String, dynamic>? args) {
     if (!_isInit) return;
 
-    if (args !=
-            null &&
-        args['title'] !=
-            null) {
-      final index = _model.services.indexWhere(
-        (
-          s,
-        ) =>
-            s.title ==
-            args['title'],
-      );
+    if (args != null && args['title'] != null) {
+      final index = _model.services.indexWhere((s) => s.title == args['title']);
 
-      if (index !=
-          -1) {
-        final newSelected =
-            Map<
-              int,
-              int
-            >.from(
-              _model.selectedServices,
-            );
+      if (index != -1) {
+        final newSelected = Map<int, int>.from(_model.selectedServices);
         newSelected[index] = 1;
-        _model = _model.copyWith(
-          selectedServices: newSelected,
-        );
+        _model = _model.copyWith(selectedServices: newSelected);
         notifyListeners();
       }
     }
@@ -117,61 +75,31 @@ class ServiceDetailController
     _isInit = false;
   }
 
-  void toggleServiceSelection(
-    int index,
-    bool isSelected,
-  ) {
-    final newSelected =
-        Map<
-          int,
-          int
-        >.from(
-          _model.selectedServices,
-        );
+  void toggleServiceSelection(int index, bool isSelected) {
+    final newSelected = Map<int, int>.from(_model.selectedServices);
 
     if (isSelected) {
       newSelected[index] = 1;
     } else {
-      newSelected.remove(
-        index,
-      );
+      newSelected.remove(index);
     }
 
-    _model = _model.copyWith(
-      selectedServices: newSelected,
-    );
+    _model = _model.copyWith(selectedServices: newSelected);
     notifyListeners();
   }
 
-  void updateQuantity(
-    int index,
-    int newQuantity,
-  ) {
-    if (newQuantity <=
-        0) {
-      toggleServiceSelection(
-        index,
-        false,
-      );
+  void updateQuantity(int index, int newQuantity) {
+    if (newQuantity <= 0) {
+      toggleServiceSelection(index, false);
     } else {
-      final newSelected =
-          Map<
-            int,
-            int
-          >.from(
-            _model.selectedServices,
-          );
+      final newSelected = Map<int, int>.from(_model.selectedServices);
       newSelected[index] = newQuantity;
-      _model = _model.copyWith(
-        selectedServices: newSelected,
-      );
+      _model = _model.copyWith(selectedServices: newSelected);
       notifyListeners();
     }
   }
 
-  void navigateToPickupSchedule(
-    BuildContext context,
-  ) {
+  void navigateToPickupSchedule(BuildContext context) {
     if (!_model.hasSelectedServices) return;
 
     Navigator.pushNamed(
@@ -186,17 +114,11 @@ class ServiceDetailController
     );
   }
 
-  void goBack(
-    BuildContext context,
-  ) {
-    Navigator.pop(
-      context,
-    );
+  void goBack(BuildContext context) {
+    Navigator.pop(context);
   }
 
-  String formatPrice(
-    int value,
-  ) {
+  String formatPrice(int value) {
     return 'Rp ${value.toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}';
   }
 }

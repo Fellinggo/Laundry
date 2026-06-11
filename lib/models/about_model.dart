@@ -1,10 +1,5 @@
 class AboutModel {
-  final List<
-    String
-  >
-  paragraphs;
+  final List<String> paragraphs;
 
-  const AboutModel({
-    required this.paragraphs,
-  });
+  const AboutModel({required this.paragraphs});
 }

@@ -5,31 +5,18 @@ import '../models/main_shell_model.dart';
 import '../views/screens/home_screen.dart';
 import '../views/screens/my_orders_screen.dart';
 
-class MainShellController
-    extends
-        ChangeNotifier {
+class MainShellController extends ChangeNotifier {
   MainShellState _state = MainShellState(
     selectedIndex: NavigationTarget.home,
     isLoggedIn: false,
     userFirstName: null,
   );
 
-  final GlobalKey<
-    HomeScreenState
-  >
-  homeScreenKey =
-      GlobalKey<
-        HomeScreenState
-      >();
+  final GlobalKey<HomeScreenState> homeScreenKey = GlobalKey<HomeScreenState>();
 
   // GLOBAL KEY UNTUK MY ORDERS SCREEN
-  final GlobalKey<
-    MyOrdersScreenState
-  >
-  myOrdersKey =
-      GlobalKey<
-        MyOrdersScreenState
-      >();
+  final GlobalKey<MyOrdersScreenState> myOrdersKey =
+      GlobalKey<MyOrdersScreenState>();
 
   int _tabUpdateTrigger = DateTime.now().millisecondsSinceEpoch;
 
@@ -43,106 +30,51 @@ class MainShellController
     _loadUser();
   }
 
-  Future<
-    void
-  >
-  _loadUser() async {
+  Future<void> _loadUser() async {
     final prefs = await SharedPreferences.getInstance();
-    final loggedIn =
-        prefs.getBool(
-          'isLoggedIn',
-        ) ??
-        false;
-    final firstName = loggedIn
-        ? prefs.getString(
-            'userName',
-          )
-        : null;
+    final loggedIn = prefs.getBool('isLoggedIn') ?? false;
+    final firstName = loggedIn ? prefs.getString('userName') : null;
 
-    _state = _state.copyWith(
-      isLoggedIn: loggedIn,
-      userFirstName: firstName,
-    );
+    _state = _state.copyWith(isLoggedIn: loggedIn, userFirstName: firstName);
     notifyListeners();
   }
 
-  Future<
-    void
-  >
-  refreshUser() async {
+  Future<void> refreshUser() async {
     await _loadUser();
     homeScreenKey.currentState?.refreshUserData();
   }
 
   // METHOD BARU: Refresh My Orders Data
-  Future<
-    void
-  >
-  refreshMyOrdersData() async {
+  Future<void> refreshMyOrdersData() async {
     // Panggil method refresh dari MyOrdersScreen jika ada
     await myOrdersKey.currentState?.refreshOrders();
-    debugPrint(
-      'DEBUG - My Orders data refreshed',
-    );
+    debugPrint('DEBUG - My Orders data refreshed');
   }
 
-  void changeTab(
-    int index,
-  ) {
-    if (_state.selectedIndex !=
-        index) {
-      _state = _state.copyWith(
-        selectedIndex: index,
-      );
+  void changeTab(int index) {
+    if (_state.selectedIndex != index) {
+      _state = _state.copyWith(selectedIndex: index);
       _tabUpdateTrigger = DateTime.now().millisecondsSinceEpoch;
       notifyListeners();
     }
   }
 
-  void goToServicesTab() => changeTab(
-    NavigationTarget.services,
-  );
-  void goToOffersTab() => changeTab(
-    NavigationTarget.offers,
-  );
-  void goToHomeTab() => changeTab(
-    NavigationTarget.home,
-  );
-  void goToMyOrdersTab() => changeTab(
-    NavigationTarget.myOrders,
-  );
-  void goToProfileTab() => changeTab(
-    NavigationTarget.profile,
-  );
+  void goToServicesTab() => changeTab(NavigationTarget.services);
+  void goToOffersTab() => changeTab(NavigationTarget.offers);
+  void goToHomeTab() => changeTab(NavigationTarget.home);
+  void goToMyOrdersTab() => changeTab(NavigationTarget.myOrders);
+  void goToProfileTab() => changeTab(NavigationTarget.profile);
 
-  void handleNotificationTap(
-    BuildContext context,
-  ) {
+  void handleNotificationTap(BuildContext context) {
     if (!_state.isLoggedIn) {
-      showLoginModal(
-        context,
-      );
+      showLoginModal(context);
       return;
     }
-    Navigator.pushNamed(
-      context,
-      '/notifications',
-    );
+    Navigator.pushNamed(context, '/notifications');
   }
 
-  void handleServiceDetail(
-    BuildContext context,
-    Map<
-      String,
-      dynamic
-    >
-    service,
-  ) {
-    Navigator.pushNamed(
-      context,
-      '/service-detail',
-      arguments: service,
-    );
+  void handleServiceDetail(BuildContext context, Map<String, dynamic> service) {
+    Navigator.pushNamed(context, '/service-detail', arguments: service);
   }
 
   bool canNavigateToAuthenticatedOnly() {

@@ -4,10 +4,7 @@ class ProfileModel {
   final String name;
   final String email;
   final bool isLoggedIn;
-  final List<
-    AddressModel
-  >
-  addresses;
+  final List<AddressModel> addresses;
 
   ProfileModel({
     required this.name,
@@ -28,10 +25,7 @@ class ProfileModel {
   factory ProfileModel.loggedIn({
     required String name,
     required String email,
-    required List<
-      AddressModel
-    >
-    addresses,
+    required List<AddressModel> addresses,
   }) {
     return ProfileModel(
       name: name,
@@ -45,43 +39,22 @@ class ProfileModel {
     String? name,
     String? email,
     bool? isLoggedIn,
-    List<
-      AddressModel
-    >?
-    addresses,
+    List<AddressModel>? addresses,
   }) {
     return ProfileModel(
-      name:
-          name ??
-          this.name,
-      email:
-          email ??
-          this.email,
-      isLoggedIn:
-          isLoggedIn ??
-          this.isLoggedIn,
-      addresses:
-          addresses ??
-          this.addresses,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      isLoggedIn: isLoggedIn ?? this.isLoggedIn,
+      addresses: addresses ?? this.addresses,
     );
   }
 
-  Map<
-    String,
-    dynamic
-  >
-  toMap() {
+  Map<String, dynamic> toMap() {
     return {
       'name': name,
       'email': email,
       'isLoggedIn': isLoggedIn,
-      'addresses': addresses
-          .map(
-            (
-              e,
-            ) => e.toMap(),
-          )
-          .toList(),
+      'addresses': addresses.map((e) => e.toMap()).toList(),
     };
   }
 }

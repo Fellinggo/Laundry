@@ -3,9 +3,7 @@ import '../../../constants/app_colors.dart';
 import '../../../constants/app_spacing.dart';
 import '../../../constants/app_text_styles.dart';
 
-class OnboardingNavigationButtons
-    extends
-        StatelessWidget {
+class OnboardingNavigationButtons extends StatelessWidget {
   final bool isFinalPage;
   final bool isLastPage;
   final VoidCallback onSkip;
@@ -22,9 +20,7 @@ class OnboardingNavigationButtons
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     if (isFinalPage) {
       return SizedBox(
         width: double.infinity,
@@ -76,9 +72,7 @@ class OnboardingNavigationButtons
             ),
           ),
         ),
-        const SizedBox(
-          width: 15,
-        ),
+        const SizedBox(width: 15),
         Expanded(
           flex: 13,
           child: SizedBox(

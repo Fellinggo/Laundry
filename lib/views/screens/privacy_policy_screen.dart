@@ -9,104 +9,57 @@ import '../widgets/navy_app_bar.dart';
 import '../widgets/rounded_white_panel.dart';
 import '../widgets/policy_bullet_widget.dart';
 
-class PrivacyPolicyScreen
-    extends
-        StatelessWidget {
-  const PrivacyPolicyScreen({
-    super.key,
-  });
+class PrivacyPolicyScreen extends StatelessWidget {
+  const PrivacyPolicyScreen({super.key});
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    return ChangeNotifierProvider<
-      PrivacyPolicyController
-    >(
-      create:
-          (
-            _,
-          ) => PrivacyPolicyController(),
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<PrivacyPolicyController>(
+      create: (_) => PrivacyPolicyController(),
       child: const _PrivacyPolicyContent(),
     );
   }
 }
 
-class _PrivacyPolicyContent
-    extends
-        StatelessWidget {
+class _PrivacyPolicyContent extends StatelessWidget {
   const _PrivacyPolicyContent();
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     // Membaca method goBack dari controller tanpa me-listen perubahan state
-    final controller = context
-        .read<
-          PrivacyPolicyController
-        >();
+    final controller = context.read<PrivacyPolicyController>();
 
     return Scaffold(
       backgroundColor: AppColors.profileNavy,
       appBar: NavyBackAppBar(
         title: 'Kebijakan Privasi',
-        onBack: () => controller.goBack(
-          context,
-        ),
+        onBack: () => controller.goBack(context),
       ),
-      body: _buildBody(
-        context,
-      ),
+      body: _buildBody(context),
     );
   }
 
-  Widget _buildBody(
-    BuildContext context,
-  ) {
+  Widget _buildBody(BuildContext context) {
     // Menggunakan context.select untuk memantau perubahan state secara spesifik (efisiensi rerender)
-    final isLoading =
-        context.select<
-          PrivacyPolicyController,
-          bool
-        >(
-          (
-            c,
-          ) => c.isLoading,
+    final isLoading = context.select<PrivacyPolicyController, bool>(
+      (c) => c.isLoading,
+    );
+    final errorMessage = context.select<PrivacyPolicyController, String?>(
+      (c) => c.errorMessage,
+    );
+    final policyModel = context
+        .select<PrivacyPolicyController, PrivacyPolicyModel>(
+          (c) => c.policyModel,
         );
-    final errorMessage =
-        context.select<
-          PrivacyPolicyController,
-          String?
-        >(
-          (
-            c,
-          ) => c.errorMessage,
-        );
-    final policyModel =
-        context.select<
-          PrivacyPolicyController,
-          PrivacyPolicyModel
-        >(
-          (
-            c,
-          ) => c.policyModel,
-        );
-    final controller = context
-        .read<
-          PrivacyPolicyController
-        >();
+    final controller = context.read<PrivacyPolicyController>();
 
     if (isLoading) {
       return const Center(
-        child: CircularProgressIndicator(
-          color: AppColors.profileNavy,
-        ),
+        child: CircularProgressIndicator(color: AppColors.profileNavy),
       );
     }
 
-    if (errorMessage !=
-        null) {
+    if (errorMessage != null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -116,17 +69,13 @@ class _PrivacyPolicyContent
               style: AppTextStyles.bodyMuted,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(
-              height: 16,
-            ),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => controller.refreshPolicy(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.profileNavy,
               ),
-              child: const Text(
-                'Coba Lagi',
-              ),
+              child: const Text('Coba Lagi'),
             ),
           ],
         ),
@@ -137,35 +86,23 @@ class _PrivacyPolicyContent
       child: RoundedWhitePanel(
         topRadius: 28,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(
-            AppSpacing.xl,
-          ),
+          padding: const EdgeInsets.all(AppSpacing.xl),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 policyModel.mainTitle,
-                style: AppTextStyles.sectionTitle.copyWith(
-                  fontSize: 18,
-                ),
+                style: AppTextStyles.sectionTitle.copyWith(fontSize: 18),
               ),
-              const SizedBox(
-                height: 12,
-              ),
+              const SizedBox(height: 12),
               Text(
                 policyModel.mainContent,
                 style: AppTextStyles.bodyMuted,
                 textAlign: TextAlign.justify,
               ),
               ...policyModel.sections.map(
-                (
-                  section,
-                ) => _buildSection(
-                  context,
-                  controller,
-                  section,
-                  policyModel,
-                ),
+                (section) =>
+                    _buildSection(context, controller, section, policyModel),
               ),
             ],
           ),
@@ -180,55 +117,27 @@ class _PrivacyPolicyContent
     PrivacyPolicySection section,
     PrivacyPolicyModel policyModel,
   ) {
-    final int sectionIndex = policyModel.sections.indexOf(
-      section,
-    );
-    final bool isLastSection =
-        sectionIndex ==
-        policyModel.sections.length -
-            1;
+    final int sectionIndex = policyModel.sections.indexOf(section);
+    final bool isLastSection = sectionIndex == policyModel.sections.length - 1;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(
-          height: AppSpacing.xl,
-        ),
-        Text(
-          section.title,
-          style: AppTextStyles.sectionTitle,
-        ),
-        const SizedBox(
-          height: 8,
-        ),
-        ...section.items.asMap().entries.map(
-          (
-            entry,
-          ) {
-            final index = entry.key;
-            final item = entry.value;
-            final bool isLastItem =
-                index ==
-                section.items.length -
-                    1;
+        const SizedBox(height: AppSpacing.xl),
+        Text(section.title, style: AppTextStyles.sectionTitle),
+        const SizedBox(height: 8),
+        ...section.items.asMap().entries.map((entry) {
+          final index = entry.key;
+          final item = entry.value;
+          final bool isLastItem = index == section.items.length - 1;
 
-            return PolicyBulletWidget(
-              text: item,
-              isLastItem: isLastItem,
-            );
-          },
-        ).toList(),
+          return PolicyBulletWidget(text: item, isLastItem: isLastItem);
+        }).toList(),
         if (section.hasLearnMoreButton) ...[
-          const SizedBox(
-            height: 8,
-          ),
+          const SizedBox(height: 8),
           TextButton(
-            onPressed: () => controller.onLearnMorePressed(
-              context,
-            ),
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.zero,
-            ),
+            onPressed: () => controller.onLearnMorePressed(context),
+            style: TextButton.styleFrom(padding: EdgeInsets.zero),
             child: Text(
               'Pelajari lebih lanjut tentang cookie',
               style: AppTextStyles.link.copyWith(
@@ -237,10 +146,7 @@ class _PrivacyPolicyContent
             ),
           ),
         ],
-        if (!isLastSection)
-          const SizedBox(
-            height: AppSpacing.lg,
-          ),
+        if (!isLastSection) const SizedBox(height: AppSpacing.lg),
       ],
     );
   }

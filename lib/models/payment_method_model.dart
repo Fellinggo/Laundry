@@ -16,26 +16,19 @@ class PaymentMethodData {
     this.isConnected = true,
   });
 
-  static const List<
-    PaymentMethodData
-  >
-  list = [
+  static const List<PaymentMethodData> list = [
     PaymentMethodData(
       id: 'dana',
       name: 'DANA',
       logoLabel: 'D',
-      color: Color(
-        0xFF118EEA,
-      ),
+      color: Color(0xFF118EEA),
       isConnected: true,
     ),
     PaymentMethodData(
       id: 'ovo',
       name: 'OVO',
       logoLabel: 'O',
-      color: Color(
-        0xFF6B2C91,
-      ),
+      color: Color(0xFF6B2C91),
       isConnected: true,
     ),
     PaymentMethodData(
@@ -49,18 +42,14 @@ class PaymentMethodData {
       id: 'bni',
       name: 'BNI',
       logoLabel: 'N',
-      color: Color(
-        0xFF00529C,
-      ),
+      color: Color(0xFF00529C),
       isConnected: false,
     ),
     PaymentMethodData(
       id: 'mandiri',
       name: 'Mandiri',
       logoLabel: 'M',
-      color: Color(
-        0xFFFF6B00,
-      ),
+      color: Color(0xFFFF6B00),
       isConnected: false,
     ),
   ];

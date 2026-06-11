@@ -147,8 +147,7 @@ class _RegisterContentState extends State<_RegisterContent> {
                         onChanged: (value) =>
                             controller.updateConfirmPassword(value),
                         suffix: IconButton(
-                          onPressed:
-                              controller.toggleConfirmPasswordVisibility,
+                          onPressed: controller.toggleConfirmPasswordVisibility,
                           icon: Icon(
                             obscureConfirmPassword
                                 ? Icons.visibility_off_outlined

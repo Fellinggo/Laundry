@@ -9,22 +9,13 @@ import '../widgets/notification_list_tile.dart';
 import '../widgets/notification_date_header.dart';
 import '../../models/notification_model.dart';
 
-class NotificationsScreen
-    extends
-        StatelessWidget {
-  const NotificationsScreen({
-    super.key,
-  });
+class NotificationsScreen extends StatelessWidget {
+  const NotificationsScreen({super.key});
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     // Membaca state NotificationsController secara reaktif
-    final controller = context
-        .watch<
-          NotificationsController
-        >();
+    final controller = context.watch<NotificationsController>();
 
     return Scaffold(
       backgroundColor: AppColors.pageBgCool,
@@ -32,9 +23,7 @@ class NotificationsScreen
         backgroundColor: AppColors.pageBgCool,
         elevation: 0,
         leading: IconButton(
-          onPressed: () => controller.goBack(
-            context,
-          ),
+          onPressed: () => controller.goBack(context),
           icon: const Icon(
             Icons.chevron_left,
             color: AppColors.primaryNavy,
@@ -43,9 +32,7 @@ class NotificationsScreen
         ),
         title: Text(
           'Notifikasi',
-          style: AppTextStyles.screenTitleNavy.copyWith(
-            fontSize: 20,
-          ),
+          style: AppTextStyles.screenTitleNavy.copyWith(fontSize: 20),
         ),
         centerTitle: true,
         actions: [
@@ -55,10 +42,7 @@ class NotificationsScreen
                 Icons.delete_outline,
                 color: AppColors.textSecondary,
               ),
-              onPressed: () => _confirmClearAll(
-                context,
-                controller,
-              ),
+              onPressed: () => _confirmClearAll(context, controller),
             ),
         ],
       ),
@@ -74,40 +58,30 @@ class NotificationsScreen
                 NotificationFilterTab(
                   icon: Icons.list_alt_rounded,
                   label: 'Semua',
-                  selected:
-                      controller.currentFilter ==
-                      NotificationFilter.all,
+                  selected: controller.currentFilter == NotificationFilter.all,
                   activeColor: AppColors.accentBlue,
-                  onTap: () => controller.changeFilter(
-                    NotificationFilter.all,
-                  ),
+                  onTap: () => controller.changeFilter(NotificationFilter.all),
                 ),
                 NotificationFilterTab(
                   icon: Icons.assignment_outlined,
                   label: 'Pesanan',
                   selected:
-                      controller.currentFilter ==
-                      NotificationFilter.orders,
+                      controller.currentFilter == NotificationFilter.orders,
                   activeColor: AppColors.skyTab,
-                  onTap: () => controller.changeFilter(
-                    NotificationFilter.orders,
-                  ),
+                  onTap: () =>
+                      controller.changeFilter(NotificationFilter.orders),
                 ),
               ],
             ),
           ),
           Expanded(
             child: controller.isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
+                ? const Center(child: CircularProgressIndicator())
                 : ListView(
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.xl,
                     ),
-                    children: _buildContent(
-                      controller,
-                    ),
+                    children: _buildContent(controller),
                   ),
           ),
         ],
@@ -115,46 +89,25 @@ class NotificationsScreen
     );
   }
 
-  List<
-    Widget
-  >
-  _buildContent(
-    NotificationsController controller,
-  ) {
+  List<Widget> _buildContent(NotificationsController controller) {
     final filteredNotifications = controller.getFilteredNotifications();
-    final isOrdersOnly =
-        controller.currentFilter ==
-        NotificationFilter.orders;
+    final isOrdersOnly = controller.currentFilter == NotificationFilter.orders;
 
-    if (isOrdersOnly &&
-        filteredNotifications.isEmpty) {
+    if (isOrdersOnly && filteredNotifications.isEmpty) {
       return [
-        const NotificationDateHeader(
-          title: 'Hari Ini',
-        ),
+        const NotificationDateHeader(title: 'Hari Ini'),
         const Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: 20,
-          ),
+          padding: EdgeInsets.symmetric(vertical: 20),
           child: Text(
             "Belum ada pesanan",
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppColors.textMuted,
-            ),
+            style: TextStyle(color: AppColors.textMuted),
           ),
         ),
       ];
     }
 
-    final widgets =
-        <
-          Widget
-        >[
-          const NotificationDateHeader(
-            title: 'Hari Ini',
-          ),
-        ];
+    final widgets = <Widget>[const NotificationDateHeader(title: 'Hari Ini')];
 
     // System notification (only for "Semua" filter)
     if (!isOrdersOnly) {
@@ -169,11 +122,7 @@ class NotificationsScreen
           dateLabel: 'Hari ini',
         ),
       );
-      widgets.add(
-        const SizedBox(
-          height: 10,
-        ),
-      );
+      widgets.add(const SizedBox(height: 10));
     }
 
     // Order notifications
@@ -190,11 +139,7 @@ class NotificationsScreen
             dateLabel: notification.dateLabel,
           ),
         );
-        widgets.add(
-          const SizedBox(
-            height: 10,
-          ),
-        );
+        widgets.add(const SizedBox(height: 10));
       }
     }
 
@@ -207,46 +152,26 @@ class NotificationsScreen
   ) {
     showDialog(
       context: context,
-      builder:
-          (
-            ctx,
-          ) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                16,
-              ),
-            ),
-            title: const Text(
-              'Hapus Semua Notifikasi',
-            ),
-            content: const Text(
-              'Apakah Anda yakin ingin menghapus semua notifikasi?',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(
-                  ctx,
-                ),
-                child: const Text(
-                  'Batal',
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(
-                    ctx,
-                  );
-                  controller.clearAllNotifications();
-                },
-                child: const Text(
-                  'Hapus',
-                  style: TextStyle(
-                    color: Colors.red,
-                  ),
-                ),
-              ),
-            ],
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Hapus Semua Notifikasi'),
+        content: const Text(
+          'Apakah Anda yakin ingin menghapus semua notifikasi?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Batal'),
           ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              controller.clearAllNotifications();
+            },
+            child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
     );
   }
 }

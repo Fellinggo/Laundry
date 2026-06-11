@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/address_model.dart';
 
-class AddAddressController
-    extends
-        ChangeNotifier {
-  final List<
-    String
-  >
-  titleOptions = [
+class AddAddressController extends ChangeNotifier {
+  final List<String> titleOptions = [
     'Rumah',
     'Kantor',
     'Kos',
@@ -25,24 +20,18 @@ class AddAddressController
   String? get addressError => _addressError;
 
   /// Update pilihan tipe alamat dan hapus error-nya jika ada
-  void selectTitle(
-    String? value,
-  ) {
+  void selectTitle(String? value) {
     _selectedTitle = value;
     _titleError = null;
     notifyListeners();
   }
 
   /// Validasi internal state
-  bool validate(
-    String addressText,
-  ) {
+  bool validate(String addressText) {
     final addressValue = addressText.trim();
 
     // 1. Validasi Tipe Alamat
-    if (_selectedTitle ==
-            null ||
-        _selectedTitle!.isEmpty) {
+    if (_selectedTitle == null || _selectedTitle!.isEmpty) {
       _titleError = 'Pilih tipe alamat';
     } else {
       _titleError = null;
@@ -51,28 +40,19 @@ class AddAddressController
     // 2. Validasi Konten Alamat
     if (addressValue.isEmpty) {
       _addressError = 'Alamat tidak boleh kosong';
-    } else if (addressValue.length <
-        10) {
+    } else if (addressValue.length < 10) {
       _addressError = 'Alamat terlalu pendek (minimal 10 karakter)';
     } else {
       _addressError = null;
     }
 
     notifyListeners();
-    return _titleError ==
-            null &&
-        _addressError ==
-            null;
+    return _titleError == null && _addressError == null;
   }
 
   /// Membuat model data alamat setelah validasi sukses
-  AddressModel createAddress(
-    String addressText,
-  ) {
-    return AddressModel(
-      title: _selectedTitle!,
-      address: addressText.trim(),
-    );
+  AddressModel createAddress(String addressText) {
+    return AddressModel(title: _selectedTitle!, address: addressText.trim());
   }
 
   /// Reset state ketika screen ditutup atau dihancurkan

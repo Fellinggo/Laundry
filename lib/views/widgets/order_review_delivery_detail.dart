@@ -3,9 +3,7 @@ import '../../../constants/app_colors.dart';
 import '../../../constants/app_text_styles.dart';
 import 'info_kv_row.dart';
 
-class OrderReviewDeliveryDetail
-    extends
-        StatelessWidget {
+class OrderReviewDeliveryDetail extends StatelessWidget {
   final String pickupTime;
   final String deliveryTime;
   final String address;
@@ -20,9 +18,7 @@ class OrderReviewDeliveryDetail
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -38,10 +34,7 @@ class OrderReviewDeliveryDetail
             ),
             TextButton.icon(
               onPressed: onEdit,
-              icon: const Icon(
-                Icons.edit_outlined,
-                size: 16,
-              ),
+              icon: const Icon(Icons.edit_outlined, size: 16),
               label: Text(
                 'Edit',
                 style: AppTextStyles.bodyMuted.copyWith(
@@ -49,28 +42,19 @@ class OrderReviewDeliveryDetail
                 ),
               ),
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
             ),
           ],
         ),
-        const SizedBox(
-          height: 12,
-        ),
+        const SizedBox(height: 12),
         Container(
-          padding: const EdgeInsets.all(
-            16,
-          ),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: AppColors.inputFill,
-            borderRadius: BorderRadius.circular(
-              12,
-            ),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
             children: [

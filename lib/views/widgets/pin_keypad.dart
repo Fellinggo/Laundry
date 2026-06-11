@@ -2,71 +2,31 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
 
-class PinKeypad
-    extends
-        StatelessWidget {
+class PinKeypad extends StatelessWidget {
   const PinKeypad({
     super.key,
     required this.onDigit,
     required this.onBackspace,
   });
 
-  final ValueChanged<
-    int
-  >
-  onDigit;
+  final ValueChanged<int> onDigit;
   final VoidCallback onBackspace;
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Container(
       color: AppColors.keypadBg,
-      padding: const EdgeInsets.fromLTRB(
-        12,
-        8,
-        12,
-        24,
-      ),
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
       child: Column(
         children: [
-          _row(
-            [
-              1,
-              2,
-              3,
-            ],
-          ),
-          _row(
-            [
-              4,
-              5,
-              6,
-            ],
-          ),
-          _row(
-            [
-              7,
-              8,
-              9,
-            ],
-          ),
+          _row([1, 2, 3]),
+          _row([4, 5, 6]),
+          _row([7, 8, 9]),
           Row(
             children: [
-              const Expanded(
-                child: SizedBox(),
-              ),
+              const Expanded(child: SizedBox()),
               Expanded(
-                child: _key(
-                  Text(
-                    '0',
-                    style: _numStyle,
-                  ),
-                  () => onDigit(
-                    0,
-                  ),
-                ),
+                child: _key(Text('0', style: _numStyle), () => onDigit(0)),
               ),
               Expanded(
                 child: _key(
@@ -90,47 +50,24 @@ class PinKeypad
     color: AppColors.textDark,
   );
 
-  Widget _row(
-    List<
-      int
-    >
-    nums,
-  ) {
+  Widget _row(List<int> nums) {
     return Row(
       children: nums
           .map(
-            (
-              n,
-            ) => Expanded(
-              child: _key(
-                Text(
-                  '$n',
-                  style: _numStyle,
-                ),
-                () => onDigit(
-                  n,
-                ),
-              ),
+            (n) => Expanded(
+              child: _key(Text('$n', style: _numStyle), () => onDigit(n)),
             ),
           )
           .toList(),
     );
   }
 
-  Widget _key(
-    Widget child,
-    VoidCallback onTap,
-  ) {
+  Widget _key(Widget child, VoidCallback onTap) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        child: SizedBox(
-          height: 52,
-          child: Center(
-            child: child,
-          ),
-        ),
+        child: SizedBox(height: 52, child: Center(child: child)),
       ),
     );
   }

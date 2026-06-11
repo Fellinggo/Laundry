@@ -19,46 +19,20 @@ class OrderModel {
     required this.itemsJson,
   });
 
-  factory OrderModel.fromMap(
-    Map<
-      String,
-      dynamic
-    >
-    map,
-  ) {
+  factory OrderModel.fromMap(Map<String, dynamic> map) {
     return OrderModel(
-      orderId:
-          map['orderId'] ??
-          '000000',
-      service:
-          map['service'] ??
-          'Cuci Regular',
-      qty:
-          map['qty'] ??
-          '1',
-      pickupTime:
-          map['pickupTime'] ??
-          '-',
-      deliveryTime:
-          map['deliveryTime'] ??
-          '-',
-      totalPrice:
-          map['totalPrice'] ??
-          'Rp 0',
-      address:
-          map['address'] ??
-          '-',
-      itemsJson:
-          map['itemsJson'] ??
-          '',
+      orderId: map['orderId'] ?? '000000',
+      service: map['service'] ?? 'Cuci Regular',
+      qty: map['qty'] ?? '1',
+      pickupTime: map['pickupTime'] ?? '-',
+      deliveryTime: map['deliveryTime'] ?? '-',
+      totalPrice: map['totalPrice'] ?? 'Rp 0',
+      address: map['address'] ?? '-',
+      itemsJson: map['itemsJson'] ?? '',
     );
   }
 
-  Map<
-    String,
-    dynamic
-  >
-  toMap() {
+  Map<String, dynamic> toMap() {
     return {
       'orderId': orderId,
       'service': service,
@@ -71,15 +45,9 @@ class OrderModel {
     };
   }
 
-  bool get isDummyOrder =>
-      orderId ==
-      '100001';
+  bool get isDummyOrder => orderId == '100001';
 
-  int get currentStep => isDummyOrder
-      ? 2
-      : 0;
+  int get currentStep => isDummyOrder ? 2 : 0;
 
-  String get badgeLabel => isDummyOrder
-      ? 'Dicuci'
-      : 'Diproses';
+  String get badgeLabel => isDummyOrder ? 'Dicuci' : 'Diproses';
 }

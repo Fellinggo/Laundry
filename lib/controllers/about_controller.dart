@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/about_model.dart';
 
-class AboutController
-    extends
-        ChangeNotifier {
+class AboutController extends ChangeNotifier {
   // Menyimpan data secara const agar hemat memori
   final AboutModel _aboutData = const AboutModel(
     paragraphs: [

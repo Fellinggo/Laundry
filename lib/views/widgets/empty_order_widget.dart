@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_text_styles.dart';
 
-class EmptyOrdersWidget
-    extends
-        StatelessWidget {
+class EmptyOrdersWidget extends StatelessWidget {
   final String message;
   final String subtitle;
 
@@ -15,14 +13,10 @@ class EmptyOrdersWidget
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 24,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -31,9 +25,7 @@ class EmptyOrdersWidget
               size: 72,
               color: AppColors.textMuted,
             ),
-            const SizedBox(
-              height: 16,
-            ),
+            const SizedBox(height: 16),
             Text(
               message,
               style: AppTextStyles.sectionTitle.copyWith(
@@ -41,9 +33,7 @@ class EmptyOrdersWidget
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(
-              height: 8,
-            ),
+            const SizedBox(height: 8),
             Text(
               subtitle,
               textAlign: TextAlign.center,

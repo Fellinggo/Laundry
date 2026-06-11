@@ -33,26 +33,27 @@ class _MainShellScreenState extends State<MainShellScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && !_hasInitialized) {
         final shellProvider = context.read<MainShellController>();
-        
+
         // Set tab awal
         if (shellProvider.currentIndex != widget.initialTabIndex) {
           shellProvider.changeTab(widget.initialTabIndex);
         }
-        
+
         // Refresh data jika diperlukan
         if (widget.refreshMyOrders) {
           shellProvider.refreshMyOrdersData();
-          
+
           // KOREKSI: Refresh notifikasi dari SharedPreferences
           try {
-            final notificationController = context.read<NotificationsController>();
+            final notificationController = context
+                .read<NotificationsController>();
             notificationController.loadNotifications();
             debugPrint('🔔 Notifications refreshed after order confirmation');
           } catch (e) {
             debugPrint('⚠️ Error refreshing notifications: $e');
           }
         }
-        
+
         _hasInitialized = true;
       }
     });
@@ -75,27 +76,26 @@ class _MainShellScreenState extends State<MainShellScreen> {
             key: shellProvider.homeScreenKey,
             loggedIn: isLoggedIn,
             userFirstName: userFirstName,
-            onOpenNotifications: () => shellProvider.handleNotificationTap(context),
+            onOpenNotifications: () =>
+                shellProvider.handleNotificationTap(context),
             onOpenServices: () => shellProvider.goToServicesTab(),
-            onOpenServiceDetail: (service) => shellProvider.handleServiceDetail(context, service),
+            onOpenServiceDetail: (service) =>
+                shellProvider.handleServiceDetail(context, service),
             onOpenDisc: () => shellProvider.goToOffersTab(),
           ),
-          MyOrdersScreen(
-            key: shellProvider.myOrdersKey,
-            loggedIn: isLoggedIn,
-          ),
+          MyOrdersScreen(key: shellProvider.myOrdersKey, loggedIn: isLoggedIn),
           ServicesScreen(
             loggedIn: isLoggedIn,
-            onOpenNotifications: () => shellProvider.handleNotificationTap(context),
+            onOpenNotifications: () =>
+                shellProvider.handleNotificationTap(context),
           ),
           OffersScreen(
             loggedIn: isLoggedIn,
-            onOpenNotifications: () => shellProvider.handleNotificationTap(context),
+            onOpenNotifications: () =>
+                shellProvider.handleNotificationTap(context),
             onOpenServices: () => shellProvider.goToServicesTab(),
           ),
-          ProfileScreen(
-            key: ValueKey(isLoggedIn),
-          ),
+          ProfileScreen(key: ValueKey(isLoggedIn)),
         ],
       ),
       bottomNavigationBar: AppBottomNavBar(

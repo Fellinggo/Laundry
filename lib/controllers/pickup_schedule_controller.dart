@@ -40,12 +40,16 @@ class PickupScheduleController extends ChangeNotifier {
     if (savedAddresses.isNotEmpty) {
       final Map<String, String> addresses = {};
       for (int i = 0; i < savedAddresses.length; i++) {
-        final title = i < savedTitles.length ? savedTitles[i] : 'Alamat ${i + 1}';
+        final title = i < savedTitles.length
+            ? savedTitles[i]
+            : 'Alamat ${i + 1}';
         addresses[title] = savedAddresses[i];
       }
       _data = _data.copyWith(
         addresses: addresses,
-        selectedAddressType: savedTitles.isNotEmpty ? savedTitles[0] : 'Alamat 1',
+        selectedAddressType: savedTitles.isNotEmpty
+            ? savedTitles[0]
+            : 'Alamat 1',
         isLoadingAddresses: false,
       );
     } else {
@@ -59,18 +63,12 @@ class PickupScheduleController extends ChangeNotifier {
   }
 
   void setPickupTime(TimeOfDay? time) {
-    _data = _data.copyWith(
-      pickupTime: time,
-      pickupError: false,
-    );
+    _data = _data.copyWith(pickupTime: time, pickupError: false);
     notifyListeners();
   }
 
   void setDeliveryTime(TimeOfDay? time) {
-    _data = _data.copyWith(
-      deliveryTime: time,
-      deliveryError: false,
-    );
+    _data = _data.copyWith(deliveryTime: time, deliveryError: false);
     notifyListeners();
   }
 
@@ -104,7 +102,7 @@ class PickupScheduleController extends ChangeNotifier {
     if (hasError) return;
 
     final addressController = context.read<AddressSelectorController>();
-    
+
     addressController.useCustomAddress();
     addressController.saveAddressIfNeeded();
 
@@ -113,9 +111,7 @@ class PickupScheduleController extends ChangeNotifier {
 
     if (!addressController.isAddressValid()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Silakan pilih alamat terlebih dahulu'),
-        ),
+        const SnackBar(content: Text('Silakan pilih alamat terlebih dahulu')),
       );
       return;
     }

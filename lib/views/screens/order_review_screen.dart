@@ -9,140 +9,93 @@ import '../widgets/order_review_service_summary.dart';
 import '../../../controllers/order_review_controller.dart';
 import '../../../models/order_review_model.dart';
 
-class OrderReviewScreen
-    extends
-        StatelessWidget {
-  const OrderReviewScreen({
-    super.key,
-  });
+class OrderReviewScreen extends StatelessWidget {
+  const OrderReviewScreen({super.key});
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     // Mengekstrak arguments dari rute navigasi
     final args =
-        ModalRoute.of(
-              context,
-            )?.settings.arguments
-            as Map<
-              String,
-              dynamic
-            >? ??
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>? ??
         {};
-    final reviewData = OrderReviewData.fromArguments(
-      args,
-    );
+    final reviewData = OrderReviewData.fromArguments(args);
 
-    return ChangeNotifierProvider<
-      OrderReviewController
-    >(
-      create:
-          (
-            _,
-          ) => OrderReviewController(
-            data: reviewData,
-          ),
-      child:
-          Consumer<
-            OrderReviewController
-          >(
-            builder:
-                (
-                  context,
-                  controller,
-                  child,
-                ) {
-                  final data = controller.orderData;
+    return ChangeNotifierProvider<OrderReviewController>(
+      create: (_) => OrderReviewController(data: reviewData),
+      child: Consumer<OrderReviewController>(
+        builder: (context, controller, child) {
+          final data = controller.orderData;
 
-                  return Scaffold(
-                    backgroundColor: AppColors.headerNavy,
-                    appBar: NavyBackAppBar(
-                      title: 'Tinjau Pesanan',
-                      onBack: () => controller.goBack(
-                        context,
-                      ),
+          return Scaffold(
+            backgroundColor: AppColors.headerNavy,
+            appBar: NavyBackAppBar(
+              title: 'Tinjau Pesanan',
+              onBack: () => controller.goBack(context),
+            ),
+            body: Column(
+              children: [
+                const SizedBox(height: 8),
+                Expanded(
+                  child: RoundedWhitePanel(
+                    topRadius: AppSpacing.sheetTopRadius,
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.xl,
+                      AppSpacing.xl,
+                      AppSpacing.xl,
+                      0,
                     ),
-                    body: Column(
+                    child: Column(
                       children: [
-                        const SizedBox(
-                          height: 8,
-                        ),
                         Expanded(
-                          child: RoundedWhitePanel(
-                            topRadius: AppSpacing.sheetTopRadius,
-                            padding: const EdgeInsets.fromLTRB(
-                              AppSpacing.xl,
-                              AppSpacing.xl,
-                              AppSpacing.xl,
-                              0,
-                            ),
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: ScrollConfiguration(
-                                    behavior: const _NoOverscrollBehavior(),
-                                    child: SingleChildScrollView(
-                                      physics: const ClampingScrollPhysics(),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Ringkasan Pesanan',
-                                            style: AppTextStyles.sectionTitle.copyWith(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            height: 12,
-                                          ),
-
-                                          // Ringkasan Layanan
-                                          OrderReviewServiceSummary(
-                                            data: data,
-                                            formatRupiah: controller.formatRupiah,
-                                          ),
-                                          const SizedBox(
-                                            height: 24,
-                                          ),
-
-                                          // Detail Pengiriman
-                                          _buildDeliveryDetail(
-                                            context,
-                                            data,
-                                            controller,
-                                          ),
-                                          const SizedBox(
-                                            height: 24,
-                                          ),
-
-                                          // Detail Pembayaran
-                                          _buildPaymentDetail(
-                                            data,
-                                            controller,
-                                          ),
-                                          const SizedBox(
-                                            height: 24,
-                                          ),
-                                        ],
-                                      ),
+                          child: ScrollConfiguration(
+                            behavior: const _NoOverscrollBehavior(),
+                            child: SingleChildScrollView(
+                              physics: const ClampingScrollPhysics(),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Ringkasan Pesanan',
+                                    style: AppTextStyles.sectionTitle.copyWith(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                ),
-                                _buildBottomButton(
-                                  context,
-                                  controller,
-                                ),
-                              ],
+                                  const SizedBox(height: 12),
+
+                                  // Ringkasan Layanan
+                                  OrderReviewServiceSummary(
+                                    data: data,
+                                    formatRupiah: controller.formatRupiah,
+                                  ),
+                                  const SizedBox(height: 24),
+
+                                  // Detail Pengiriman
+                                  _buildDeliveryDetail(
+                                    context,
+                                    data,
+                                    controller,
+                                  ),
+                                  const SizedBox(height: 24),
+
+                                  // Detail Pembayaran
+                                  _buildPaymentDetail(data, controller),
+                                  const SizedBox(height: 24),
+                                ],
+                              ),
                             ),
                           ),
                         ),
+                        _buildBottomButton(context, controller),
                       ],
                     ),
-                  );
-                },
-          ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -164,62 +117,32 @@ class OrderReviewScreen
                 fontWeight: FontWeight.w600,
               ),
             ),
-            _buildEditButton(
-              () => controller.editDelivery(
-                context,
-              ),
-            ),
+            _buildEditButton(() => controller.editDelivery(context)),
           ],
         ),
-        const SizedBox(
-          height: 12,
-        ),
+        const SizedBox(height: 12),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(
-            16,
-          ),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: AppColors.inputFill,
-            borderRadius: BorderRadius.circular(
-              12,
-            ),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildInfoRow(
-                'Waktu Pengambilan',
-                data.pickupTime,
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              _buildInfoRow(
-                'Waktu Pengiriman',
-                data.deliveryTime,
-              ),
-              const SizedBox(
-                height: 12,
-              ),
+              _buildInfoRow('Waktu Pengambilan', data.pickupTime),
+              const SizedBox(height: 12),
+              _buildInfoRow('Waktu Pengiriman', data.deliveryTime),
+              const SizedBox(height: 12),
               const Divider(),
-              const SizedBox(
-                height: 8,
-              ),
+              const SizedBox(height: 8),
               Text(
                 'Alamat Pengiriman',
-                style: AppTextStyles.body.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
               ),
-              const SizedBox(
-                height: 8,
-              ),
-              Text(
-                data.address,
-                style: AppTextStyles.body,
-                softWrap: true,
-              ),
+              const SizedBox(height: 8),
+              Text(data.address, style: AppTextStyles.body, softWrap: true),
             ],
           ),
         ),
@@ -241,44 +164,28 @@ class OrderReviewScreen
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(
-          height: 12,
-        ),
+        const SizedBox(height: 12),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(
-            16,
-          ),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: AppColors.inputFill,
-            borderRadius: BorderRadius.circular(
-              12,
-            ),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
             children: [
               _buildInfoRow(
                 'Total Pesanan',
-                controller.formatRupiah(
-                  data.serviceFee,
-                ),
+                controller.formatRupiah(data.serviceFee),
               ),
-              const SizedBox(
-                height: 12,
-              ),
+              const SizedBox(height: 12),
               _buildInfoRow(
                 'Biaya Pengiriman',
-                controller.formatRupiah(
-                  data.deliveryFee,
-                ),
+                controller.formatRupiah(data.deliveryFee),
               ),
-              const SizedBox(
-                height: 12,
-              ),
+              const SizedBox(height: 12),
               const Divider(),
-              const SizedBox(
-                height: 8,
-              ),
+              const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -289,9 +196,7 @@ class OrderReviewScreen
                     ),
                   ),
                   Text(
-                    controller.formatRupiah(
-                      data.totalPayment,
-                    ),
+                    controller.formatRupiah(data.totalPayment),
                     style: AppTextStyles.body.copyWith(
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryNavy,
@@ -307,48 +212,30 @@ class OrderReviewScreen
     );
   }
 
-  Widget _buildInfoRow(
-    String label,
-    String value,
-  ) {
+  Widget _buildInfoRow(String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: AppTextStyles.body,
-        ),
+        Text(label, style: AppTextStyles.body),
         Text(
           value,
-          style: AppTextStyles.body.copyWith(
-            fontWeight: FontWeight.w500,
-          ),
+          style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500),
           textAlign: TextAlign.right,
         ),
       ],
     );
   }
 
-  Widget _buildEditButton(
-    VoidCallback onTap,
-  ) {
+  Widget _buildEditButton(VoidCallback onTap) {
     return TextButton.icon(
       onPressed: onTap,
-      icon: const Icon(
-        Icons.edit_outlined,
-        size: 16,
-      ),
+      icon: const Icon(Icons.edit_outlined, size: 16),
       label: Text(
         'Edit',
-        style: AppTextStyles.bodyMuted.copyWith(
-          color: AppColors.actionBlue,
-        ),
+        style: AppTextStyles.bodyMuted.copyWith(color: AppColors.actionBlue),
       ),
       style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 8,
-          vertical: 4,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         minimumSize: Size.zero,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
@@ -360,21 +247,14 @@ class OrderReviewScreen
     OrderReviewController controller,
   ) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        vertical: AppSpacing.md,
-      ),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
-              0.05,
-            ),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
-            offset: const Offset(
-              0,
-              -2,
-            ),
+            offset: const Offset(0, -2),
           ),
         ],
       ),
@@ -386,16 +266,12 @@ class OrderReviewScreen
             backgroundColor: AppColors.headerNavy,
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                AppSpacing.buttonRadius,
-              ),
+              borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
             ),
           ),
           onPressed: controller.isProcessing
               ? null
-              : () => controller.processPayment(
-                  context,
-                ),
+              : () => controller.processPayment(context),
           child: controller.isProcessing
               ? const SizedBox(
                   height: 20,
@@ -418,9 +294,7 @@ class OrderReviewScreen
   }
 }
 
-class _NoOverscrollBehavior
-    extends
-        ScrollBehavior {
+class _NoOverscrollBehavior extends ScrollBehavior {
   const _NoOverscrollBehavior();
 
   @override
@@ -433,9 +307,7 @@ class _NoOverscrollBehavior
   }
 
   @override
-  ScrollPhysics getScrollPhysics(
-    BuildContext context,
-  ) {
+  ScrollPhysics getScrollPhysics(BuildContext context) {
     return const ClampingScrollPhysics();
   }
 }

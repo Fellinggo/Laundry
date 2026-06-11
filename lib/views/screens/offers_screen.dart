@@ -8,9 +8,7 @@ import '../widgets/navy_app_bar.dart';
 import '../widgets/promo_card_widget.dart';
 import '../../models/offer_model.dart';
 
-class OffersScreen
-    extends
-        StatelessWidget {
+class OffersScreen extends StatelessWidget {
   const OffersScreen({
     super.key,
     this.onOpenNotifications,
@@ -23,25 +21,14 @@ class OffersScreen
   final VoidCallback? onOpenServices;
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     // Mengakses OffersController secara reaktif melalui Provider
-    final controller = context
-        .watch<
-          OffersController
-        >();
+    final controller = context.watch<OffersController>();
 
     // Menjaga sinkronisasi state login jika terjadi pembaruan dari MainShell
-    WidgetsBinding.instance.addPostFrameCallback(
-      (
-        _,
-      ) {
-        controller.updateLoginStatus(
-          loggedIn,
-        );
-      },
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.updateLoginStatus(loggedIn);
+    });
 
     final newUserOffers = controller.getNewUserOffers();
     final specialOffers = controller.getSpecialOffers();
@@ -54,13 +41,9 @@ class OffersScreen
             title: 'Tawaranku',
             actions: [
               Padding(
-                padding: const EdgeInsets.only(
-                  right: 20,
-                ),
+                padding: const EdgeInsets.only(right: 20),
                 child: GestureDetector(
-                  onTap: () => controller.handleNotificationTap(
-                    context,
-                  ),
+                  onTap: () => controller.handleNotificationTap(context),
                   child: const Icon(
                     Icons.notifications_none_rounded,
                     color: Colors.white,
@@ -72,16 +55,10 @@ class OffersScreen
           ),
           Expanded(
             child: Container(
-              margin: const EdgeInsets.only(
-                top: 12,
-              ),
+              margin: const EdgeInsets.only(top: 12),
               decoration: const BoxDecoration(
                 color: AppColors.white,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(
-                    28,
-                  ),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: SingleChildScrollView(
                 physics: const ClampingScrollPhysics(),
@@ -100,23 +77,15 @@ class OffersScreen
                         newUserOffers.first.category.displayTitle,
                         style: AppTextStyles.sectionTitle,
                       ),
-                      const SizedBox(
-                        height: AppSpacing.md,
-                      ),
+                      const SizedBox(height: AppSpacing.md),
                       ...newUserOffers.map(
-                        (
-                          offer,
-                        ) => PromoCardWidget(
+                        (offer) => PromoCardWidget(
                           imagePath: offer.imagePath,
-                          onTap: () => controller.handlePromoCardTap(
-                            context,
-                            offer,
-                          ),
+                          onTap: () =>
+                              controller.handlePromoCardTap(context, offer),
                         ),
                       ),
-                      const SizedBox(
-                        height: AppSpacing.xl,
-                      ),
+                      const SizedBox(height: AppSpacing.xl),
                     ],
 
                     // Special Offers Section
@@ -125,18 +94,12 @@ class OffersScreen
                         specialOffers.first.category.displayTitle,
                         style: AppTextStyles.sectionTitle,
                       ),
-                      const SizedBox(
-                        height: AppSpacing.md,
-                      ),
+                      const SizedBox(height: AppSpacing.md),
                       ...specialOffers.map(
-                        (
-                          offer,
-                        ) => PromoCardWidget(
+                        (offer) => PromoCardWidget(
                           imagePath: offer.imagePath,
-                          onTap: () => controller.handlePromoCardTap(
-                            context,
-                            offer,
-                          ),
+                          onTap: () =>
+                              controller.handlePromoCardTap(context, offer),
                         ),
                       ),
                     ],

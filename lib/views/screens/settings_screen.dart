@@ -9,77 +9,43 @@ import '../../constants/app_text_styles.dart';
 import '../widgets/navy_app_bar.dart';
 import '../widgets/rounded_white_panel.dart';
 
-class SettingsScreen
-    extends
-        StatelessWidget {
-  const SettingsScreen({
-    super.key,
-  });
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    return ChangeNotifierProvider<
-      SettingsController
-    >(
-      create:
-          (
-            _,
-          ) => SettingsController(),
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<SettingsController>(
+      create: (_) => SettingsController(),
       child: const _SettingsContent(),
     );
   }
 }
 
-class _SettingsContent
-    extends
-        StatelessWidget {
+class _SettingsContent extends StatelessWidget {
   const _SettingsContent();
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final controller = context
-        .read<
-          SettingsController
-        >();
+  Widget build(BuildContext context) {
+    final controller = context.read<SettingsController>();
 
     // Menyeleksi variabel secara atomik menggunakan context.select untuk efisiensi render tingkat tinggi
-    final isLoggedIn =
-        context.select<
-          SettingsController,
-          bool
-        >(
-          (
-            c,
-          ) => c.isLoggedIn,
-        );
-    final currentLanguageName =
-        context.select<
-          SettingsController,
-          String
-        >(
-          (
-            c,
-          ) => c.languageOptions[c.selectedLanguage].name,
-        );
+    final isLoggedIn = context.select<SettingsController, bool>(
+      (c) => c.isLoggedIn,
+    );
+    final currentLanguageName = context.select<SettingsController, String>(
+      (c) => c.languageOptions[c.selectedLanguage].name,
+    );
 
     return Scaffold(
       backgroundColor: AppColors.profileNavy,
       appBar: NavyBackAppBar(
         title: 'Pengaturan',
-        onBack: () => controller.goBack(
-          context,
-        ),
+        onBack: () => controller.goBack(context),
       ),
       body: RoundedWhitePanel(
         topRadius: 28,
         child: ListView(
-          padding: const EdgeInsets.all(
-            AppSpacing.xl,
-          ),
+          padding: const EdgeInsets.all(AppSpacing.xl),
           children: [
             Text(
               'Umum',
@@ -87,61 +53,43 @@ class _SettingsContent
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(
-              height: 8,
-            ),
+            const SizedBox(height: 8),
             SettingsTileWidget(
               icon: Icons.language,
               title: 'Bahasa',
               trailing: currentLanguageName,
-              onTap: () => controller.showLanguageSheet(
-                context,
-              ),
+              onTap: () => controller.showLanguageSheet(context),
             ),
-            const SizedBox(
-              height: AppSpacing.xl,
-            ),
+            const SizedBox(height: AppSpacing.xl),
             Text(
               'Lainnya',
               style: AppTextStyles.caption.copyWith(
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(
-              height: 8,
-            ),
+            const SizedBox(height: 8),
             SettingsTileWidget(
               icon: Icons.privacy_tip_outlined,
               title: 'Kebijakan Privasi',
-              onTap: () => controller.navigateToPrivacy(
-                context,
-              ),
+              onTap: () => controller.navigateToPrivacy(context),
             ),
             SettingsTileWidget(
               icon: Icons.help_outline,
               title: 'Bantuan',
-              onTap: () => controller.navigateToHelp(
-                context,
-              ),
+              onTap: () => controller.navigateToHelp(context),
             ),
             SettingsTileWidget(
               icon: Icons.article_outlined,
               title: 'Syarat dan Ketentuan',
-              onTap: () => controller.navigateToTerms(
-                context,
-              ),
+              onTap: () => controller.navigateToTerms(context),
             ),
             SettingsTileWidget(
               icon: Icons.info_outline,
               title: 'Tentang',
-              onTap: () => controller.navigateToAbout(
-                context,
-              ),
+              onTap: () => controller.navigateToAbout(context),
             ),
             if (isLoggedIn) ...[
-              const SizedBox(
-                height: AppSpacing.xl,
-              ),
+              const SizedBox(height: AppSpacing.xl),
               Text(
                 'Tindakan Berbahaya',
                 style: AppTextStyles.caption.copyWith(
@@ -149,9 +97,7 @@ class _SettingsContent
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(
-                height: 8,
-              ),
+              const SizedBox(height: 8),
               SettingsTileWidget(
                 icon: Icons.person_off_outlined,
                 title: 'Hapus Akun',

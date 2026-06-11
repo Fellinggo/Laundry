@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-class PromoCardWidget
-    extends
-        StatelessWidget {
+class PromoCardWidget extends StatelessWidget {
   final String imagePath;
   final VoidCallback onTap;
 
@@ -13,19 +11,13 @@ class PromoCardWidget
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(
-          bottom: 12,
-        ),
+        margin: const EdgeInsets.only(bottom: 12),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(
-            20,
-          ),
+          borderRadius: BorderRadius.circular(20),
           child: Image.asset(
             imagePath,
             fit: BoxFit.contain,

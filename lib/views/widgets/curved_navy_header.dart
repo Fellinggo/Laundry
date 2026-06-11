@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
 
-class CurvedNavyHeader
-    extends
-        StatelessWidget {
+class CurvedNavyHeader extends StatelessWidget {
   const CurvedNavyHeader({
     super.key,
     required this.subtitle,
@@ -15,14 +13,8 @@ class CurvedNavyHeader
   final double heightFraction;
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final height =
-        MediaQuery.of(
-          context,
-        ).size.height *
-        heightFraction;
+  Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height * heightFraction;
 
     return SizedBox(
       height: height,
@@ -42,11 +34,7 @@ class CurvedNavyHeader
               height: 75,
               decoration: const BoxDecoration(
                 color: AppColors.pageBg,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(
-                    40,
-                  ),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
               ),
             ),
           ),
@@ -60,15 +48,11 @@ class CurvedNavyHeader
                   height: 100,
                   fit: BoxFit.contain,
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
+                const SizedBox(height: 15),
                 Text(
                   subtitle,
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.body.copyWith(
-                    color: Colors.white,
-                  ),
+                  style: AppTextStyles.body.copyWith(color: Colors.white),
                 ),
               ],
             ),

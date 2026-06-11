@@ -18,43 +18,22 @@ class SplashModel {
     return SplashModel(
       splashDurationInSeconds: 2,
       logoAssetPath: 'assets/images/logo.png',
-      backgroundColor: const Color(
-        0xFFF6F7FF,
-      ),
+      backgroundColor: const Color(0xFFF6F7FF),
       redirectRoute: '/onboarding',
     );
   }
 
   // Untuk kemudahan jika nanti ingin konfigurasi dari file/config
-  factory SplashModel.fromJson(
-    Map<
-      String,
-      dynamic
-    >
-    json,
-  ) {
+  factory SplashModel.fromJson(Map<String, dynamic> json) {
     return SplashModel(
-      splashDurationInSeconds:
-          json['splashDurationInSeconds'] ??
-          2,
-      logoAssetPath:
-          json['logoAssetPath'] ??
-          'assets/images/logo.png',
-      backgroundColor: Color(
-        json['backgroundColor'] ??
-            0xFFF6F7FF,
-      ),
-      redirectRoute:
-          json['redirectRoute'] ??
-          '/onboarding',
+      splashDurationInSeconds: json['splashDurationInSeconds'] ?? 2,
+      logoAssetPath: json['logoAssetPath'] ?? 'assets/images/logo.png',
+      backgroundColor: Color(json['backgroundColor'] ?? 0xFFF6F7FF),
+      redirectRoute: json['redirectRoute'] ?? '/onboarding',
     );
   }
 
-  Map<
-    String,
-    dynamic
-  >
-  toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'splashDurationInSeconds': splashDurationInSeconds,
       'logoAssetPath': logoAssetPath,

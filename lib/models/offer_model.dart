@@ -38,10 +38,7 @@ class OfferModel {
     );
   }
 
-  static List<
-    OfferModel
-  >
-  getDefaultOffers() {
+  static List<OfferModel> getDefaultOffers() {
     return [
       OfferModel.newUserOffer(),
       OfferModel.specialOffer(
@@ -60,14 +57,9 @@ class OfferModel {
   }
 }
 
-enum OfferCategory {
-  newUser,
-  special,
-}
+enum OfferCategory { newUser, special }
 
-extension OfferCategoryExtension
-    on
-        OfferCategory {
+extension OfferCategoryExtension on OfferCategory {
   String get displayTitle {
     switch (this) {
       case OfferCategory.newUser:

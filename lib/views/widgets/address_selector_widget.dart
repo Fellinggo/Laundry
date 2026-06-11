@@ -15,10 +15,7 @@ class AddressSelector extends StatelessWidget {
         if (controller.isLoadingAddresses) {
           return Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 14,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
             decoration: BoxDecoration(
               color: AppColors.inputFill,
               borderRadius: BorderRadius.circular(14),
@@ -59,18 +56,11 @@ class AddressSelector extends StatelessWidget {
           const Center(
             child: Column(
               children: [
-                Icon(
-                  Icons.location_off_outlined,
-                  color: Colors.grey,
-                  size: 40,
-                ),
+                Icon(Icons.location_off_outlined, color: Colors.grey, size: 40),
                 SizedBox(height: 8),
                 Text(
                   'Belum ada alamat tersimpan',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
                 ),
               ],
             ),
@@ -82,10 +72,7 @@ class AddressSelector extends StatelessWidget {
             style: AppTextStyles.body,
             decoration: InputDecoration(
               hintText: 'Masukkan alamat lengkap...',
-              hintStyle: TextStyle(
-                color: Colors.grey.shade400,
-                fontSize: 13,
-              ),
+              hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
               filled: true,
               fillColor: Colors.white,
               border: OutlineInputBorder(
@@ -116,21 +103,18 @@ class AddressSelector extends StatelessWidget {
                   value: controller.saveToProfile,
                   onChanged: (_) => controller.toggleSaveToProfile(),
                   checkColor: Colors.white,
-                  fillColor: WidgetStateProperty.resolveWith<Color>(
-                    (Set<WidgetState> states) {
-                      if (states.contains(WidgetState.selected)) {
-                        return AppColors.primaryNavy;
-                      }
-                      return Colors.white;
-                    },
-                  ),
+                  fillColor: WidgetStateProperty.resolveWith<Color>((
+                    Set<WidgetState> states,
+                  ) {
+                    if (states.contains(WidgetState.selected)) {
+                      return AppColors.primaryNavy;
+                    }
+                    return Colors.white;
+                  }),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  side: BorderSide(
-                    color: Colors.grey.shade400,
-                    width: 1.5,
-                  ),
+                  side: BorderSide(color: Colors.grey.shade400, width: 1.5),
                 ),
               ),
               const SizedBox(width: 8),
@@ -155,10 +139,7 @@ class AddressSelector extends StatelessWidget {
           onTap: () => controller.toggleAddressOptions(),
           child: Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 14,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
             decoration: BoxDecoration(
               color: AppColors.inputFill,
               borderRadius: BorderRadius.circular(14),
@@ -211,10 +192,7 @@ class AddressSelector extends StatelessWidget {
             style: AppTextStyles.body,
             decoration: InputDecoration(
               hintText: 'Atau masukkan alamat lain...',
-              hintStyle: TextStyle(
-                color: Colors.grey.shade400,
-                fontSize: 13,
-              ),
+              hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
               filled: true,
               fillColor: Colors.white,
               border: OutlineInputBorder(
@@ -246,21 +224,18 @@ class AddressSelector extends StatelessWidget {
                   value: controller.saveToProfile,
                   onChanged: (_) => controller.toggleSaveToProfile(),
                   checkColor: Colors.white,
-                  fillColor: WidgetStateProperty.resolveWith<Color>(
-                    (Set<WidgetState> states) {
-                      if (states.contains(WidgetState.selected)) {
-                        return AppColors.primaryNavy;
-                      }
-                      return Colors.white;
-                    },
-                  ),
+                  fillColor: WidgetStateProperty.resolveWith<Color>((
+                    Set<WidgetState> states,
+                  ) {
+                    if (states.contains(WidgetState.selected)) {
+                      return AppColors.primaryNavy;
+                    }
+                    return Colors.white;
+                  }),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  side: BorderSide(
-                    color: Colors.grey.shade400,
-                    width: 1.5,
-                  ),
+                  side: BorderSide(color: Colors.grey.shade400, width: 1.5),
                 ),
               ),
               const SizedBox(width: 8),

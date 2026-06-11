@@ -19,9 +19,7 @@ class ServiceModel {
   });
 
   // Factory untuk konversi dari dummy data ke model
-  factory ServiceModel.fromDummy(
-    dynamic dummyService,
-  ) {
+  factory ServiceModel.fromDummy(dynamic dummyService) {
     return ServiceModel(
       title: dummyService.title,
       price: dummyService.price,
@@ -32,11 +30,7 @@ class ServiceModel {
     );
   }
 
-  Map<
-    String,
-    dynamic
-  >
-  toMap() {
+  Map<String, dynamic> toMap() {
     return {
       'title': title,
       'price': price,

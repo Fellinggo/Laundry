@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_colors.dart';
 
-class AddressCardWidget
-    extends
-        StatelessWidget {
+class AddressCardWidget extends StatelessWidget {
   final int index;
   final String title;
   final String address;
@@ -20,46 +18,29 @@ class AddressCardWidget
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(
-        12,
-      ),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(
-          14,
-        ),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.location_on_outlined,
-            color: AppColors.actionBlue,
-          ),
-          const SizedBox(
-            width: 10,
-          ),
+          const Icon(Icons.location_on_outlined, color: AppColors.actionBlue),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
-                const SizedBox(
-                  height: 4,
-                ),
+                const SizedBox(height: 4),
                 Text(
                   address,
-                  style: const TextStyle(
-                    fontSize: 13,
-                  ),
+                  style: const TextStyle(fontSize: 13),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -68,14 +49,9 @@ class AddressCardWidget
           ),
           GestureDetector(
             onTap: onEdit,
-            child: const Icon(
-              Icons.edit_outlined,
-              size: 18,
-            ),
+            child: const Icon(Icons.edit_outlined, size: 18),
           ),
-          const SizedBox(
-            width: 10,
-          ),
+          const SizedBox(width: 10),
           GestureDetector(
             onTap: onDelete,
             child: const Icon(

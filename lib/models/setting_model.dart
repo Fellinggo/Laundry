@@ -1,10 +1,7 @@
 class SettingsModel {
   final bool isLoggedIn;
   final int selectedLanguageIndex;
-  final List<
-    LanguageOption
-  >
-  languageOptions;
+  final List<LanguageOption> languageOptions;
 
   SettingsModel({
     required this.isLoggedIn,
@@ -23,21 +20,13 @@ class SettingsModel {
   SettingsModel copyWith({
     bool? isLoggedIn,
     int? selectedLanguageIndex,
-    List<
-      LanguageOption
-    >?
-    languageOptions,
+    List<LanguageOption>? languageOptions,
   }) {
     return SettingsModel(
-      isLoggedIn:
-          isLoggedIn ??
-          this.isLoggedIn,
+      isLoggedIn: isLoggedIn ?? this.isLoggedIn,
       selectedLanguageIndex:
-          selectedLanguageIndex ??
-          this.selectedLanguageIndex,
-      languageOptions:
-          languageOptions ??
-          this.languageOptions,
+          selectedLanguageIndex ?? this.selectedLanguageIndex,
+      languageOptions: languageOptions ?? this.languageOptions,
     );
   }
 }
@@ -53,15 +42,9 @@ class LanguageOption {
     this.comingSoonText,
   });
 
-  static List<
-    LanguageOption
-  >
-  getDefaultOptions() {
+  static List<LanguageOption> getDefaultOptions() {
     return [
-      LanguageOption(
-        name: 'Indonesia',
-        isAvailable: true,
-      ),
+      LanguageOption(name: 'Indonesia', isAvailable: true),
       LanguageOption(
         name: 'English',
         isAvailable: false,

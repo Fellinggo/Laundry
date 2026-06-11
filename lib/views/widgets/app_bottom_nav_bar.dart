@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
 
-class AppBottomNavBar
-    extends
-        StatelessWidget {
+class AppBottomNavBar extends StatelessWidget {
   const AppBottomNavBar({
     super.key,
     required this.currentIndex,
@@ -13,29 +11,18 @@ class AppBottomNavBar
   });
 
   final int currentIndex;
-  final ValueChanged<
-    int
-  >
-  onTap;
+  final ValueChanged<int> onTap;
   final BottomNavVariant variant;
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final bg =
-        variant ==
-            BottomNavVariant.navy
+  Widget build(BuildContext context) {
+    final bg = variant == BottomNavVariant.navy
         ? AppColors.headerNavyAlt
         : AppColors.white;
-    final active =
-        variant ==
-            BottomNavVariant.navy
+    final active = variant == BottomNavVariant.navy
         ? AppColors.skyTab
         : AppColors.actionBlue;
-    final inactive =
-        variant ==
-            BottomNavVariant.navy
+    final inactive = variant == BottomNavVariant.navy
         ? Colors.white54
         : AppColors.textMuted;
 
@@ -43,17 +30,11 @@ class AppBottomNavBar
       decoration: BoxDecoration(
         color: bg,
         boxShadow: [
-          if (variant ==
-              BottomNavVariant.white)
+          if (variant == BottomNavVariant.white)
             BoxShadow(
-              color: Colors.black.withOpacity(
-                0.08,
-              ),
+              color: Colors.black.withOpacity(0.08),
               blurRadius: 16,
-              offset: const Offset(
-                0,
-                -4,
-              ),
+              offset: const Offset(0, -4),
             ),
         ],
       ),
@@ -66,62 +47,42 @@ class AppBottomNavBar
             alignment: Alignment.bottomCenter,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _NavItem(
                       icon: Icons.home_rounded,
                       label: 'Home',
-                      selected:
-                          currentIndex ==
-                          0,
+                      selected: currentIndex == 0,
                       activeColor: active,
                       inactiveColor: inactive,
-                      onTap: () => onTap(
-                        0,
-                      ),
+                      onTap: () => onTap(0),
                     ),
                     _NavItem(
                       icon: Icons.receipt_long_outlined,
                       label: 'Order',
-                      selected:
-                          currentIndex ==
-                          1,
+                      selected: currentIndex == 1,
                       activeColor: active,
                       inactiveColor: inactive,
-                      onTap: () => onTap(
-                        1,
-                      ),
+                      onTap: () => onTap(1),
                     ),
-                    const SizedBox(
-                      width: 45,
-                    ),
+                    const SizedBox(width: 45),
                     _NavItem(
                       icon: Icons.percent_rounded,
                       label: 'Diskon',
-                      selected:
-                          currentIndex ==
-                          3,
+                      selected: currentIndex == 3,
                       activeColor: active,
                       inactiveColor: inactive,
-                      onTap: () => onTap(
-                        3,
-                      ),
+                      onTap: () => onTap(3),
                     ),
                     _NavItem(
                       icon: Icons.person_outline_rounded,
                       label: 'Profile',
-                      selected:
-                          currentIndex ==
-                          4,
+                      selected: currentIndex == 4,
                       activeColor: active,
                       inactiveColor: inactive,
-                      onTap: () => onTap(
-                        4,
-                      ),
+                      onTap: () => onTap(4),
                     ),
                   ],
                 ),
@@ -130,9 +91,7 @@ class AppBottomNavBar
               Positioned(
                 top: -10,
                 child: GestureDetector(
-                  onTap: () => onTap(
-                    2,
-                  ),
+                  onTap: () => onTap(2),
                   child: Container(
                     width: 64,
                     height: 64,
@@ -141,14 +100,9 @@ class AppBottomNavBar
                       color: AppColors.headerNavy,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(
-                            0.2,
-                          ),
+                          color: Colors.black.withOpacity(0.2),
                           blurRadius: 12,
-                          offset: const Offset(
-                            0,
-                            6,
-                          ),
+                          offset: const Offset(0, 6),
                         ),
                       ],
                     ),
@@ -170,14 +124,9 @@ class AppBottomNavBar
   }
 }
 
-enum BottomNavVariant {
-  white,
-  navy,
-}
+enum BottomNavVariant { white, navy }
 
-class _NavItem
-    extends
-        StatelessWidget {
+class _NavItem extends StatelessWidget {
   const _NavItem({
     required this.icon,
     required this.label,
@@ -195,38 +144,23 @@ class _NavItem
   final VoidCallback onTap;
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final color = selected
-        ? activeColor
-        : inactiveColor;
+  Widget build(BuildContext context) {
+    final color = selected ? activeColor : inactiveColor;
 
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: 8,
-          horizontal: 4,
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              color: color,
-              size: 24,
-            ),
-            const SizedBox(
-              height: 2,
-            ),
+            Icon(icon, color: color, size: 24),
+            const SizedBox(height: 2),
             Text(
               label,
               style: AppTextStyles.caption.copyWith(
                 color: color,
-                fontWeight: selected
-                    ? FontWeight.w600
-                    : FontWeight.w500,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                 fontSize: 11,
               ),
             ),

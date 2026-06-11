@@ -3,33 +3,16 @@ import 'package:wushlaundry/views/widgets/login_modal_sheet.dart';
 import '../models/service_model.dart';
 import '../../data/service_dummy.dart';
 
-class ServicesController
-    extends
-        ChangeNotifier {
+class ServicesController extends ChangeNotifier {
   bool _loggedIn;
   VoidCallback? _onOpenNotifications;
 
-  List<
-    ServiceModel
-  >
-  _allServices = [];
-  List<
-    ServiceModel
-  >
-  _gridServices = [];
-  List<
-    ServiceModel
-  >
-  _wideServices = [];
+  List<ServiceModel> _allServices = [];
+  List<ServiceModel> _gridServices = [];
+  List<ServiceModel> _wideServices = [];
 
-  List<
-    ServiceModel
-  >
-  get gridServices => _gridServices;
-  List<
-    ServiceModel
-  >
-  get wideServices => _wideServices;
+  List<ServiceModel> get gridServices => _gridServices;
+  List<ServiceModel> get wideServices => _wideServices;
   bool get isLoggedIn => _loggedIn;
 
   ServicesController({
@@ -46,13 +29,11 @@ class ServicesController
     VoidCallback? onOpenNotifications,
   }) {
     bool hasChanged = false;
-    if (_loggedIn !=
-        loggedIn) {
+    if (_loggedIn != loggedIn) {
       _loggedIn = loggedIn;
       hasChanged = true;
     }
-    if (_onOpenNotifications !=
-        onOpenNotifications) {
+    if (_onOpenNotifications != onOpenNotifications) {
       _onOpenNotifications = onOpenNotifications;
       hasChanged = true;
     }
@@ -64,75 +45,41 @@ class ServicesController
 
   void _loadServices() {
     _allServices = serviceDummy
-        .map(
-          (
-            service,
-          ) => ServiceModel.fromDummy(
-            service,
-          ),
-        )
+        .map((service) => ServiceModel.fromDummy(service))
         .toList();
 
-    _gridServices = _allServices
-        .where(
-          (
-            service,
-          ) => !service.isWide,
-        )
-        .toList();
+    _gridServices = _allServices.where((service) => !service.isWide).toList();
 
-    _wideServices = _allServices
-        .where(
-          (
-            service,
-          ) => service.isWide,
-        )
-        .toList();
+    _wideServices = _allServices.where((service) => service.isWide).toList();
 
     notifyListeners();
   }
 
-  void handleServiceTap(
-    BuildContext context,
-    String serviceTitle,
-  ) {
+  void handleServiceTap(BuildContext context, String serviceTitle) {
     if (!_loggedIn) {
-      showLoginModal(
-        context,
-      );
+      showLoginModal(context);
       return;
     }
 
     Navigator.pushNamed(
       context,
       '/service-detail',
-      arguments: {
-        'title': serviceTitle,
-      },
+      arguments: {'title': serviceTitle},
     );
   }
 
-  void handleNotificationTap(
-    BuildContext context,
-  ) {
+  void handleNotificationTap(BuildContext context) {
     if (!_loggedIn) {
-      showLoginModal(
-        context,
-      );
+      showLoginModal(context);
       return;
     }
 
     _onOpenNotifications?.call();
   }
 
-  void handleProtectedAction(
-    BuildContext context,
-    VoidCallback action,
-  ) {
+  void handleProtectedAction(BuildContext context, VoidCallback action) {
     if (!_loggedIn) {
-      showLoginModal(
-        context,
-      );
+      showLoginModal(context);
       return;
     }
     action();

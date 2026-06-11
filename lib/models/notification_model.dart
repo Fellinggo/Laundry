@@ -22,9 +22,7 @@ class NotificationModel {
     required this.createdAt,
   });
 
-  factory NotificationModel.system({
-    required String subtitle,
-  }) {
+  factory NotificationModel.system({required String subtitle}) {
     return NotificationModel(
       id: 'system_${DateTime.now().millisecondsSinceEpoch}',
       title: 'Sistem',
@@ -37,9 +35,7 @@ class NotificationModel {
     );
   }
 
-  factory NotificationModel.order({
-    required String subtitle,
-  }) {
+  factory NotificationModel.order({required String subtitle}) {
     return NotificationModel(
       id: 'order_${DateTime.now().millisecondsSinceEpoch}',
       title: 'Pesanan',
@@ -52,23 +48,14 @@ class NotificationModel {
     );
   }
 
-  factory NotificationModel.fromString(
-    String message,
-    NotificationType type,
-  ) {
+  factory NotificationModel.fromString(String message, NotificationType type) {
     return NotificationModel(
       id: '${type.name}_${DateTime.now().millisecondsSinceEpoch}',
-      title:
-          type ==
-              NotificationType.system
-          ? 'Sistem'
-          : 'Pesanan',
+      title: type == NotificationType.system ? 'Sistem' : 'Pesanan',
       subtitle: message,
       dateLabel: 'Baru saja',
       type: type,
-      icon:
-          type ==
-              NotificationType.system
+      icon: type == NotificationType.system
           ? Icons.settings_outlined
           : Icons.local_laundry_service,
       iconColor: AppColors.skyTab,
@@ -76,11 +63,7 @@ class NotificationModel {
     );
   }
 
-  Map<
-    String,
-    dynamic
-  >
-  toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'title': title,
@@ -94,10 +77,7 @@ class NotificationModel {
   }
 }
 
-enum NotificationType {
-  system,
-  order,
-}
+enum NotificationType { system, order }
 
 class NotificationFilter {
   static const int all = 0;

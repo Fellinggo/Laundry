@@ -1,25 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_text_styles.dart';
 
-class ServiceSectionHeader
-    extends
-        StatelessWidget {
+class ServiceSectionHeader extends StatelessWidget {
   final String title;
 
-  const ServiceSectionHeader({
-    super.key,
-    required this.title,
-  });
+  const ServiceSectionHeader({super.key, required this.title});
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Text(
       title,
-      style: AppTextStyles.sectionTitle.copyWith(
-        fontSize: 16,
-      ),
+      style: AppTextStyles.sectionTitle.copyWith(fontSize: 16),
     );
   }
 }

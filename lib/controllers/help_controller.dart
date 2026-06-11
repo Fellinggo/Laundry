@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/help_model.dart';
 
-class HelpController
-    extends
-        ChangeNotifier {
+class HelpController extends ChangeNotifier {
   final HelpModel _helpData = const HelpModel(
     paragraphs: [
       'Jika anda mengalami kendala saat menggunakan aplikasi, silahkan hubungi layanan pelanggan kami melalui kontak yang tersedia. Tim kami akan membantu menyelesaikan masalah secepat mungkin.',

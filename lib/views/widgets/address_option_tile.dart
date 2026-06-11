@@ -25,7 +25,9 @@ class AddressOptionTile extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         margin: const EdgeInsets.only(bottom: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.inputFill.withOpacity(0.1) : AppColors.inputFill,
+          color: isSelected
+              ? AppColors.inputFill.withOpacity(0.1)
+              : AppColors.inputFill,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isSelected ? AppColors.inputFill : Colors.transparent,
@@ -54,9 +56,7 @@ class AddressOptionTile extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     address,
-                    style: AppTextStyles.bodyMuted.copyWith(
-                      fontSize: 12,
-                    ),
+                    style: AppTextStyles.bodyMuted.copyWith(fontSize: 12),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),

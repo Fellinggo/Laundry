@@ -1,10 +1,5 @@
 class HelpModel {
-  final List<
-    String
-  >
-  paragraphs;
+  final List<String> paragraphs;
 
-  const HelpModel({
-    required this.paragraphs,
-  });
+  const HelpModel({required this.paragraphs});
 }
