@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wushlaundry/controllers/home_controller.dart';
 import 'core/constants/app_colors.dart';
 
 // Controllers / Providers
@@ -11,6 +10,7 @@ import 'features/auth/controllers/onboarding_controller.dart';
 import 'features/auth/controllers/register_controller.dart';
 import 'features/auth/controllers/splash_controller.dart';
 import 'features/help/controllers/help_controller.dart';
+import 'features/home/controllers/home_controller.dart';
 import 'features/home/controllers/offer_controller.dart';
 import 'features/home/controllers/service_controller.dart';
 import 'features/home/controllers/service_detail_controller.dart';
