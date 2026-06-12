@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../Data1/models/service_model.dart';
+import '../../../Data1/models/service/service_model.dart';
 import '../../shared/widgets/login_modal_sheet.dart';
 
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../Data1/models/order_item_model.dart';
-import '../../../Data1/models/service_detail_model.dart';
+import '../../../Data1/models/order/order_item_model.dart';
+import '../../../Data1/models/service/service_detail_model.dart';
 
 
 class ServiceDetailController extends ChangeNotifier {

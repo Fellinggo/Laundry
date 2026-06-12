@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../Data1/models/notification_model.dart';
+import '../../../Data1/models/static/notification_model.dart';
 
 class NotificationsController extends ChangeNotifier {
   int _currentFilter = NotificationFilter.all;

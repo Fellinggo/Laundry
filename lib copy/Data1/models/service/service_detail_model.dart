@@ -1,4 +1,4 @@
-import 'order_item_model.dart';
+import '../order/order_item_model.dart';
 
 class ServiceDetailModel {
   final List<OrderItemModel> services;

@@ -1,12 +1,12 @@
 class OrderModel {
   final String orderId;
   final String service;
-  final int qty;               // int
+  final int qty;               // dari MockAPI: Number
   final String pickupTime;
   final String deliveryTime;
-  final String totalPrice;        // int
+  final int totalPrice;        // dari MockAPI: Number (bukan String)
   final String address;
-  final String itemsJson;      // jika backend mengirim string JSON
+  final String itemsJson;
 
   OrderModel({
     required this.orderId,
@@ -19,39 +19,38 @@ class OrderModel {
     required this.itemsJson,
   });
 
+  /// Parsing dari JSON MockAPI ke object OrderModel
   factory OrderModel.fromJson(Map<String, dynamic> map) {
     return OrderModel(
       orderId: map['orderId']?.toString() ?? '',
       service: map['service'] ?? '',
-      // parsing qty: pastikan menjadi int
-      qty: map['qty'] is int ? map['qty'] : int.tryParse(map['qty']?.toString() ?? '0') ?? 0,
+      // qty: langsung as int karena dari Number
+      qty: map['qty'] as int? ?? 0,
       pickupTime: map['pickupTime'] ?? '',
       deliveryTime: map['deliveryTime'] ?? '',
-      // parsing totalPrice: pastikan menjadi int (tanpa 'Rp')
-      totalPrice: map['totalPrice'] is int 
-          ? map['totalPrice'] 
-          : int.tryParse(map['totalPrice']?.toString().replaceAll(RegExp(r'[^0-9]'), '') ?? '0') ?? 0,
+      // totalPrice: langsung as int karena dari Number
+      totalPrice: map['totalPrice'] as int? ?? 0,
       address: map['address'] ?? '',
       itemsJson: map['itemsJson'] ?? '',
     );
   }
 
+  /// Konversi object ke JSON untuk dikirim ke API (POST/PUT)
   Map<String, dynamic> toJson() {
     return {
       'orderId': orderId,
       'service': service,
-      'qty': qty,
+      'qty': qty,               // langsung kirim int
       'pickupTime': pickupTime,
       'deliveryTime': deliveryTime,
-      'totalPrice': totalPrice,
+      'totalPrice': totalPrice, // langsung kirim int (karena API terima Number)
       'address': address,
       'itemsJson': itemsJson,
     };
   }
 
+  // Properti tambahan (opsional)
   bool get isDummyOrder => orderId == '100001';
   int get currentStep => isDummyOrder ? 2 : 0;
   String get badgeLabel => isDummyOrder ? 'Dicuci' : 'Diproses';
-  
-  // HAPUS baris static Object? fromJson(json) {} yang tidak berguna
 }

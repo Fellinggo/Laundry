@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../Data1/models/order_model.dart';
-import '../../../Data1/models/user_model.dart';
+import '../../../Data1/models/order/order_model.dart';
+import '../../../Data1/models/auth/user_model.dart';
 import '../../../core/utils/formatter.dart';
 
 

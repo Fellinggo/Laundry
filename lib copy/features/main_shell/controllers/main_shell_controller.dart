@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../Data1/models/main_shell_model.dart';
+import '../../../Data1/models/core/main_shell_model.dart';
 import '../../home/views/home_screen.dart';
 import '../../order/views/my_orders_screen.dart';
 import '../../shared/widgets/login_modal_sheet.dart';

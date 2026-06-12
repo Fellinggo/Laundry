@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../Data1/models/pickup_schedule_model.dart';
+import '../../../Data1/models/schedule/pickup_schedule_model.dart';
 import '../../profile/controllers/address_selector_controller.dart';
 
 

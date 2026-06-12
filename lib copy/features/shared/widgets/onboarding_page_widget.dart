@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../Data1/models/onboardinng_model.dart';
+import '../../../Data1/models/static/onboardinng_model.dart';
 import '../../../core/constants/app_text_styles.dart';
 
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../Data1/models/login_model.dart';
+import '../../../Data1/models/auth/login_model.dart';
 
 class LoginController extends ChangeNotifier {
   bool _obscure = true;

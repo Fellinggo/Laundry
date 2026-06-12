@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../Data1/models/onboardinng_model.dart';
+import '../../../Data1/models/static/onboardinng_model.dart';
 
 class OnboardingController extends ChangeNotifier {
   final PageController pageController = PageController();

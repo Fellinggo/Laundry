@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../Data1/models/help_model.dart';
+import '../../../Data1/models/static/help_model.dart';
 
 class HelpController extends ChangeNotifier {
   final HelpModel _helpData = const HelpModel(

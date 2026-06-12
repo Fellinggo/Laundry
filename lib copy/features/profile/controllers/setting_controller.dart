@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../Data1/models/setting_model.dart';
+import '../../../Data1/models/static/setting_model.dart';
 import '../../shared/widgets/confirmation_dialog_widget.dart';
 import '../../shared/widgets/language_sheet_widget.dart';
 

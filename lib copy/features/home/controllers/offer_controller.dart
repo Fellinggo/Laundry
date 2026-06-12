@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../Data1/models/offer_model.dart';
+import '../../../Data1/models/static/offer_model.dart';
 import '../../shared/widgets/login_modal_sheet.dart';
 
 

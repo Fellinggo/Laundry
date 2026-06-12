@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../Data1/models/about_model.dart';
+import '../../../Data1/models/static/about_model.dart';
 
 
 class AboutController extends ChangeNotifier {

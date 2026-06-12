@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../Data1/models/terms_model.dart';
+import '../../../Data1/models/static/terms_model.dart';
 
 
 class TermsController extends ChangeNotifier {

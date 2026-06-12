@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../Data1/models/user_order_model.dart';
+import '../../../Data1/models/order/user_order_model.dart';
 
 
 class MyOrdersController extends ChangeNotifier {

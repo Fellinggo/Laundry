@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../../Data1/models/splash_model.dart';
+import '../../../Data1/models/core/splash_model.dart';
 
 class SplashController extends ChangeNotifier {
   SplashModel _splashModel = SplashModel.defaultSplash();

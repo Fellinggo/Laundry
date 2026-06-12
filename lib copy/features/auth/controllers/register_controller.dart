@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../Data1/models/registration_model.dart';
+import '../../../Data1/models/auth/registration_model.dart';
 
 class RegisterController extends ChangeNotifier {
   RegistrationData _data = RegistrationData(

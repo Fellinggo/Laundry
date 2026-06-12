@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../Data1/models/address_model.dart';
+import '../../../Data1/models/profile/address_model.dart';
 
 
 class AddAddressController extends ChangeNotifier {

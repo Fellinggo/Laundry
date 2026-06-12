@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../Data1/models/order_review_model.dart';
+import '../../../Data1/models/order/order_review_model.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import 'order_review_item_row.dart';

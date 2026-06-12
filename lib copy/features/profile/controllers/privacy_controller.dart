@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../Data1/models/privacy_policy_model.dart';
+import '../../../Data1/models/static/privacy_policy_model.dart';
 
 class PrivacyPolicyController extends ChangeNotifier {
   PrivacyPolicyModel _policyModel = PrivacyPolicyModel.defaultPolicy();

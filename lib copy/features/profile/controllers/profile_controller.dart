@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../Data1/models/address_model.dart';
-import '../../../Data1/models/profile_model.dart';
+import '../../../Data1/models/profile/address_model.dart';
+import '../../../Data1/models/profile/profile_model.dart';
 
 
 class ProfileController extends ChangeNotifier {

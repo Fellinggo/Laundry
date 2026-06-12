@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../Data1/models/pin_entry_model.dart';
+import '../../../Data1/models/auth/pin_entry_model.dart';
 
 
 class PinEntryController extends ChangeNotifier {
