@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wushlaundry/models/onboardinng_model.dart';
-import '../../../constants/app_text_styles.dart';
+import 'package:wushlaundry/models/static/onboardinng_model.dart';
+import '../../core/constants/app_text_styles.dart';
 
 class OnboardingPageWidget
     extends

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../constants/app_colors.dart';
-import '../../../constants/app_text_styles.dart';
-import '../../../models/order_detail_model.dart';
+import '../../core/constants/app_colors.dart';
+import '../../core/constants/app_text_styles.dart';
+import '../../models/order/order_detail_model.dart';
 
 class OrderDetailItemRow
     extends

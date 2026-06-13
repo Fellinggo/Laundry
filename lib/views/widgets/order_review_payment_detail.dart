@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../constants/app_colors.dart';
-import '../../../constants/app_text_styles.dart';
+import '../../core/constants/app_colors.dart';
+import '../../core/constants/app_text_styles.dart';
 import 'info_kv_row.dart';
 
 class OrderReviewPaymentDetail

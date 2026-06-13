@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:wushlaundry/models/setting_model.dart';
-import '../../../constants/app_colors.dart';
-import '../../../constants/app_spacing.dart';
-import '../../../constants/app_text_styles.dart';
+import 'package:wushlaundry/models/static/setting_model.dart';
+import '../../core/constants/app_colors.dart';
+import '../../core/constants/app_spacing.dart';
+import '../../core/constants/app_text_styles.dart';
 
 class LanguageSheetWidget
     extends

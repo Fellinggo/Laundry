@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:wushlaundry/views/widgets/eta_badge.dart';
-import '../../../constants/app_colors.dart';
-import '../../../constants/app_text_styles.dart';
+import '../../core/constants/app_colors.dart';
+import '../../core/constants/app_text_styles.dart';
+import '../../core/utils/image_helper.dart';
 
-class ServiceGridCard
-    extends
-        StatelessWidget {
+class ServiceGridCard extends StatelessWidget {
   final String title;
   final String price;
   final String eta;
   final dynamic etaType;
-  final String imagePath;
+  final String imageKeyword; // Menggunakan keyword, bukan path
   final VoidCallback onTap;
 
   const ServiceGridCard({
@@ -19,42 +18,26 @@ class ServiceGridCard
     required this.price,
     required this.eta,
     required this.etaType,
-    required this.imagePath,
+    required this.imageKeyword,
     required this.onTap,
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color.fromARGB(
-          255,
-          255,
-          255,
-          255,
-        ),
-        borderRadius: BorderRadius.circular(
-          16,
-        ),
+        color: const Color.fromARGB(255, 255, 255, 255),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
-              0.36,
-            ),
+            color: Colors.black.withOpacity(0.36),
             blurRadius: 10,
-            offset: const Offset(
-              0,
-              4,
-            ),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(
-          16,
-        ),
+        borderRadius: BorderRadius.circular(16),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
@@ -66,8 +49,9 @@ class ServiceGridCard
                   flex: 5,
                   child: Stack(
                     children: [
-                      Image.asset(
-                        imagePath,
+                      // Menggunakan ImageHelper dengan keyword
+                      ImageHelper.buildServiceImage(
+                        imageKeyword: imageKeyword,
                         width: double.infinity,
                         height: double.infinity,
                         fit: BoxFit.cover,
@@ -84,9 +68,7 @@ class ServiceGridCard
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(
-                    12,
-                  ),
+                  padding: const EdgeInsets.all(12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -97,9 +79,7 @@ class ServiceGridCard
                           color: Colors.grey[600],
                         ),
                       ),
-                      const SizedBox(
-                        height: 2,
-                      ),
+                      const SizedBox(height: 2),
                       Text(
                         title,
                         maxLines: 1,

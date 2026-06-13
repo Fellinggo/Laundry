@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:wushlaundry/views/widgets/eta_badge.dart';
-import '../../../constants/app_text_styles.dart';
+import '../../core/constants/app_text_styles.dart';
+import '../../core/utils/image_helper.dart';
 
-class ServiceWideCard
-    extends
-        StatelessWidget {
+class ServiceWideCard extends StatelessWidget {
   final String title;
   final String price;
   final String eta;
-  final String imagePath;
+  final String imageKeyword; // Menggunakan keyword, bukan path
   final VoidCallback onTap;
 
   const ServiceWideCard({
@@ -16,38 +15,27 @@ class ServiceWideCard
     required this.title,
     required this.price,
     required this.eta,
-    required this.imagePath,
+    required this.imageKeyword,
     required this.onTap,
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(
-          16,
-        ),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
-              0.36,
-            ),
+            color: Colors.black.withOpacity(0.36),
             blurRadius: 10,
-            offset: const Offset(
-              0,
-              4,
-            ),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(
-          16,
-        ),
+        borderRadius: BorderRadius.circular(16),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
@@ -57,8 +45,9 @@ class ServiceWideCard
               children: [
                 Stack(
                   children: [
-                    Image.asset(
-                      imagePath,
+                    // Menggunakan ImageHelper dengan keyword
+                    ImageHelper.buildServiceImage(
+                      imageKeyword: imageKeyword,
                       height: 120,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -74,9 +63,7 @@ class ServiceWideCard
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(
-                    14,
-                  ),
+                  padding: const EdgeInsets.all(14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -86,9 +73,7 @@ class ServiceWideCard
                           fontSize: 12,
                         ),
                       ),
-                      const SizedBox(
-                        height: 2,
-                      ),
+                      const SizedBox(height: 2),
                       Text(
                         title,
                         style: AppTextStyles.sectionTitle.copyWith(

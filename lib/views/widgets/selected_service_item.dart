@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wushlaundry/views/widgets/quantity_stepper.dart';
-import '../../../constants/app_text_styles.dart';
+import '../../core/constants/app_text_styles.dart';
 
 class SelectedServiceItem
     extends

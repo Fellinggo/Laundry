@@ -1,4 +1,4 @@
-import 'package:wushlaundry/models/address_model.dart';
+import 'package:wushlaundry/models/profile/address_model.dart';
 
 class AddressModelDummy {
   static List<

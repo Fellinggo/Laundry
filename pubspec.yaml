@@ -34,6 +34,7 @@ dependencies:
   google_fonts: ^6.1.0
   shared_preferences: ^2.5.5
   image_picker: ^1.0.7
+  dio: ^5.0.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -78,6 +79,14 @@ flutter:
     - assets/images/payday.png
     - assets/images/diskn bed.png
     - assets/images/
+    - assets/images/Cucireg.png
+    - assets/images/Cucisetrika.png
+    - assets/images/kering.png
+    - assets/images/paket.png
+    - assets/images/jasgaun.png
+    - assets/images/setrikasaja.png
+    - assets/images/sprei.png
+    - assets/images/sepatu.png
   fonts:
     - family: Poppins
       fonts:

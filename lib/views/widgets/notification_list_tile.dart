@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../constants/app_text_styles.dart';
+import '../../core/constants/app_text_styles.dart';
 
 class NotificationListTile
     extends
