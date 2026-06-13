@@ -145,7 +145,6 @@ class RegisterController extends ChangeNotifier {
   void navigateToMain(
     BuildContext context,
   ) async {
-    // Refresh HomeController sebelum navigasi
     if (context.mounted) {
       final homeController = context.read<HomeController>();
       await homeController.refreshData();
